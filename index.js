@@ -3,10 +3,9 @@ const app = express();
 const { Client, GatewayIntentBits } = require("discord.js");
 const fs = require("fs");
 
-// ===== PORTA RENDER =====
 const PORT = process.env.PORT || 3000;
+const PREFIX = ".";
 
-// ===== WEB SERVER (per Render) =====
 app.get("/", (req, res) => {
   res.send("Bot is alive");
 });
@@ -15,12 +14,10 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
 });
 
-// ===== DEBUG TOKEN =====
 console.log("Starting Hero-Dex...");
 console.log("Token exists?", !!process.env.TOKEN);
 console.log("Token length:", process.env.TOKEN ? process.env.TOKEN.length : 0);
 
-// ===== DISCORD CLIENT =====
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -29,14 +26,10 @@ const client = new Client({
   ]
 });
 
-const PREFIX = ".";
-
-// ===== BOT ONLINE =====
 client.once("ready", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 });
 
-// ===== ERROR HANDLING =====
 client.on("error", (err) => {
   console.error("Client error:", err);
 });
@@ -45,7 +38,15 @@ client.on("shardError", (err) => {
   console.error("Shard error:", err);
 });
 
-// ===== COMANDI =====
+function getPdfFiles() {
+  try {
+    return fs.readdirSync("./pdf").filter(file => file.toLowerCase().endsWith(".pdf"));
+  } catch (err) {
+    console.log("Cartella pdf non trovata o vuota");
+    return [];
+  }
+}
+
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith(PREFIX)) return;
@@ -53,9 +54,8 @@ client.on("messageCreate", async (message) => {
   const args = message.content.slice(PREFIX.length).trim().toLowerCase().split(/ +/);
   const command = args[0];
 
-  // ===== LISTA HEROES =====
   if (command === "heroes") {
-    const files = fs.readdirSync("./pdf").filter(f => f.endsWith(".pdf"));
+    const files = getPdfFiles();
     const categories = {};
 
     files.forEach(file => {
@@ -89,8 +89,7 @@ client.on("messageCreate", async (message) => {
     return;
   }
 
-  // ===== CERCA HERO =====
-  const files = fs.readdirSync("./pdf").filter(f => f.endsWith(".pdf"));
+  const files = getPdfFiles();
   const file = files.find(f => f.toLowerCase().includes(command));
 
   if (file) {
@@ -103,7 +102,6 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-// ===== LOGIN =====
 client.login(process.env.TOKEN)
   .then(() => {
     console.log("Login request sent");
