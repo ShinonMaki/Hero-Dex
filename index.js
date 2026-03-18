@@ -1,11 +1,24 @@
 const express = require("express");
 const app = express();
-const { Client, GatewayIntentBits } = require("discord.js");
 const fs = require("fs");
+const path = require("path");
+
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  AttachmentBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require("discord.js");
+
+const heroesData = require("./heroes.json");
 
 const PORT = process.env.PORT || 3000;
 const PREFIX = ".";
 
+// ===== SERVER =====
 app.get("/", (req, res) => {
   res.send("Bot is alive");
 });
@@ -14,10 +27,18 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
 });
 
-console.log("Starting Hero-Dex...");
-console.log("Token exists?", !!process.env.TOKEN);
-console.log("Token length:", process.env.TOKEN ? process.env.TOKEN.length : 0);
+// ===== COLORI TYPE =====
+const typeColors = {
+  truth: 0x2ecc71,
+  order: 0x3498db,
+  combat: 0xe74c3c,
+  light: 0xf1c40f,
+  dark: 0x8e44ad,
+  chaos: 0x7f8c8d,
+  default: 0x95a5a6
+};
 
+// ===== BOT =====
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -26,45 +47,54 @@ const client = new Client({
   ]
 });
 
-client.once("ready", () => {
+client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 });
 
-client.on("error", (err) => {
-  console.error("Client error:", err);
-});
-
-client.on("shardError", (err) => {
-  console.error("Shard error:", err);
-});
-
-function getPdfFiles() {
+// ===== FUNZIONI FILE =====
+function getFiles(folder, exts) {
   try {
-    return fs.readdirSync("./pdf").filter(file => file.toLowerCase().endsWith(".pdf"));
-  } catch (err) {
-    console.log("Cartella pdf non trovata o vuota");
+    return fs.readdirSync(folder).filter(file =>
+      exts.includes(path.extname(file).toLowerCase())
+    );
+  } catch {
     return [];
   }
 }
 
+function findPdf(hero) {
+  const files = getFiles("./pdf", [".pdf"]);
+  return files.find(f =>
+    path.basename(f, ".pdf").toLowerCase().endsWith(`_${hero}`) ||
+    path.basename(f, ".pdf").toLowerCase() === hero
+  );
+}
+
+function findImage(hero) {
+  const files = getFiles("./images", [".png", ".jpg", ".jpeg", ".webp"]);
+  return files.find(f =>
+    path.parse(f).name.toLowerCase() === hero
+  );
+}
+
+// ===== COMANDI =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith(PREFIX)) return;
 
-  const args = message.content.slice(PREFIX.length).trim().toLowerCase().split(/ +/);
-  const command = args[0];
+  const command = message.content.slice(1).trim().toLowerCase();
 
+  // ===== HERO LIST =====
   if (command === "heroes") {
-    const files = getPdfFiles();
+    const files = getFiles("./pdf", [".pdf"]);
     const categories = {};
 
     files.forEach(file => {
       const name = file.replace(".pdf", "");
-      const parts = name.split("_");
-      const cats = parts[0].split("+");
-      const hero = parts[1];
-
+      const [catsPart, hero] = name.split("_");
       if (!hero) return;
+
+      const cats = catsPart.split("+");
 
       cats.forEach(cat => {
         if (!categories[cat]) categories[cat] = [];
@@ -76,36 +106,77 @@ client.on("messageCreate", async (message) => {
 
     let reply = "**Hero List:**\n";
 
-    for (const cat in categories) {
+    Object.keys(categories).sort().forEach(cat => {
       reply += `\n__${cat.toUpperCase()}__:\n`;
-      reply += categories[cat].map(h => `- ${h}`).join("\n") + "\n";
-    }
+      reply += categories[cat].sort().map(h => `- ${h}`).join("\n") + "\n";
+    });
 
-    if (reply === "**Hero List:**\n") {
-      reply = "No heroes found.";
-    }
-
-    message.reply(reply);
-    return;
+    return message.reply(reply || "No heroes found.");
   }
 
-  const files = getPdfFiles();
-  const file = files.find(f => f.toLowerCase().includes(command));
+  // ===== HERO CARD =====
+  const hero = command;
+  const data = heroesData[hero];
 
-  if (file) {
-    message.reply({
-      content: `Here is ${command}`,
-      files: [`./pdf/${file}`]
+  const pdf = findPdf(hero);
+  if (!pdf) return message.reply("Hero not found.");
+
+  const imageFile = findImage(hero);
+
+  const type = data?.type?.toLowerCase() || "default";
+  const color = typeColors[type] || typeColors.default;
+
+  const embed = new EmbedBuilder()
+    .setColor(color)
+    .setImage(imageFile ? `attachment://${hero}.png` : null)
+    .addFields(
+      { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
+      { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
+      { name: "Type", value: data?.type || "Unknown" },
+      { name: "Category", value: data?.category || "Unknown" }
+    );
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`guide_${hero}`)
+      .setLabel("GUIDE")
+      .setStyle(ButtonStyle.Primary)
+  );
+
+  const files = [];
+  if (imageFile) {
+    files.push(new AttachmentBuilder(`./images/${imageFile}`, { name: `${hero}.png` }));
+  }
+
+  await message.reply({
+    embeds: [embed],
+    components: [row],
+    files
+  });
+});
+
+// ===== BUTTON CLICK =====
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  if (interaction.customId.startsWith("guide_")) {
+    const hero = interaction.customId.replace("guide_", "");
+    const pdf = findPdf(hero);
+
+    if (!pdf) {
+      return interaction.reply({
+        content: "Guide not found.",
+        ephemeral: true
+      });
+    }
+
+    return interaction.reply({
+      content: `Guide for ${hero}`,
+      files: [`./pdf/${pdf}`],
+      ephemeral: true
     });
-  } else {
-    message.reply("Hero not found.");
   }
 });
 
-client.login(process.env.TOKEN)
-  .then(() => {
-    console.log("Login request sent");
-  })
-  .catch((err) => {
-    console.error("Login error:", err);
-  });
+// ===== LOGIN =====
+client.login(process.env.TOKEN);
