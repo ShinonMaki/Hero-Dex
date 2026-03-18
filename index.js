@@ -84,7 +84,6 @@ client.on("messageCreate", async (message) => {
 
   const command = message.content.slice(1).trim().toLowerCase();
 
-  // ===== HERO LIST =====
   if (command === "heroes") {
     const files = getFiles("./pdf", [".pdf"]);
     const categories = {};
@@ -114,7 +113,6 @@ client.on("messageCreate", async (message) => {
     return message.reply(reply || "No heroes found.");
   }
 
-  // ===== HERO CARD =====
   const hero = command;
   const data = heroesData[hero];
 
@@ -161,20 +159,25 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.customId.startsWith("guide_")) {
     const hero = interaction.customId.replace("guide_", "");
-    const pdf = findPdf(hero);
 
-    if (!pdf) {
-      return interaction.reply({
-        content: "Guide not found.",
-        ephemeral: true
+    try {
+      await interaction.deferReply({ ephemeral: true });
+
+      const pdf = findPdf(hero);
+
+      if (!pdf) {
+        return interaction.editReply({
+          content: "Guide not found."
+        });
+      }
+
+      return interaction.editReply({
+        content: `Guide for ${hero}`,
+        files: [`./pdf/${pdf}`]
       });
+    } catch (err) {
+      console.error("Guide button error:", err);
     }
-
-    return interaction.reply({
-      content: `Guide for ${hero}`,
-      files: [`./pdf/${pdf}`],
-      ephemeral: true
-    });
   }
 });
 
