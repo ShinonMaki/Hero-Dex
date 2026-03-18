@@ -1,1 +1,7 @@
-
+{
+  "madara": {
+    "roles": ["Burst", "DPS"],
+    "type": "Chaos",
+    "category": "Blazing"
+  }
+}
