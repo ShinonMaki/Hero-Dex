@@ -10,7 +10,8 @@ const {
   AttachmentBuilder,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle
+  ButtonStyle,
+  StringSelectMenuBuilder
 } = require("discord.js");
 
 const heroesData = require("./heroes.json");
@@ -77,6 +78,16 @@ function findImage(hero) {
   );
 }
 
+function getTierlistFiles() {
+  return getFiles("./tierlist", [".png", ".jpg", ".jpeg", ".webp", ".pdf"]);
+}
+
+function formatFileLabel(text) {
+  return text
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 // ===== COMANDI =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
@@ -84,6 +95,10 @@ client.on("messageCreate", async (message) => {
 
   const command = message.content.slice(1).trim().toLowerCase();
 
+  // Ignora "." da solo
+  if (!command) return;
+
+  // ===== HERO LIST =====
   if (command === "heroes") {
     const files = getFiles("./pdf", [".pdf"]);
     const categories = {};
@@ -106,18 +121,64 @@ client.on("messageCreate", async (message) => {
     let reply = "**Hero List:**\n";
 
     Object.keys(categories).sort().forEach(cat => {
-      reply += `\n__${cat.toUpperCase()}__:\n`;
+      reply += `\n__${formatFileLabel(cat)}__:\n`;
       reply += categories[cat].sort().map(h => `- ${h}`).join("\n") + "\n";
     });
 
     return message.reply(reply || "No heroes found.");
   }
 
+  // ===== TIERLIST =====
+  if (command === "tierlist") {
+    const tierlistFiles = getTierlistFiles();
+
+    if (tierlistFiles.length === 0) {
+      return message.reply("No tierlists found.");
+    }
+
+    const tierlistNames = tierlistFiles.map(file =>
+      formatFileLabel(path.parse(file).name)
+    );
+
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle("📊 Tierlist Hub")
+      .setDescription("Choose a tierlist from the menu below.")
+      .addFields({
+        name: "Available Tierlists",
+        value: tierlistNames.map(name => `• ${name}`).join("\n")
+      })
+      .setFooter({ text: "Hero-Dex System" });
+
+    const options = tierlistFiles.slice(0, 25).map(file => {
+      const name = path.parse(file).name;
+      return {
+        label: formatFileLabel(name).slice(0, 100),
+        value: name
+      };
+    });
+
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId("tierlist_menu")
+        .setPlaceholder("Choose a tierlist")
+        .addOptions(options)
+    );
+
+    return message.reply({
+      embeds: [embed],
+      components: [row]
+    });
+  }
+
+  // ===== HERO CARD =====
   const hero = command;
   const data = heroesData[hero];
 
   const pdf = findPdf(hero);
-  if (!pdf) return message.reply("Hero not found.");
+
+  // Ignora comandi inesistenti senza scrivere "Hero not found."
+  if (!pdf) return;
 
   const imageFile = findImage(hero);
 
@@ -153,11 +214,10 @@ client.on("messageCreate", async (message) => {
   });
 });
 
-// ===== BUTTON CLICK =====
+// ===== INTERAZIONI =====
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isButton()) return;
-
-  if (interaction.customId.startsWith("guide_")) {
+  // ===== GUIDE BUTTON =====
+  if (interaction.isButton() && interaction.customId.startsWith("guide_")) {
     const hero = interaction.customId.replace("guide_", "");
 
     try {
@@ -177,6 +237,33 @@ client.on("interactionCreate", async (interaction) => {
       });
     } catch (err) {
       console.error("Guide button error:", err);
+    }
+
+    return;
+  }
+
+  // ===== TIERLIST MENU =====
+  if (interaction.isStringSelectMenu() && interaction.customId === "tierlist_menu") {
+    const selected = interaction.values[0];
+    const tierlistFiles = getTierlistFiles();
+
+    const selectedFile = tierlistFiles.find(file => path.parse(file).name === selected);
+
+    try {
+      await interaction.deferReply({ ephemeral: true });
+
+      if (!selectedFile) {
+        return interaction.editReply({
+          content: "Tierlist not found."
+        });
+      }
+
+      return interaction.editReply({
+        content: formatFileLabel(selected),
+        files: [`./tierlist/${selectedFile}`]
+      });
+    } catch (err) {
+      console.error("Tierlist menu error:", err);
     }
   }
 });
