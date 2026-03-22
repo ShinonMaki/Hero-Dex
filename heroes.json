@@ -1,16 +1,27 @@
 {
   "madara": {
-    "roles": ["Hyper Carry Hybrid Mage"],
+    "roles": [
+      "Hyper Carry Hybrid Mage"
+    ],
     "type": "Chaos",
     "category": "Blazing"
   },
-
   "lux": {
-    "roles": ["Utility Tanker", "Support"],
+    "roles": [
+      "Utility Tanker",
+      "Support"
+    ],
     "type": "Light",
     "category": [
       "LTD Immortal Leggendary(NA/EU)",
       "LTD Transcendent (TW/Rumble)"
     ]
+  },
+  "herotest1": {
+    "roles": [
+      "Test"
+    ],
+    "type": "Supertest",
+    "category": "Cattest"
   }
 }
