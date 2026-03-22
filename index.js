@@ -22,8 +22,9 @@ const heroesData = require("./heroes.json");
 const PORT = process.env.PORT || 3000;
 const PREFIX = ".";
 
-// ===== ADD HERO SESSIONS =====
+// ===== HERO SESSIONS =====
 const heroCreationSessions = new Map();
+const heroDeleteSessions = new Map();
 
 // ===== SERVER =====
 app.get("/", (req, res) => {
@@ -255,6 +256,81 @@ client.on("messageCreate", async (message) => {
     }
   }
 
+  // ===== HERO DELETE FLOW =====
+  if (heroDeleteSessions.has(message.author.id)) {
+    const session = heroDeleteSessions.get(message.author.id);
+    const content = message.content.trim().toLowerCase();
+
+    if (content === ".canceldelete") {
+      heroDeleteSessions.delete(message.author.id);
+      return message.reply("Hero deletion cancelled.");
+    }
+
+    try {
+      // STEP 1 - NAME
+      if (session.step === 1) {
+        const hero = content;
+
+        if (!heroesData[hero]) {
+          return message.reply("Hero not found. Try again.");
+        }
+
+        session.hero = hero;
+        session.step = 2;
+
+        return message.reply(`Are you sure you want to delete **${formatFileLabel(hero)}**? (yes/no)`);
+      }
+
+      // STEP 2 - CONFIRM
+      if (session.step === 2) {
+        if (content !== "yes") {
+          heroDeleteSessions.delete(message.author.id);
+          return message.reply("Deletion cancelled.");
+        }
+
+        const hero = session.hero;
+
+        // remove from JSON
+        delete heroesData[hero];
+        saveHeroesJson();
+
+        // remove image
+        const imageFile = findImage(hero);
+        if (imageFile) {
+          fs.unlinkSync(`./images/${imageFile}`);
+        }
+
+        // remove pdf
+        const pdfFile = findPdf(hero);
+        if (pdfFile) {
+          fs.unlinkSync(`./pdf/${pdfFile}`);
+        }
+
+        heroDeleteSessions.delete(message.author.id);
+
+        exec(
+          `cd /root/Hero-Dex && git add heroes.json images pdf && git commit -m "Delete hero: ${hero}" && git push`,
+          (err, stdout, stderr) => {
+            if (err) {
+              console.error("Git delete push error:", err);
+              console.error(stderr);
+              return;
+            }
+
+            console.log("Git delete push success:");
+            console.log(stdout);
+          }
+        );
+
+        return message.reply(`Hero deleted successfully: ${formatFileLabel(hero)}`);
+      }
+    } catch (err) {
+      console.error("Delete hero error:", err);
+      heroDeleteSessions.delete(message.author.id);
+      return message.reply("Something went wrong while deleting the hero.");
+    }
+  }
+
   if (!message.content.startsWith(PREFIX)) return;
 
   const command = message.content.slice(1).trim().toLowerCase();
@@ -270,6 +346,20 @@ client.on("messageCreate", async (message) => {
     heroCreationSessions.set(message.author.id, {
       step: 1,
       data: {}
+    });
+
+    return message.reply("Hero name?");
+  }
+
+  // ===== DELETE HERO START =====
+  if (command === "deletehero") {
+    if (heroDeleteSessions.has(message.author.id)) {
+      return message.reply("You are already deleting a hero.");
+    }
+
+    heroDeleteSessions.set(message.author.id, {
+      step: 1,
+      hero: null
     });
 
     return message.reply("Hero name?");
