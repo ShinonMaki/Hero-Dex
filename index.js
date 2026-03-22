@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const fs = require("fs");
@@ -279,7 +281,7 @@ client.on("shardError", (err) => {
   console.error("Shard error:", err);
 });
 
-console.log("TOKEN:", process.env.TOKEN);
+console.log("TOKEN exists:", !!process.env.TOKEN);
 
 client.login(process.env.TOKEN)
   .then(() => {
