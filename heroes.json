@@ -16,12 +16,5 @@
       "LTD Immortal Leggendary(NA/EU)",
       "LTD Transcendent (TW/Rumble)"
     ]
-  },
-  "herotest1": {
-    "roles": [
-      "Test"
-    ],
-    "type": "Supertest",
-    "category": "Cattest"
   }
 }
