@@ -23,12 +23,5 @@
     ],
     "type": "Supertest",
     "category": "Cattest"
-  },
-  "herotest2": {
-    "roles": [
-      "DPS"
-    ],
-    "type": "Chaos",
-    "category": "Test"
   }
 }
