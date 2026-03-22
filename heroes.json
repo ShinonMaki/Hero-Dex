@@ -16,5 +16,12 @@
       "LTD Immortal Leggendary(NA/EU)",
       "LTD Transcendent (TW/Rumble)"
     ]
+  },
+  "shea": {
+    "roles": [
+      "Admin"
+    ],
+    "type": "Honey",
+    "category": "Sweety"
   }
 }
