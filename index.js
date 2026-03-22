@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const path = require("path");
+const { exec } = require("child_process");
 
 const {
   Client,
@@ -227,9 +228,25 @@ client.on("messageCreate", async (message) => {
         };
 
         saveHeroesJson();
+
+        const heroName = session.data.name;
         heroCreationSessions.delete(message.author.id);
 
-        return message.reply(`Hero added successfully: ${formatFileLabel(session.data.name)}`);
+        exec(
+          `cd /root/Hero-Dex && git add heroes.json images pdf && git commit -m "Add hero: ${heroName}" && git push`,
+          (err, stdout, stderr) => {
+            if (err) {
+              console.error("Git push error:", err);
+              console.error(stderr);
+              return;
+            }
+
+            console.log("Git push success:");
+            console.log(stdout);
+          }
+        );
+
+        return message.reply(`Hero added successfully: ${formatFileLabel(heroName)}`);
       }
     } catch (err) {
       console.error("Add hero flow error:", err);
