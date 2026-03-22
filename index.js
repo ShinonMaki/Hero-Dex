@@ -279,6 +279,8 @@ client.on("shardError", (err) => {
   console.error("Shard error:", err);
 });
 
+console.log("TOKEN:", process.env.TOKEN);
+
 client.login(process.env.TOKEN)
   .then(() => {
     console.log("Login request sent");
