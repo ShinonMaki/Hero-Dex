@@ -48,10 +48,6 @@ const client = new Client({
   ]
 });
 
-client.once("clientReady", () => {
-  console.log(`Hero-Dex is online as ${client.user.tag}`);
-});
-
 // ===== FUNZIONI FILE =====
 function getFiles(folder, exts) {
   try {
@@ -95,7 +91,6 @@ client.on("messageCreate", async (message) => {
 
   const command = message.content.slice(1).trim().toLowerCase();
 
-  // Ignora "." da solo
   if (!command) return;
 
   // ===== HERO LIST =====
@@ -176,8 +171,6 @@ client.on("messageCreate", async (message) => {
   const data = heroesData[hero];
 
   const pdf = findPdf(hero);
-
-  // Ignora comandi inesistenti senza scrivere "Hero not found."
   if (!pdf) return;
 
   const imageFile = findImage(hero);
@@ -186,19 +179,19 @@ client.on("messageCreate", async (message) => {
   const color = typeColors[type] || typeColors.default;
 
   const embed = new EmbedBuilder()
-  .setColor(color)
-  .setImage(imageFile ? `attachment://${hero}.png` : null)
-  .addFields(
-    { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
-    { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
-    { name: "Type", value: data?.type || "Unknown" },
-    {
-      name: "Category",
-      value: Array.isArray(data?.category)
-        ? data.category.join(", ")
-        : data?.category || "Unknown"
-    }
-  );
+    .setColor(color)
+    .setImage(imageFile ? `attachment://${hero}.png` : null)
+    .addFields(
+      { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
+      { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
+      { name: "Type", value: data?.type || "Unknown" },
+      {
+        name: "Category",
+        value: Array.isArray(data?.category)
+          ? data.category.join(", ")
+          : data?.category || "Unknown"
+      }
+    );
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
@@ -273,5 +266,23 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// ===== LOGIN =====
-client.login(process.env.TOKEN);
+// ===== DEBUG LOGIN =====
+client.once("clientReady", () => {
+  console.log(`Hero-Dex is online as ${client.user.tag}`);
+});
+
+client.on("error", (err) => {
+  console.error("Client error:", err);
+});
+
+client.on("shardError", (err) => {
+  console.error("Shard error:", err);
+});
+
+client.login(process.env.TOKEN)
+  .then(() => {
+    console.log("Login request sent");
+  })
+  .catch((err) => {
+    console.error("Login error:", err);
+  });
