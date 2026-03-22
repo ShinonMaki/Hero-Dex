@@ -21,6 +21,9 @@ const heroesData = require("./heroes.json");
 const PORT = process.env.PORT || 3000;
 const PREFIX = ".";
 
+// ===== ADD HERO SESSIONS =====
+const heroCreationSessions = new Map();
+
 // ===== SERVER =====
 app.get("/", (req, res) => {
   res.send("Bot is alive");
@@ -61,6 +64,12 @@ function getFiles(folder, exts) {
   }
 }
 
+function ensureDir(folder) {
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder, { recursive: true });
+  }
+}
+
 function findPdf(hero) {
   const files = getFiles("./pdf", [".pdf"]);
   return files.find(f =>
@@ -86,40 +95,195 @@ function formatFileLabel(text) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function saveHeroesJson() {
+  fs.writeFileSync("./heroes.json", JSON.stringify(heroesData, null, 2));
+}
+
+async function downloadAttachment(url, destinationPath) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to download file: ${res.status}`);
+  }
+  const arrayBuffer = await res.arrayBuffer();
+  fs.writeFileSync(destinationPath, Buffer.from(arrayBuffer));
+}
+
 // ===== COMANDI =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+
+  // ===== HERO CREATION FLOW =====
+  if (heroCreationSessions.has(message.author.id)) {
+    const session = heroCreationSessions.get(message.author.id);
+
+    if (message.content.trim().toLowerCase() === ".cancelhero") {
+      heroCreationSessions.delete(message.author.id);
+      return message.reply("Hero creation cancelled.");
+    }
+
+    try {
+      // STEP 1 - NAME
+      if (session.step === 1) {
+        const heroName = message.content.trim().toLowerCase();
+
+        if (!heroName) {
+          return message.reply("Hero name?");
+        }
+
+        session.data.name = heroName;
+        session.step = 2;
+        return message.reply("Hero role?");
+      }
+
+      // STEP 2 - ROLE
+      if (session.step === 2) {
+        const roles = message.content
+          .split(",")
+          .map(r => r.trim())
+          .filter(Boolean);
+
+        if (roles.length === 0) {
+          return message.reply("Hero role?");
+        }
+
+        session.data.roles = roles;
+        session.step = 3;
+        return message.reply("Hero type?");
+      }
+
+      // STEP 3 - TYPE
+      if (session.step === 3) {
+        const type = message.content.trim();
+
+        if (!type) {
+          return message.reply("Hero type?");
+        }
+
+        session.data.type = type;
+        session.step = 4;
+        return message.reply("Hero category?");
+      }
+
+      // STEP 4 - CATEGORY
+      if (session.step === 4) {
+        const raw = message.content.trim();
+
+        if (!raw) {
+          return message.reply("Hero category?");
+        }
+
+        const categories = raw
+          .split(";")
+          .map(c => c.trim())
+          .filter(Boolean);
+
+        session.data.category = categories.length === 1 ? categories[0] : categories;
+        session.step = 5;
+        return message.reply("Hero image? Please send the image file.");
+      }
+
+      // STEP 5 - IMAGE
+      if (session.step === 5) {
+        if (message.attachments.size === 0) {
+          return message.reply("Hero image? Please send the image file.");
+        }
+
+        const attachment = message.attachments.first();
+        const ext = path.extname(attachment.name || "").toLowerCase();
+
+        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
+          return message.reply("Please send a valid image file (.png, .jpg, .jpeg, .webp).");
+        }
+
+        ensureDir("./images");
+        const imagePath = `./images/${session.data.name}${ext}`;
+        await downloadAttachment(attachment.url, imagePath);
+
+        session.step = 6;
+        return message.reply("Hero PDF? Please send the PDF file.");
+      }
+
+      // STEP 6 - PDF
+      if (session.step === 6) {
+        if (message.attachments.size === 0) {
+          return message.reply("Hero PDF? Please send the PDF file.");
+        }
+
+        const attachment = message.attachments.first();
+        const ext = path.extname(attachment.name || "").toLowerCase();
+
+        if (ext !== ".pdf") {
+          return message.reply("Please send a valid PDF file.");
+        }
+
+        ensureDir("./pdf");
+        const pdfPath = `./pdf/${session.data.name}.pdf`;
+        await downloadAttachment(attachment.url, pdfPath);
+
+        heroesData[session.data.name] = {
+          roles: session.data.roles,
+          type: session.data.type,
+          category: session.data.category
+        };
+
+        saveHeroesJson();
+        heroCreationSessions.delete(message.author.id);
+
+        return message.reply(`Hero added successfully: ${formatFileLabel(session.data.name)}`);
+      }
+    } catch (err) {
+      console.error("Add hero flow error:", err);
+      heroCreationSessions.delete(message.author.id);
+      return message.reply("Something went wrong while creating the hero.");
+    }
+  }
+
   if (!message.content.startsWith(PREFIX)) return;
 
   const command = message.content.slice(1).trim().toLowerCase();
 
   if (!command) return;
 
-  // ===== HERO LIST =====
+  // ===== ADD HERO START =====
+  if (command === "addhero") {
+    if (heroCreationSessions.has(message.author.id)) {
+      return message.reply("You are already creating a hero.");
+    }
+
+    heroCreationSessions.set(message.author.id, {
+      step: 1,
+      data: {}
+    });
+
+    return message.reply("Hero name?");
+  }
+
+  // ===== HERO LIST (FROM JSON TYPE) =====
   if (command === "heroes") {
-    const files = getFiles("./pdf", [".pdf"]);
-    const categories = {};
+    const types = {};
 
-    files.forEach(file => {
-      const name = file.replace(".pdf", "");
-      const [catsPart, hero] = name.split("_");
-      if (!hero) return;
+    Object.entries(heroesData).forEach(([heroName, data]) => {
+      const heroType = data?.type;
 
-      const cats = catsPart.split("+");
+      if (!heroType) return;
 
-      cats.forEach(cat => {
-        if (!categories[cat]) categories[cat] = [];
-        if (!categories[cat].includes(hero)) {
-          categories[cat].push(hero);
-        }
-      });
+      if (!types[heroType]) {
+        types[heroType] = [];
+      }
+
+      if (!types[heroType].includes(heroName)) {
+        types[heroType].push(heroName);
+      }
     });
 
     let reply = "**Hero List:**\n";
 
-    Object.keys(categories).sort().forEach(cat => {
-      reply += `\n__${formatFileLabel(cat)}__:\n`;
-      reply += categories[cat].sort().map(h => `- ${h}`).join("\n") + "\n";
+    Object.keys(types).sort().forEach(type => {
+      reply += `\n__${formatFileLabel(type)}__:\n`;
+      reply += types[type]
+        .sort()
+        .map(h => `- ${formatFileLabel(h)}`)
+        .join("\n") + "\n";
     });
 
     return message.reply(reply || "No heroes found.");
