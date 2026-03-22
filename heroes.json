@@ -6,8 +6,11 @@
   },
 
   "lux": {
-    "roles": ["Utility Tanker","Support"],
+    "roles": ["Utility Tanker", "Support"],
     "type": "Light",
-    "category": "LTD Immortal Leggendary(NA/EU)","LTD Transcendent (TW/Rumble)"
+    "category": [
+      "LTD Immortal Leggendary(NA/EU)",
+      "LTD Transcendent (TW/Rumble)"
+    ]
   }
 }
