@@ -186,14 +186,19 @@ client.on("messageCreate", async (message) => {
   const color = typeColors[type] || typeColors.default;
 
   const embed = new EmbedBuilder()
-    .setColor(color)
-    .setImage(imageFile ? `attachment://${hero}.png` : null)
-    .addFields(
-      { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
-      { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
-      { name: "Type", value: data?.type || "Unknown" },
-      {name: "Category",value: Array.isArray(data?.category) ? data.category.join(", ") : data?.category || "Unknown"}
-    );
+  .setColor(color)
+  .setImage(imageFile ? `attachment://${hero}.png` : null)
+  .addFields(
+    { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
+    { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
+    { name: "Type", value: data?.type || "Unknown" },
+    {
+      name: "Category",
+      value: Array.isArray(data?.category)
+        ? data.category.join(", ")
+        : data?.category || "Unknown"
+    }
+  );
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
