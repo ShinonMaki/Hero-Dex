@@ -3,5 +3,11 @@
     "roles": ["Hyper Carry Hybrid Mage"],
     "type": "Chaos",
     "category": "Blazing"
+  },
+
+  "lux": {
+    "roles": ["Utility Tanker","Support"],
+    "type": "Light",
+    "category": "LTD Immortal Leggendary(NA/EU)","LTD Transcendent (TW/Rumble)"
   }
 }
