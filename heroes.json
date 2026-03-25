@@ -16,5 +16,15 @@
       "LTD Immortal Leggendary(NA/EU)",
       "LTD Transcendent (TW/Rumble)"
     ]
+  },
+  "saitama": {
+    "roles": [
+      "Nearly All-in-One"
+    ],
+    "type": "Light",
+    "category": [
+      "LTD Blazing (NA/EU)",
+      "LTD Transcendent (TW/Rumble)"
+    ]
   }
 }
