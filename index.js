@@ -25,7 +25,11 @@ const {
 
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
-const { handleManageGuideButtons } = require("./interactions/manageGuideButtons");
+const {
+  handleManageGuideButtons,
+  handleRenameCategorySelect,
+  handleRenameCategoryFlow
+} = require("./interactions/manageGuideButtons");
 const { handleTierlistMenu } = require("./interactions/tierlistMenu");
 const { handleGuideCategoryButtons } = require("./interactions/guideCategoryButtons");
 const { handleGuideMenu } = require("./interactions/guideMenu");
@@ -60,6 +64,7 @@ client.on("messageCreate", async (message) => {
   if (await handleEditHeroFlow(message)) return;
   if (await handleAddGuideFlow(message)) return;
   if (await handleEditGuideFlow(message)) return;
+  if (await handleRenameCategoryFlow(message)) return;
 
   if (!message.content.startsWith(PREFIX)) return;
 
@@ -158,7 +163,8 @@ client.on("interactionCreate", async (interaction) => {
     if (
       interaction.customId === "manage_addguide" ||
       interaction.customId === "manage_editguide" ||
-      interaction.customId === "manage_deleteguide"
+      interaction.customId === "manage_deleteguide" ||
+      interaction.customId === "manage_renamecategory"
     ) {
       return handleManageGuideButtons(interaction);
     }
@@ -174,6 +180,10 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isStringSelectMenu() && interaction.customId === "guide_edit_select_guide") {
     return handleEditGuideSelection(interaction);
+  }
+
+  if (interaction.isStringSelectMenu() && interaction.customId === "guide_rename_category_select") {
+    return handleRenameCategorySelect(interaction);
   }
 });
 
