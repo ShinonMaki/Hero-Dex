@@ -25,6 +25,7 @@ const PREFIX = ".";
 // ===== HERO SESSIONS =====
 const heroCreationSessions = new Map();
 const heroDeleteSessions = new Map();
+const heroEditSessions = new Map();
 
 // ===== SERVER =====
 app.get("/", (req, res) => {
@@ -290,17 +291,14 @@ client.on("messageCreate", async (message) => {
 
         const hero = session.hero;
 
-        // remove from JSON
         delete heroesData[hero];
         saveHeroesJson();
 
-        // remove image
         const imageFile = findImage(hero);
         if (imageFile) {
           fs.unlinkSync(`./images/${imageFile}`);
         }
 
-        // remove pdf
         const pdfFile = findPdf(hero);
         if (pdfFile) {
           fs.unlinkSync(`./pdf/${pdfFile}`);
@@ -331,6 +329,149 @@ client.on("messageCreate", async (message) => {
     }
   }
 
+  // ===== HERO EDIT FLOW =====
+  if (heroEditSessions.has(message.author.id)) {
+    const session = heroEditSessions.get(message.author.id);
+    const content = message.content.trim();
+
+    if (content.toLowerCase() === ".canceledit") {
+      heroEditSessions.delete(message.author.id);
+      return message.reply("Hero edit cancelled.");
+    }
+
+    try {
+      // STEP 1 - NAME
+      if (session.step === 1) {
+        const hero = content.toLowerCase();
+
+        if (!heroesData[hero]) {
+          return message.reply("Hero not found. Try again.");
+        }
+
+        session.hero = hero;
+        session.step = 2;
+
+        return message.reply("What do you want to edit? (role/type/category/image/pdf)");
+      }
+
+      // STEP 2 - FIELD
+      if (session.step === 2) {
+        const field = content.toLowerCase();
+
+        if (!["role", "type", "category", "image", "pdf"].includes(field)) {
+          return message.reply("Choose: role/type/category/image/pdf");
+        }
+
+        session.field = field;
+        session.step = 3;
+
+        if (field === "image") {
+          return message.reply("Send new image file.");
+        }
+
+        if (field === "pdf") {
+          return message.reply("Send new PDF file.");
+        }
+
+        return message.reply(`New ${field}?`);
+      }
+
+      // STEP 3 - APPLY
+      if (session.step === 3) {
+        const hero = session.hero;
+        const field = session.field;
+
+        if (field === "role") {
+          const roles = content
+            .split(",")
+            .map(r => r.trim())
+            .filter(Boolean);
+
+          heroesData[hero].roles = roles;
+        }
+
+        if (field === "type") {
+          heroesData[hero].type = content;
+        }
+
+        if (field === "category") {
+          const categories = content
+            .split(";")
+            .map(c => c.trim())
+            .filter(Boolean);
+
+          heroesData[hero].category =
+            categories.length === 1 ? categories[0] : categories;
+        }
+
+        if (field === "image") {
+          if (message.attachments.size === 0) {
+            return message.reply("Send image file.");
+          }
+
+          const attachment = message.attachments.first();
+          const ext = path.extname(attachment.name || "").toLowerCase();
+
+          if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
+            return message.reply("Invalid image.");
+          }
+
+          const old = findImage(hero);
+          if (old) {
+            fs.unlinkSync(`./images/${old}`);
+          }
+
+          const imagePath = `./images/${hero}${ext}`;
+          await downloadAttachment(attachment.url, imagePath);
+        }
+
+        if (field === "pdf") {
+          if (message.attachments.size === 0) {
+            return message.reply("Send PDF file.");
+          }
+
+          const attachment = message.attachments.first();
+          const ext = path.extname(attachment.name || "").toLowerCase();
+
+          if (ext !== ".pdf") {
+            return message.reply("Invalid PDF.");
+          }
+
+          const old = findPdf(hero);
+          if (old) {
+            fs.unlinkSync(`./pdf/${old}`);
+          }
+
+          const pdfPath = `./pdf/${hero}.pdf`;
+          await downloadAttachment(attachment.url, pdfPath);
+        }
+
+        saveHeroesJson();
+        heroEditSessions.delete(message.author.id);
+
+        exec(
+          `cd /root/Hero-Dex && git add heroes.json images pdf && git commit -m "Edit hero: ${hero}" && git push`,
+          (err, stdout, stderr) => {
+            if (err) {
+              console.error("Git edit push error:", err);
+              console.error(stderr);
+              return;
+            }
+
+            console.log("Git edit push success:");
+            console.log(stdout);
+          }
+        );
+
+        return message.reply(`Hero updated: ${formatFileLabel(hero)}`);
+      }
+    } catch (err) {
+      console.error("Edit hero error:", err);
+      heroEditSessions.delete(message.author.id);
+      return message.reply("Error editing hero.");
+    }
+  }
+
   if (!message.content.startsWith(PREFIX)) return;
 
   const command = message.content.slice(1).trim().toLowerCase();
@@ -351,6 +492,21 @@ client.on("messageCreate", async (message) => {
     return message.reply("Hero name?");
   }
 
+  // ===== EDIT HERO START =====
+  if (command === "edithero") {
+    if (heroEditSessions.has(message.author.id)) {
+      return message.reply("You are already editing a hero.");
+    }
+
+    heroEditSessions.set(message.author.id, {
+      step: 1,
+      hero: null,
+      field: null
+    });
+
+    return message.reply("Hero name?");
+  }
+
   // ===== DELETE HERO START =====
   if (command === "deletehero") {
     if (heroDeleteSessions.has(message.author.id)) {
@@ -363,6 +519,34 @@ client.on("messageCreate", async (message) => {
     });
 
     return message.reply("Hero name?");
+  }
+
+  // ===== MANAGE HERO =====
+  if (command === "managehero") {
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle("Hero Management")
+      .setDescription("Choose an action below.");
+
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("manage_addhero")
+        .setLabel("Add Hero")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("manage_edithero")
+        .setLabel("Edit Hero")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("manage_deletehero")
+        .setLabel("Delete Hero")
+        .setStyle(ButtonStyle.Danger)
+    );
+
+    return message.reply({
+      embeds: [embed],
+      components: [row]
+    });
   }
 
   // ===== HERO LIST (FROM JSON TYPE) =====
@@ -487,6 +671,67 @@ client.on("messageCreate", async (message) => {
 
 // ===== INTERAZIONI =====
 client.on("interactionCreate", async (interaction) => {
+  // ===== MANAGE HERO BUTTONS =====
+  if (interaction.isButton()) {
+    if (interaction.customId === "manage_addhero") {
+      if (heroCreationSessions.has(interaction.user.id)) {
+        return interaction.reply({
+          content: "You are already creating a hero.",
+          ephemeral: true
+        });
+      }
+
+      heroCreationSessions.set(interaction.user.id, {
+        step: 1,
+        data: {}
+      });
+
+      return interaction.reply({
+        content: "Hero name?",
+        ephemeral: true
+      });
+    }
+
+    if (interaction.customId === "manage_edithero") {
+      if (heroEditSessions.has(interaction.user.id)) {
+        return interaction.reply({
+          content: "You are already editing a hero.",
+          ephemeral: true
+        });
+      }
+
+      heroEditSessions.set(interaction.user.id, {
+        step: 1,
+        hero: null,
+        field: null
+      });
+
+      return interaction.reply({
+        content: "Hero name?",
+        ephemeral: true
+      });
+    }
+
+    if (interaction.customId === "manage_deletehero") {
+      if (heroDeleteSessions.has(interaction.user.id)) {
+        return interaction.reply({
+          content: "You are already deleting a hero.",
+          ephemeral: true
+        });
+      }
+
+      heroDeleteSessions.set(interaction.user.id, {
+        step: 1,
+        hero: null
+      });
+
+      return interaction.reply({
+        content: "Hero name?",
+        ephemeral: true
+      });
+    }
+  }
+
   // ===== GUIDE BUTTON =====
   if (interaction.isButton() && interaction.customId.startsWith("guide_")) {
     const hero = interaction.customId.replace("guide_", "");
