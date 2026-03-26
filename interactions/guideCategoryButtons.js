@@ -3,7 +3,6 @@ const {
 } = require("../sessions/guideSessions");
 
 const {
-  addCategory,
   getGuides
 } = require("../utils/guideUtils");
 
