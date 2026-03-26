@@ -42,7 +42,7 @@ function addCategory(category) {
   return guides;
 }
 
-function addGuide(category, title, fileName) {
+function addGuide(category, title, fileName, text = "", images = []) {
   const guides = getGuides();
 
   if (!guides[category]) {
@@ -50,11 +50,25 @@ function addGuide(category, title, fileName) {
   }
 
   guides[category][title] = {
-    file: fileName
+    file: fileName,
+    text,
+    images
   };
 
   saveGuides(guides);
   return guides;
+}
+
+function deleteGuide(category, title) {
+  const guides = getGuides();
+
+  if (!guides[category] || !guides[category][title]) {
+    return false;
+  }
+
+  delete guides[category][title];
+  saveGuides(guides);
+  return true;
 }
 
 function createGuidePdf(outputPath, title, text, imagePaths = []) {
@@ -69,7 +83,6 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
     const stream = fs.createWriteStream(outputPath);
     doc.pipe(stream);
 
-    // Title
     doc
       .font("Helvetica-Bold")
       .fontSize(24)
@@ -77,7 +90,6 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
 
     doc.moveDown(1.5);
 
-    // Body
     doc
       .font("Helvetica")
       .fontSize(12)
@@ -86,7 +98,6 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
         lineGap: 4
       });
 
-    // Images
     for (const imagePath of imagePaths) {
       if (!fs.existsSync(imagePath)) continue;
 
@@ -122,6 +133,7 @@ module.exports = {
   saveGuides,
   addCategory,
   addGuide,
+  deleteGuide,
   createGuidePdf,
   ensureGuidesFolder,
   slugify,
