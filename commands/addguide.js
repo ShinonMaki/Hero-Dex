@@ -33,14 +33,7 @@ async function startAddGuide(interactionOrMessage) {
   const isInteraction = !!interactionOrMessage.isButton;
 
   if (guideAddSessions.has(userId)) {
-    if (isInteraction) {
-      return interactionOrMessage.reply({
-        content: "You are already adding a guide.",
-        ephemeral: true
-      });
-    }
-
-    return interactionOrMessage.reply("You are already adding a guide.");
+    return reply(interactionOrMessage, "You are already adding a guide.", isInteraction);
   }
 
   guideAddSessions.set(userId, {
@@ -50,7 +43,8 @@ async function startAddGuide(interactionOrMessage) {
       title: null,
       text: null,
       wantsImages: null,
-      imagePaths: []
+      imagePaths: [],
+      imageNames: []
     }
   });
 
@@ -94,7 +88,6 @@ async function handleAddGuideFlow(message) {
   const content = message.content.trim();
 
   if (content.toLowerCase() === ".cancelguide") {
-    cleanupTempImages(session.data.imagePaths);
     guideAddSessions.delete(message.author.id);
     await message.reply("Guide creation cancelled.");
     return true;
@@ -163,7 +156,6 @@ async function handleAddGuideFlow(message) {
         return true;
       }
 
-      // create PDF immediately
       ensureGuidesFolder();
 
       const safeFileName = `${slugify(session.data.title)}.pdf`;
@@ -176,13 +168,20 @@ async function handleAddGuideFlow(message) {
         []
       );
 
-      addGuide(session.data.category, session.data.title, safeFileName);
+      addGuide(
+        session.data.category,
+        session.data.title,
+        safeFileName,
+        session.data.text,
+        []
+      );
 
+      const guideTitle = session.data.title;
       guideAddSessions.delete(message.author.id);
 
-      gitCommitAndPush(`Add guide: ${session.data.title}`);
+      gitCommitAndPush(`Add guide: ${guideTitle}`);
 
-      await message.reply(`Guide added successfully: ${session.data.title}`);
+      await message.reply(`Guide added successfully: ${guideTitle}`);
       return true;
     }
 
@@ -201,14 +200,20 @@ async function handleAddGuideFlow(message) {
           session.data.imagePaths
         );
 
-        addGuide(session.data.category, session.data.title, safeFileName);
+        addGuide(
+          session.data.category,
+          session.data.title,
+          safeFileName,
+          session.data.text,
+          session.data.imageNames
+        );
 
-        cleanupTempImages(session.data.imagePaths);
+        const guideTitle = session.data.title;
         guideAddSessions.delete(message.author.id);
 
-        gitCommitAndPush(`Add guide: ${session.data.title}`);
+        gitCommitAndPush(`Add guide: ${guideTitle}`);
 
-        await message.reply(`Guide added successfully: ${session.data.title}`);
+        await message.reply(`Guide added successfully: ${guideTitle}`);
         return true;
       }
 
@@ -217,6 +222,8 @@ async function handleAddGuideFlow(message) {
         return true;
       }
 
+      ensureGuidesFolder();
+
       for (const attachment of message.attachments.values()) {
         const ext = path.extname(attachment.name || "").toLowerCase();
 
@@ -224,14 +231,16 @@ async function handleAddGuideFlow(message) {
           continue;
         }
 
-        const tempName = `temp-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
-        const tempPath = path.join(guidesFolderPath, tempName);
+        const safeTitle = slugify(session.data.title || "guide");
+        const imageName = `${safeTitle}-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
+        const imagePath = path.join(guidesFolderPath, imageName);
 
         const res = await fetch(attachment.url);
         const buffer = Buffer.from(await res.arrayBuffer());
-        fs.writeFileSync(tempPath, buffer);
+        fs.writeFileSync(imagePath, buffer);
 
-        session.data.imagePaths.push(tempPath);
+        session.data.imagePaths.push(imagePath);
+        session.data.imageNames.push(imageName);
       }
 
       await message.reply("Image(s) added. Send more images or write `done`.");
@@ -239,7 +248,6 @@ async function handleAddGuideFlow(message) {
     }
   } catch (err) {
     console.error("Add guide error:", err);
-    cleanupTempImages(session.data.imagePaths);
     guideAddSessions.delete(message.author.id);
     await message.reply("Something went wrong while creating the guide.");
     return true;
@@ -248,15 +256,9 @@ async function handleAddGuideFlow(message) {
   return false;
 }
 
-function cleanupTempImages(imagePaths = []) {
-  for (const imagePath of imagePaths) {
-    try {
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    } catch (err) {
-      console.error("Temp image cleanup error:", err);
-    }
+async function reply(target, content, ephemeral = false) {
+  if (target.reply) {
+    return target.reply(ephemeral ? { content, ephemeral: true } : content);
   }
 }
 
