@@ -1,36 +1,84 @@
-const { StringSelectMenuBuilder, ActionRowBuilder } = require("discord.js");
-const fs = require("fs");
+const {
+  guideAddSessions
+} = require("../sessions/guideSessions");
 
-const guides = require("../guides.json");
+const {
+  addCategory,
+  getGuides
+} = require("../utils/guideUtils");
+
+const {
+  formatFileLabel
+} = require("../utils/formatUtils");
+
+const {
+  StringSelectMenuBuilder,
+  ActionRowBuilder
+} = require("discord.js");
 
 async function handleGuideCategoryButtons(interaction) {
-  const category = interaction.customId.replace("guide_category_", "");
+  const userId = interaction.user.id;
 
-  const categoryData = guides[category];
-  if (!categoryData) {
+  // ADD GUIDE FLOW category selection
+  if (interaction.customId.startsWith("guide_add_category_")) {
+    if (!guideAddSessions.has(userId)) {
+      return interaction.reply({
+        content: "No active guide creation session found.",
+        ephemeral: true
+      });
+    }
+
+    const session = guideAddSessions.get(userId);
+    const selected = interaction.customId.replace("guide_add_category_", "");
+
+    if (selected === "new") {
+      session.step = 2;
+      return interaction.reply({
+        content: "Write the new category name.",
+        ephemeral: true
+      });
+    }
+
+    session.data.category = selected;
+    session.step = 3;
+
     return interaction.reply({
-      content: "Category not found.",
+      content: `Category selected: ${formatFileLabel(selected)}\nNow send the guide title.`,
       ephemeral: true
     });
   }
 
-  const options = Object.keys(categoryData).map((guideName) => ({
-    label: guideName,
-    value: guideName
-  }));
+  // GUIDE HUB category selection
+  if (interaction.customId.startsWith("guide_category_")) {
+    const category = interaction.customId.replace("guide_category_", "");
+    const guides = getGuides();
+    const categoryData = guides[category];
 
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(`guide_menu_${category}`)
-    .setPlaceholder("Select a guide")
-    .addOptions(options);
+    if (!categoryData || Object.keys(categoryData).length === 0) {
+      return interaction.reply({
+        content: "No guides found in this category.",
+        ephemeral: true
+      });
+    }
 
-  const row = new ActionRowBuilder().addComponents(menu);
+    const options = Object.keys(categoryData).map((guideName) => ({
+      label: guideName.slice(0, 100),
+      value: guideName
+    }));
 
-  await interaction.reply({
-    content: `Category: ${category}`,
-    components: [row],
-    ephemeral: true
-  });
+    const menu = new StringSelectMenuBuilder()
+      .setCustomId(`guide_menu_${category}`)
+      .setPlaceholder("Select a guide")
+      .addOptions(options.slice(0, 25));
+
+    const row = new ActionRowBuilder().addComponents(menu);
+
+    return interaction.reply({
+      content: `Category: ${formatFileLabel(category)}`,
+      components: [row],
+      ephemeral: true
+    });
+  }
 }
 
 module.exports = { handleGuideCategoryButtons };
