@@ -1,7 +1,9 @@
 const fs = require("fs");
+const path = require("path");
 const PDFDocument = require("pdfkit");
 
-const guidesFilePath = "./guides.json";
+const guidesFilePath = path.join(__dirname, "..", "guides.json");
+const guidesFolderPath = path.join(__dirname, "..", "guides");
 
 function getGuides() {
   try {
@@ -15,64 +17,50 @@ function saveGuides(data) {
   fs.writeFileSync(guidesFilePath, JSON.stringify(data, null, 2));
 }
 
+function ensureGuidesFolder() {
+  if (!fs.existsSync(guidesFolderPath)) {
+    fs.mkdirSync(guidesFolderPath, { recursive: true });
+  }
+}
+
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
 function addCategory(category) {
   const guides = getGuides();
 
   if (!guides[category]) {
-    guides[category] = [];
+    guides[category] = {};
     saveGuides(guides);
   }
 
   return guides;
 }
 
-function addGuide(category, guideData) {
+function addGuide(category, title, fileName) {
   const guides = getGuides();
 
   if (!guides[category]) {
-    guides[category] = [];
+    guides[category] = {};
   }
 
-  guides[category].push(guideData);
-  saveGuides(guides);
+  guides[category][title] = {
+    file: fileName
+  };
 
+  saveGuides(guides);
   return guides;
-}
-
-function deleteGuide(category, guideName) {
-  const guides = getGuides();
-
-  if (!guides[category]) return false;
-
-  const originalLength = guides[category].length;
-  guides[category] = guides[category].filter(
-    guide => guide.name.toLowerCase() !== guideName.toLowerCase()
-  );
-
-  if (guides[category].length === originalLength) return false;
-
-  saveGuides(guides);
-  return true;
-}
-
-function editGuide(category, oldGuideName, newGuideData) {
-  const guides = getGuides();
-
-  if (!guides[category]) return false;
-
-  const index = guides[category].findIndex(
-    guide => guide.name.toLowerCase() === oldGuideName.toLowerCase()
-  );
-
-  if (index === -1) return false;
-
-  guides[category][index] = newGuideData;
-  saveGuides(guides);
-  return true;
 }
 
 function createGuidePdf(outputPath, title, text, imagePaths = []) {
   return new Promise((resolve, reject) => {
+    ensureGuidesFolder();
+
     const doc = new PDFDocument({
       margin: 50,
       size: "A4"
@@ -81,29 +69,45 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
     const stream = fs.createWriteStream(outputPath);
     doc.pipe(stream);
 
-    doc.fontSize(22).text(title, { align: "center" });
-    doc.moveDown(2);
+    // Title
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(24)
+      .text(title, { align: "center" });
 
-    doc.fontSize(12).text(text, {
-      align: "left"
-    });
+    doc.moveDown(1.5);
 
-    if (imagePaths.length > 0) {
-      imagePaths.forEach(imagePath => {
-        doc.addPage();
-        doc.fontSize(18).text("Image", { align: "center" });
-        doc.moveDown(1);
-
-        try {
-          doc.image(imagePath, {
-            fit: [500, 700],
-            align: "center",
-            valign: "center"
-          });
-        } catch (err) {
-          console.error("Error adding image to PDF:", err);
-        }
+    // Body
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .text(text, {
+        align: "left",
+        lineGap: 4
       });
+
+    // Images
+    for (const imagePath of imagePaths) {
+      if (!fs.existsSync(imagePath)) continue;
+
+      doc.addPage();
+
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(18)
+        .text("Image", { align: "center" });
+
+      doc.moveDown(1);
+
+      try {
+        doc.image(imagePath, {
+          fit: [500, 650],
+          align: "center",
+          valign: "center"
+        });
+      } catch (err) {
+        console.error("Error adding image to PDF:", err);
+      }
     }
 
     doc.end();
@@ -118,7 +122,8 @@ module.exports = {
   saveGuides,
   addCategory,
   addGuide,
-  deleteGuide,
-  editGuide,
-  createGuidePdf
+  createGuidePdf,
+  ensureGuidesFolder,
+  slugify,
+  guidesFolderPath
 };
