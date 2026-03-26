@@ -11,6 +11,7 @@ const { formatFileLabel } = require("./utils/formatUtils");
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
 const { handleManageHero } = require("./commands/managehero");
+const { handleManageGuide } = require("./commands/manageguide");
 const { handleGuide } = require("./commands/guide");
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
@@ -18,6 +19,7 @@ const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
 
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
+const { handleManageGuideButtons } = require("./interactions/manageGuideButtons");
 const { handleTierlistMenu } = require("./interactions/tierlistMenu");
 const { handleGuideCategoryButtons } = require("./interactions/guideCategoryButtons");
 const { handleGuideMenu } = require("./interactions/guideMenu");
@@ -59,6 +61,7 @@ client.on("messageCreate", async (message) => {
   if (command === "edithero") return startEditHero(message);
   if (command === "deletehero") return startDeleteHero(message);
   if (command === "managehero") return handleManageHero(message);
+  if (command === "manageguide") return handleManageGuide(message);
   if (command === "heroes") return handleHeroes(message);
   if (command === "tierlist") return handleTierlist(message);
   if (command === "guide") return handleGuide(message);
@@ -125,6 +128,14 @@ client.on("interactionCreate", async (interaction) => {
       interaction.customId === "manage_deletehero"
     ) {
       return handleManageHeroButtons(interaction);
+    }
+
+    if (
+      interaction.customId === "manage_addguide" ||
+      interaction.customId === "manage_editguide" ||
+      interaction.customId === "manage_deleteguide"
+    ) {
+      return handleManageGuideButtons(interaction);
     }
   }
 
