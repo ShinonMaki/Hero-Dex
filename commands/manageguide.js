@@ -18,7 +18,11 @@ async function handleManageGuide(message) {
     new ButtonBuilder()
       .setCustomId("manage_deleteguide")
       .setLabel("Delete Guide")
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId("manage_renamecategory")
+      .setLabel("Rename Category")
+      .setStyle(ButtonStyle.Secondary)
   );
 
   return message.reply({
