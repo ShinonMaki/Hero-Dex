@@ -4,7 +4,10 @@
       "Hyper Carry Hybrid Mage"
     ],
     "type": "Chaos",
-    "category": "Blazing"
+    "category": [
+      "LTD Blazing (NA/EU)",
+      "LTD Transcendent (TW/Rumble)"
+    ]
   },
   "lux": {
     "roles": [
