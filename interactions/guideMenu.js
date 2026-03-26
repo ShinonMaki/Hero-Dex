@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-
-const guides = require("../guides.json");
+const { getGuides } = require("../utils/guideUtils");
 
 async function handleGuideMenu(interaction) {
   const category = interaction.customId.replace("guide_menu_", "");
   const guideName = interaction.values[0];
 
+  const guides = getGuides();
   const guide = guides[category]?.[guideName];
 
   if (!guide) {
@@ -25,7 +25,7 @@ async function handleGuideMenu(interaction) {
     });
   }
 
-  await interaction.reply({
+  return interaction.reply({
     content: `📄 ${guideName}`,
     files: [filePath],
     ephemeral: true
