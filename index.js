@@ -24,6 +24,7 @@ const { handleManageGuideButtons } = require("./interactions/manageGuideButtons"
 const { handleTierlistMenu } = require("./interactions/tierlistMenu");
 const { handleGuideCategoryButtons } = require("./interactions/guideCategoryButtons");
 const { handleGuideMenu } = require("./interactions/guideMenu");
+const { handleGuideDeliveryButtons } = require("./interactions/guideDeliveryButtons");
 
 const PORT = process.env.PORT || 3000;
 
@@ -116,6 +117,10 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
+    if (interaction.customId === "guide_delivery_ios" || interaction.customId === "guide_delivery_chat") {
+      return handleGuideDeliveryButtons(interaction);
+    }
+
     if (interaction.customId.startsWith("guide_add_category_")) {
       return handleGuideCategoryButtons(interaction);
     }
