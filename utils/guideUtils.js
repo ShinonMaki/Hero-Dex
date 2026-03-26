@@ -38,8 +38,6 @@ function addCategory(category) {
   if (!guides[category]) {
     guides[category] = {};
     saveGuides(guides);
-
-    // 🔥 FIX IMPORTANTE
     gitCommitAndPush(`Add category: ${category}`);
   }
 
@@ -60,11 +58,23 @@ function addGuide(category, title, fileName, text = "", images = []) {
   };
 
   saveGuides(guides);
-
-  // 🔥 PUSH IMMEDIATO GUIDA
   gitCommitAndPush(`Add guide: ${title}`);
 
   return guides;
+}
+
+function updateGuide(category, oldTitle, newTitle, data) {
+  const guides = getGuides();
+
+  if (!guides[category] || !guides[category][oldTitle]) {
+    return false;
+  }
+
+  delete guides[category][oldTitle];
+  guides[category][newTitle] = data;
+
+  saveGuides(guides);
+  return true;
 }
 
 function deleteGuide(category, title) {
@@ -76,7 +86,6 @@ function deleteGuide(category, title) {
 
   delete guides[category][title];
   saveGuides(guides);
-
   gitCommitAndPush(`Delete guide: ${title}`);
 
   return true;
@@ -144,6 +153,7 @@ module.exports = {
   saveGuides,
   addCategory,
   addGuide,
+  updateGuide,
   deleteGuide,
   createGuidePdf,
   ensureGuidesFolder,
