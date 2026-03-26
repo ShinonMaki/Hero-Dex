@@ -1,4 +1,5 @@
 const { startAddGuide } = require("../commands/addguide");
+const { startEditGuide } = require("../commands/editguide");
 
 async function handleManageGuideButtons(interaction) {
   if (interaction.customId === "manage_addguide") {
@@ -6,10 +7,7 @@ async function handleManageGuideButtons(interaction) {
   }
 
   if (interaction.customId === "manage_editguide") {
-    return interaction.reply({
-      content: "Edit Guide is not connected yet.",
-      ephemeral: true
-    });
+    return startEditGuide(interaction);
   }
 
   if (interaction.customId === "manage_deleteguide") {
