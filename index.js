@@ -16,6 +16,7 @@ const { handleGuide } = require("./commands/guide");
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
+const { handleAddGuideFlow } = require("./commands/addguide");
 
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
@@ -51,6 +52,7 @@ client.on("messageCreate", async (message) => {
   if (await handleAddHeroFlow(message)) return;
   if (await handleDeleteHeroFlow(message)) return;
   if (await handleEditHeroFlow(message)) return;
+  if (await handleAddGuideFlow(message)) return;
 
   if (!message.content.startsWith(PREFIX)) return;
 
@@ -114,6 +116,10 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
+    if (interaction.customId.startsWith("guide_add_category_")) {
+      return handleGuideCategoryButtons(interaction);
+    }
+
     if (interaction.customId.startsWith("guide_category_")) {
       return handleGuideCategoryButtons(interaction);
     }
