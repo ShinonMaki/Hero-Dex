@@ -44,6 +44,26 @@ function addCategory(category) {
   return guides;
 }
 
+function renameCategory(oldCategory, newCategory) {
+  const guides = getGuides();
+
+  if (!guides[oldCategory]) {
+    return { ok: false, reason: "Old category not found." };
+  }
+
+  if (guides[newCategory]) {
+    return { ok: false, reason: "New category already exists." };
+  }
+
+  guides[newCategory] = guides[oldCategory];
+  delete guides[oldCategory];
+
+  saveGuides(guides);
+  gitCommitAndPush(`Rename category: ${oldCategory} -> ${newCategory}`);
+
+  return { ok: true };
+}
+
 function addGuide(category, title, fileName, text = "", images = []) {
   const guides = getGuides();
 
@@ -61,20 +81,6 @@ function addGuide(category, title, fileName, text = "", images = []) {
   gitCommitAndPush(`Add guide: ${title}`);
 
   return guides;
-}
-
-function updateGuide(category, oldTitle, newTitle, data) {
-  const guides = getGuides();
-
-  if (!guides[category] || !guides[category][oldTitle]) {
-    return false;
-  }
-
-  delete guides[category][oldTitle];
-  guides[category][newTitle] = data;
-
-  saveGuides(guides);
-  return true;
 }
 
 function deleteGuide(category, title) {
@@ -151,12 +157,12 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
 module.exports = {
   getGuides,
   saveGuides,
-  addCategory,
-  addGuide,
-  updateGuide,
-  deleteGuide,
-  createGuidePdf,
   ensureGuidesFolder,
   slugify,
+  addCategory,
+  renameCategory,
+  addGuide,
+  deleteGuide,
+  createGuidePdf,
   guidesFolderPath
 };
