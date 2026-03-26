@@ -11,6 +11,7 @@ const { formatFileLabel } = require("./utils/formatUtils");
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
 const { handleManageHero } = require("./commands/managehero");
+const { handleGuide } = require("./commands/guide");
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
@@ -18,6 +19,8 @@ const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
 const { handleTierlistMenu } = require("./interactions/tierlistMenu");
+const { handleGuideCategoryButtons } = require("./interactions/guideCategoryButtons");
+const { handleGuideMenu } = require("./interactions/guideMenu");
 
 const PORT = process.env.PORT || 3000;
 
@@ -58,6 +61,7 @@ client.on("messageCreate", async (message) => {
   if (command === "managehero") return handleManageHero(message);
   if (command === "heroes") return handleHeroes(message);
   if (command === "tierlist") return handleTierlist(message);
+  if (command === "guide") return handleGuide(message);
 
   const hero = command;
   const data = heroesData[hero];
@@ -107,6 +111,10 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
+    if (interaction.customId.startsWith("guide_category_")) {
+      return handleGuideCategoryButtons(interaction);
+    }
+
     if (interaction.customId.startsWith("guide_")) {
       return handleGuideButton(interaction);
     }
@@ -122,6 +130,10 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isStringSelectMenu() && interaction.customId === "tierlist_menu") {
     return handleTierlistMenu(interaction);
+  }
+
+  if (interaction.isStringSelectMenu() && interaction.customId.startsWith("guide_menu_")) {
+    return handleGuideMenu(interaction);
   }
 });
 
