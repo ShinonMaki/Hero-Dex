@@ -6,7 +6,6 @@ const app = express();
 const { Client, GatewayIntentBits, EmbedBuilder, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { PREFIX, typeColors } = require("./config/constants");
 const { heroesData, findPdf, findImage } = require("./utils/fileUtils");
-const { formatFileLabel } = require("./utils/formatUtils");
 
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
@@ -17,6 +16,12 @@ const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
 const { handleAddGuideFlow } = require("./commands/addguide");
+const {
+  handleEditGuideFlow,
+  handleEditGuideCategorySelection,
+  handleEditGuideSelection,
+  handleEditGuideModeSelection
+} = require("./commands/editguide");
 
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
@@ -54,6 +59,7 @@ client.on("messageCreate", async (message) => {
   if (await handleDeleteHeroFlow(message)) return;
   if (await handleEditHeroFlow(message)) return;
   if (await handleAddGuideFlow(message)) return;
+  if (await handleEditGuideFlow(message)) return;
 
   if (!message.content.startsWith(PREFIX)) return;
 
@@ -125,6 +131,14 @@ client.on("interactionCreate", async (interaction) => {
       return handleGuideCategoryButtons(interaction);
     }
 
+    if (interaction.customId.startsWith("guide_edit_category_")) {
+      return handleEditGuideCategorySelection(interaction);
+    }
+
+    if (interaction.customId.startsWith("guide_edit_mode_")) {
+      return handleEditGuideModeSelection(interaction);
+    }
+
     if (interaction.customId.startsWith("guide_category_")) {
       return handleGuideCategoryButtons(interaction);
     }
@@ -156,6 +170,10 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isStringSelectMenu() && interaction.customId.startsWith("guide_menu_")) {
     return handleGuideMenu(interaction);
+  }
+
+  if (interaction.isStringSelectMenu() && interaction.customId === "guide_edit_select_guide") {
+    return handleEditGuideSelection(interaction);
   }
 });
 
