@@ -1,6 +1,16 @@
-const fs = require("fs");
-const path = require("path");
-const { getGuides } = require("../utils/guideUtils");
+const {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require("discord.js");
+
+const {
+  getGuides
+} = require("../utils/guideUtils");
+
+const {
+  guideViewSessions
+} = require("../sessions/guideSessions");
 
 async function handleGuideMenu(interaction) {
   const category = interaction.customId.replace("guide_menu_", "");
@@ -16,18 +26,25 @@ async function handleGuideMenu(interaction) {
     });
   }
 
-  const filePath = path.join(__dirname, "..", "guides", guide.file);
+  guideViewSessions.set(interaction.user.id, {
+    category,
+    guideName
+  });
 
-  if (!fs.existsSync(filePath)) {
-    return interaction.reply({
-      content: "Guide file missing.",
-      ephemeral: true
-    });
-  }
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("guide_delivery_ios")
+      .setLabel("iOS")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("guide_delivery_chat")
+      .setLabel("Android/PC")
+      .setStyle(ButtonStyle.Success)
+  );
 
   return interaction.reply({
-    content: `📄 ${guideName}`,
-    files: [filePath],
+    content: `How do you want to view **${guideName}**?`,
+    components: [row],
     ephemeral: true
   });
 }
