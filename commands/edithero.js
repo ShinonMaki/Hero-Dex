@@ -34,7 +34,8 @@ async function handleEditHeroFlow(message) {
   if (!heroEditSessions.has(message.author.id)) return false;
 
   const session = heroEditSessions.get(message.author.id);
-  const content = message.content.trim().toLowerCase();
+  const rawContent = message.content.trim();
+  const content = rawContent.toLowerCase();
 
   if (content === ".canceledithero") {
     heroEditSessions.delete(message.author.id);
@@ -77,8 +78,51 @@ async function handleEditHeroFlow(message) {
         return message.reply("Send images now. Write `done` when finished.");
       }
 
+      if (["5", "6"].includes(content)) {
+        session.step = 3;
+        return message.reply("Send the new file.");
+      }
+
       session.step = 3;
       return message.reply("Send new value.");
+    }
+
+    // ===== IMAGE / PDF =====
+    if (session.step === 3 && ["5", "6"].includes(session.data.mode)) {
+      const hero = session.data.hero;
+
+      if (message.attachments.size === 0) {
+        await message.reply("Send file.");
+        return true;
+      }
+
+      const attachment = message.attachments.first();
+      const ext = path.extname(attachment.name || "").toLowerCase();
+
+      if (session.data.mode === "5") {
+        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
+          await message.reply("Please send a valid image file.");
+          return true;
+        }
+
+        ensureDir("./images");
+        await downloadAttachment(attachment.url, `./images/${hero}${ext}`);
+      }
+
+      if (session.data.mode === "6") {
+        if (ext !== ".pdf") {
+          await message.reply("Please send a valid PDF file.");
+          return true;
+        }
+
+        ensureDir("./pdf");
+        await downloadAttachment(attachment.url, `./pdf/${hero}.pdf`);
+      }
+
+      gitCommitAndPush(`Update file for ${hero}`);
+      heroEditSessions.delete(message.author.id);
+
+      return message.reply("File updated.");
     }
 
     // ===== NORMAL EDIT =====
@@ -100,15 +144,15 @@ async function handleEditHeroFlow(message) {
       }
 
       if (mode === "2") {
-        heroesData[hero].roles = content.split(",").map(r => r.trim());
+        heroesData[hero].roles = rawContent.split(",").map(r => r.trim()).filter(Boolean);
       }
 
       if (mode === "3") {
-        heroesData[hero].type = content;
+        heroesData[hero].type = rawContent;
       }
 
       if (mode === "4") {
-        heroesData[hero].category = content;
+        heroesData[hero].category = rawContent;
       }
 
       saveHeroesJson();
@@ -116,34 +160,6 @@ async function handleEditHeroFlow(message) {
 
       heroEditSessions.delete(message.author.id);
       return message.reply("Hero updated.");
-    }
-
-    // ===== IMAGE / PDF =====
-    if (session.step === 3 && ["5", "6"].includes(session.data.mode)) {
-      const hero = session.data.hero;
-
-      if (message.attachments.size === 0) {
-        await message.reply("Send file.");
-        return true;
-      }
-
-      const attachment = message.attachments.first();
-      const ext = path.extname(attachment.name || "").toLowerCase();
-
-      if (session.data.mode === "5") {
-        ensureDir("./images");
-        await downloadAttachment(attachment.url, `./images/${hero}${ext}`);
-      }
-
-      if (session.data.mode === "6") {
-        ensureDir("./pdf");
-        await downloadAttachment(attachment.url, `./pdf/${hero}.pdf`);
-      }
-
-      gitCommitAndPush(`Update file for ${hero}`);
-      heroEditSessions.delete(message.author.id);
-
-      return message.reply("File updated.");
     }
 
     // ===== ANDROID IMAGES =====
