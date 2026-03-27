@@ -1,22 +1,20 @@
 const path = require("path");
 const fs = require("fs");
 
-const { mergeImagesVertically } = require("../utils/mergeImages");
-
 async function handleAndroidGuideButton(interaction) {
   const hero = interaction.customId.replace("android_", "");
   const folder = path.join("./hero-guide-images", hero);
 
   if (!fs.existsSync(folder)) {
     return interaction.reply({
-      content: "No Android images found for this hero.",
+      content: "No Android/PC images found for this hero.",
       ephemeral: true
     });
   }
 
   const files = fs
     .readdirSync(folder)
-    .filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f))
+    .filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
     .sort((a, b) => {
       const numA = parseInt(a, 10);
       const numB = parseInt(b, 10);
@@ -36,32 +34,29 @@ async function handleAndroidGuideButton(interaction) {
   }
 
   const imagePaths = files.map(file => path.join(folder, file));
-  const outputPath = path.join(folder, `${hero}-merged.png`);
 
   try {
     await interaction.reply({
-      content: "Generating image...",
+      content: `Sending ${files.length} image(s)...`,
       ephemeral: true
     });
 
-    await mergeImagesVertically(imagePaths, outputPath);
-
     await interaction.followUp({
-      files: [outputPath],
+      files: imagePaths,
       ephemeral: true
     });
   } catch (err) {
-    console.error("Android guide merge error:", err);
+    console.error("Android/PC guide send error:", err);
 
     if (interaction.replied || interaction.deferred) {
       return interaction.followUp({
-        content: "Error generating image.",
+        content: "Error sending images.",
         ephemeral: true
       });
     }
 
     return interaction.reply({
-      content: "Error generating image.",
+      content: "Error sending images.",
       ephemeral: true
     });
   }
