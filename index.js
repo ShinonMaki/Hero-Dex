@@ -24,11 +24,13 @@ const { handleGuide } = require("./commands/guide");
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
+
 const {
   handleAddGuideFlow,
   handleAddGuideCategorySelect,
   handleAddGuideNewCategory
 } = require("./commands/addguide");
+
 const {
   handleEditGuideFlow,
   handleEditGuideCategorySelection,
@@ -39,11 +41,13 @@ const {
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleAndroidGuideButton } = require("./interactions/androidGuideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
+
 const {
   handleManageGuideButtons,
   handleRenameCategorySelect,
   handleRenameCategoryFlow
 } = require("./interactions/manageGuideButtons");
+
 const { handleTierlistMenu } = require("./interactions/tierlistMenu");
 const { handleGuideCategoryButtons } = require("./interactions/guideCategoryButtons");
 const { handleGuideMenu } = require("./interactions/guideMenu");
@@ -191,7 +195,8 @@ client.on("interactionCreate", async (interaction) => {
       interaction.customId === "manage_addguide" ||
       interaction.customId === "manage_editguide" ||
       interaction.customId === "manage_deleteguide" ||
-      interaction.customId === "manage_renamecategory"
+      interaction.customId === "manage_renamecategory" ||
+      interaction.customId === "manage_regenpdf"
     ) {
       return handleManageGuideButtons(interaction);
     }
