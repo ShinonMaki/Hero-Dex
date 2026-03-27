@@ -136,6 +136,13 @@
       "images": [
         "heavy-debuffer-1774615433864.png"
       ]
+    },
+    "Buffer": {
+      "file": "buffer.pdf",
+      "text": "__BUFFER__\n\nA buffer is a support-type unit that:\n\n• applies buffs to allies\n• increases stats such as ATK, DEF, or speed\n• improves the overall effectiveness of the team\n\nIts objective is:\n\nStrengthen allies by enhancing their abilities and combat performance, allowing the team to deal more damage and survive longer in battle.",
+      "images": [
+        "buffer-1774615575165.png"
+      ]
     }
   }
 }
