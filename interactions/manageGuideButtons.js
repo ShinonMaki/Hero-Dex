@@ -1,3 +1,4 @@
+const path = require("path");
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder
@@ -10,11 +11,14 @@ const {
 } = require("../sessions/guideSessions");
 const {
   getGuides,
-  renameCategory
+  renameCategory,
+  createGuidePdf,
+  guidesFolderPath
 } = require("../utils/guideUtils");
 const {
   formatFileLabel
 } = require("../utils/formatUtils");
+const { gitCommitAndPush } = require("../utils/gitUtils");
 
 async function handleManageGuideButtons(interaction) {
   if (interaction.customId === "manage_addguide") {
@@ -63,6 +67,63 @@ async function handleManageGuideButtons(interaction) {
     return interaction.reply({
       content: "Choose the category you want to rename.",
       components: [row],
+      ephemeral: true
+    });
+  }
+
+  if (interaction.customId === "manage_regenpdf") {
+    const guides = getGuides();
+    const categories = Object.keys(guides);
+
+    if (categories.length === 0) {
+      return interaction.reply({
+        content: "No guides found.",
+        ephemeral: true
+      });
+    }
+
+    await interaction.reply({
+      content: "Regenerating all PDFs...",
+      ephemeral: true
+    });
+
+    let success = 0;
+    let failed = 0;
+
+    for (const category of categories) {
+      const categoryGuides = guides[category];
+
+      if (!categoryGuides || typeof categoryGuides !== "object") {
+        continue;
+      }
+
+      for (const title of Object.keys(categoryGuides)) {
+        const guide = categoryGuides[title];
+
+        try {
+          const text = guide.text || "";
+          const images = Array.isArray(guide.images) ? guide.images : [];
+          const pdfFile = guide.file || `${title}.pdf`;
+
+          const imagePaths = images.map(img =>
+            path.join(guidesFolderPath, img)
+          );
+
+          const outputPath = path.join(guidesFolderPath, pdfFile);
+
+          await createGuidePdf(outputPath, title, text, imagePaths);
+          success++;
+        } catch (err) {
+          console.error(`Regenerate PDF error for ${title}:`, err);
+          failed++;
+        }
+      }
+    }
+
+    gitCommitAndPush("Regenerate all guide PDFs");
+
+    return interaction.followUp({
+      content: `Done.\nSuccess: ${success}\nFailed: ${failed}`,
       ephemeral: true
     });
   }
