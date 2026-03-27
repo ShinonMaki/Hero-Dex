@@ -1,6 +1,5 @@
 {
   "events": [],
-  "tierlists": [],
   "weekly event": {
     "Limited Time Summon": {
       "file": "limited-time-summon.pdf",
@@ -94,5 +93,6 @@
     }
   },
   "test": {},
-  "shop": []
+  "shop": [],
+  "hero roles": []
 }
