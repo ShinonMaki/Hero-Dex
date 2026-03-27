@@ -157,6 +157,13 @@
       "images": [
         "assist-1774645131324.png"
       ]
+    },
+    "Bursty Mage": {
+      "file": "bursty-mage.pdf",
+      "text": "__BURSTY MAGE__\n\nA bursty mage is a mage-type unit that:\n\n• deals extremely high magic burst damage\n• relies on powerful skills or ultimate abilities\n• can eliminate targets quickly with spell combos\n\nIts objective is:\n\nPrioritize eliminating fragile enemy units or dealing massive damage to multiple targets early in the fight to gain a decisive advantage.",
+      "images": [
+        "bursty-mage-1774645212489.png"
+      ]
     }
   }
 }
