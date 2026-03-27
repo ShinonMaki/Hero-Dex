@@ -3,7 +3,16 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
-const { Client, GatewayIntentBits, EmbedBuilder, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  AttachmentBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require("discord.js");
+
 const { PREFIX, typeColors } = require("./config/constants");
 const { heroesData, findPdf, findImage } = require("./utils/fileUtils");
 
@@ -28,6 +37,7 @@ const {
 } = require("./commands/editguide");
 
 const { handleGuideButton } = require("./interactions/guideButton");
+const { handleAndroidGuideButton } = require("./interactions/androidGuideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
 const {
   handleManageGuideButtons,
@@ -114,12 +124,18 @@ client.on("messageCreate", async (message) => {
     new ButtonBuilder()
       .setCustomId(`guide_${hero}`)
       .setLabel("GUIDE")
-      .setStyle(ButtonStyle.Primary)
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId(`android_${hero}`)
+      .setLabel("ANDROID/PC")
+      .setStyle(ButtonStyle.Success)
   );
 
   const files = [];
   if (imageFile) {
-    files.push(new AttachmentBuilder(`./images/${imageFile}`, { name: `${hero}.png` }));
+    files.push(
+      new AttachmentBuilder(`./images/${imageFile}`, { name: `${hero}.png` })
+    );
   }
 
   await message.reply({
@@ -132,8 +148,15 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
-    if (interaction.customId === "guide_delivery_ios" || interaction.customId === "guide_delivery_chat") {
+    if (
+      interaction.customId === "guide_delivery_ios" ||
+      interaction.customId === "guide_delivery_chat"
+    ) {
       return handleGuideDeliveryButtons(interaction);
+    }
+
+    if (interaction.customId.startsWith("android_")) {
+      return handleAndroidGuideButton(interaction);
     }
 
     if (interaction.customId === "guide_add_category_new") {
@@ -174,23 +197,38 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId === "tierlist_menu") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "tierlist_menu"
+  ) {
     return handleTierlistMenu(interaction);
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId === "guide_add_select_category") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "guide_add_select_category"
+  ) {
     return handleAddGuideCategorySelect(interaction);
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId.startsWith("guide_menu_")) {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId.startsWith("guide_menu_")
+  ) {
     return handleGuideMenu(interaction);
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId === "guide_edit_select_guide") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "guide_edit_select_guide"
+  ) {
     return handleEditGuideSelection(interaction);
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId === "guide_rename_category_select") {
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "guide_rename_category_select"
+  ) {
     return handleRenameCategorySelect(interaction);
   }
 });
