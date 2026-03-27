@@ -9,7 +9,8 @@ const {
   heroesData,
   saveHeroesJson,
   ensureDir,
-  downloadAttachment
+  downloadAttachment,
+  renameHeroFiles
 } = require("../utils/fileUtils");
 
 const { gitCommitAndPush } = require("../utils/gitUtils");
@@ -133,6 +134,18 @@ async function handleEditHeroFlow(message) {
       if (mode === "1") {
         const newName = content;
 
+        if (!newName) {
+          await message.reply("Invalid name.");
+          return true;
+        }
+
+        if (heroesData[newName]) {
+          await message.reply("A hero with this name already exists.");
+          return true;
+        }
+
+        renameHeroFiles(hero, newName);
+
         heroesData[newName] = heroesData[hero];
         delete heroesData[hero];
 
@@ -140,11 +153,14 @@ async function handleEditHeroFlow(message) {
         gitCommitAndPush(`Rename hero ${hero} -> ${newName}`);
 
         heroEditSessions.delete(message.author.id);
-        return message.reply("Hero renamed.");
+        return message.reply("Hero renamed successfully.");
       }
 
       if (mode === "2") {
-        heroesData[hero].roles = rawContent.split(",").map(r => r.trim()).filter(Boolean);
+        heroesData[hero].roles = rawContent
+          .split(",")
+          .map(r => r.trim())
+          .filter(Boolean);
       }
 
       if (mode === "3") {
