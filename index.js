@@ -15,7 +15,11 @@ const { handleGuide } = require("./commands/guide");
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
-const { handleAddGuideFlow } = require("./commands/addguide");
+const {
+  handleAddGuideFlow,
+  handleAddGuideCategorySelect,
+  handleAddGuideNewCategory
+} = require("./commands/addguide");
 const {
   handleEditGuideFlow,
   handleEditGuideCategorySelection,
@@ -132,8 +136,8 @@ client.on("interactionCreate", async (interaction) => {
       return handleGuideDeliveryButtons(interaction);
     }
 
-    if (interaction.customId.startsWith("guide_add_category_")) {
-      return handleGuideCategoryButtons(interaction);
+    if (interaction.customId === "guide_add_category_new") {
+      return handleAddGuideNewCategory(interaction);
     }
 
     if (interaction.customId.startsWith("guide_edit_category_")) {
@@ -172,6 +176,10 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isStringSelectMenu() && interaction.customId === "tierlist_menu") {
     return handleTierlistMenu(interaction);
+  }
+
+  if (interaction.isStringSelectMenu() && interaction.customId === "guide_add_select_category") {
+    return handleAddGuideCategorySelect(interaction);
   }
 
   if (interaction.isStringSelectMenu() && interaction.customId.startsWith("guide_menu_")) {
