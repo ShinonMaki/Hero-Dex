@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { createGuidePdf } = require("./guideUtils");
 
-const guidesPath = path.join(__dirname, "../data/guides.json");
+const guidesPath = path.join(__dirname, "../guides.json");
 const guidesFolder = path.join(__dirname, "../guides");
 
 function getGuideNameFromFile(file) {
