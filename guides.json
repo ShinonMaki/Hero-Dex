@@ -100,9 +100,7 @@
       "file": "full-tank.pdf",
       "text": "__FULL TANK__\n\nA full tank is a frontline unit that:\n\n• absorbs large amounts of damage\n• has very high HP, defense, or damage reduction\n• protects the team by drawing enemy attacks\n\nIts objective is:\n\nMaintain frontline stability by absorbing enemy damage and creating space for damage dealers and supports to perform effectively.",
       "images": [
-        "full-tank-1774644552514-5016.png",
-        "full-tank-1774613951961.png",
-        "full-tank-1774614080864.png"
+        "full-tank-1774644552514-5016.png"
       ]
     },
     "DPS Assassin": {
@@ -130,8 +128,7 @@
       "file": "dot-support.pdf",
       "text": "__DOT SUPPORT__\n\nA DoT support is a support-type unit that:\n\n• applies damage over time (DoT) effects\n• weakens enemies through continuous damage or debuffs\n• supports the team by pressuring opponents over time\n\nIts objective is:\n\nGradually wear down the enemy team with persistent damage effects while supporting allies and disrupting the enemy’s ability to sustain the fight.",
       "images": [
-        "dot-support-1774644952066-6523.png",
-        "dot-support-1774645516230-9109.png"
+        "dot-support-1774644952066-6523.png"
       ]
     },
     "Heavy Debuffer": {
