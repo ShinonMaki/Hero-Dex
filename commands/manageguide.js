@@ -6,7 +6,7 @@ async function handleManageGuide(message) {
     .setTitle("📚 Guide Management")
     .setDescription("Choose an action below.");
 
-  const row = new ActionRowBuilder().addComponents(
+  const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("manage_addguide")
       .setLabel("Add Guide")
@@ -25,9 +25,16 @@ async function handleManageGuide(message) {
       .setStyle(ButtonStyle.Secondary)
   );
 
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("manage_regenpdf")
+      .setLabel("Regenerate PDFs")
+      .setStyle(ButtonStyle.Secondary)
+  );
+
   return message.reply({
     embeds: [embed],
-    components: [row]
+    components: [row1, row2]
   });
 }
 
