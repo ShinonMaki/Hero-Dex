@@ -1,16 +1,17 @@
-const fs = require("fs");
 const path = require("path");
+const fs = require("fs");
+
 const {
   heroEditSessions
 } = require("../sessions/heroSessions");
+
 const {
   heroesData,
-  findImage,
-  findPdf,
   saveHeroesJson,
+  ensureDir,
   downloadAttachment
 } = require("../utils/fileUtils");
-const { formatFileLabel } = require("../utils/formatUtils");
+
 const { gitCommitAndPush } = require("../utils/gitUtils");
 
 async function startEditHero(message) {
@@ -20,150 +21,180 @@ async function startEditHero(message) {
 
   heroEditSessions.set(message.author.id, {
     step: 1,
-    hero: null,
-    field: null
+    data: {
+      hero: null,
+      mode: null
+    }
   });
 
-  return message.reply("Hero name?");
+  return message.reply("Which hero do you want to edit?");
 }
 
 async function handleEditHeroFlow(message) {
   if (!heroEditSessions.has(message.author.id)) return false;
 
   const session = heroEditSessions.get(message.author.id);
-  const content = message.content.trim();
+  const content = message.content.trim().toLowerCase();
 
-  if (content.toLowerCase() === ".canceledit") {
+  if (content === ".canceledithero") {
     heroEditSessions.delete(message.author.id);
-    await message.reply("Hero edit cancelled.");
+    await message.reply("Edit cancelled.");
     return true;
   }
 
   try {
+    // STEP 1 - SELECT HERO
     if (session.step === 1) {
-      const hero = content.toLowerCase();
-
-      if (!heroesData[hero]) {
-        await message.reply("Hero not found. Try again.");
+      if (!heroesData[content]) {
+        await message.reply("Hero not found.");
         return true;
       }
 
-      session.hero = hero;
+      session.data.hero = content;
       session.step = 2;
-      await message.reply("What do you want to edit? (role/type/category/image/pdf)");
+
+      await message.reply(
+`What do you want to edit?
+
+1 - Name
+2 - Roles
+3 - Type
+4 - Category
+5 - Hero Image
+6 - PDF
+7 - Add Android Images
+8 - Replace Android Images`
+      );
       return true;
     }
 
+    // STEP 2 - SELECT MODE
     if (session.step === 2) {
-      const field = content.toLowerCase();
+      session.data.mode = content;
 
-      if (!["role", "type", "category", "image", "pdf"].includes(field)) {
-        await message.reply("Choose: role/type/category/image/pdf");
-        return true;
+      if (["7", "8"].includes(content)) {
+        session.step = 10;
+        return message.reply("Send images now. Write `done` when finished.");
       }
 
-      session.field = field;
       session.step = 3;
-
-      if (field === "image") {
-        await message.reply("Send new image file.");
-        return true;
-      }
-
-      if (field === "pdf") {
-        await message.reply("Send new PDF file.");
-        return true;
-      }
-
-      await message.reply(`New ${field}?`);
-      return true;
+      return message.reply("Send new value.");
     }
 
+    // ===== NORMAL EDIT =====
     if (session.step === 3) {
-      const hero = session.hero;
-      const field = session.field;
+      const hero = session.data.hero;
+      const mode = session.data.mode;
 
-      if (field === "role") {
-        const roles = content
-          .split(",")
-          .map(r => r.trim())
-          .filter(Boolean);
+      if (mode === "1") {
+        const newName = content;
 
-        heroesData[hero].roles = roles;
+        heroesData[newName] = heroesData[hero];
+        delete heroesData[hero];
+
+        saveHeroesJson();
+        gitCommitAndPush(`Rename hero ${hero} -> ${newName}`);
+
+        heroEditSessions.delete(message.author.id);
+        return message.reply("Hero renamed.");
       }
 
-      if (field === "type") {
+      if (mode === "2") {
+        heroesData[hero].roles = content.split(",").map(r => r.trim());
+      }
+
+      if (mode === "3") {
         heroesData[hero].type = content;
       }
 
-      if (field === "category") {
-        const categories = content
-          .split(";")
-          .map(c => c.trim())
-          .filter(Boolean);
-
-        heroesData[hero].category =
-          categories.length === 1 ? categories[0] : categories;
-      }
-
-      if (field === "image") {
-        if (message.attachments.size === 0) {
-          await message.reply("Send image file.");
-          return true;
-        }
-
-        const attachment = message.attachments.first();
-        const ext = path.extname(attachment.name || "").toLowerCase();
-
-        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
-          await message.reply("Invalid image.");
-          return true;
-        }
-
-        const old = findImage(hero);
-        if (old) {
-          fs.unlinkSync(`./images/${old}`);
-        }
-
-        const imagePath = `./images/${hero}${ext}`;
-        await downloadAttachment(attachment.url, imagePath);
-      }
-
-      if (field === "pdf") {
-        if (message.attachments.size === 0) {
-          await message.reply("Send PDF file.");
-          return true;
-        }
-
-        const attachment = message.attachments.first();
-        const ext = path.extname(attachment.name || "").toLowerCase();
-
-        if (ext !== ".pdf") {
-          await message.reply("Invalid PDF.");
-          return true;
-        }
-
-        const old = findPdf(hero);
-        if (old) {
-          fs.unlinkSync(`./pdf/${old}`);
-        }
-
-        const pdfPath = `./pdf/${hero}.pdf`;
-        await downloadAttachment(attachment.url, pdfPath);
+      if (mode === "4") {
+        heroesData[hero].category = content;
       }
 
       saveHeroesJson();
-      heroEditSessions.delete(message.author.id);
-
       gitCommitAndPush(`Edit hero: ${hero}`);
 
-      await message.reply(`Hero updated: ${formatFileLabel(hero)}`);
+      heroEditSessions.delete(message.author.id);
+      return message.reply("Hero updated.");
+    }
+
+    // ===== IMAGE / PDF =====
+    if (session.step === 3 && ["5", "6"].includes(session.data.mode)) {
+      const hero = session.data.hero;
+
+      if (message.attachments.size === 0) {
+        await message.reply("Send file.");
+        return true;
+      }
+
+      const attachment = message.attachments.first();
+      const ext = path.extname(attachment.name || "").toLowerCase();
+
+      if (session.data.mode === "5") {
+        ensureDir("./images");
+        await downloadAttachment(attachment.url, `./images/${hero}${ext}`);
+      }
+
+      if (session.data.mode === "6") {
+        ensureDir("./pdf");
+        await downloadAttachment(attachment.url, `./pdf/${hero}.pdf`);
+      }
+
+      gitCommitAndPush(`Update file for ${hero}`);
+      heroEditSessions.delete(message.author.id);
+
+      return message.reply("File updated.");
+    }
+
+    // ===== ANDROID IMAGES =====
+    if (session.step === 10) {
+      const hero = session.data.hero;
+      const mode = session.data.mode;
+
+      const folder = path.join("./hero-guide-images", hero);
+      ensureDir(folder);
+
+      // REPLACE
+      if (mode === "8" && !session.cleared) {
+        if (fs.existsSync(folder)) {
+          fs.rmSync(folder, { recursive: true, force: true });
+        }
+        ensureDir(folder);
+        session.cleared = true;
+      }
+
+      if (content === "done") {
+        gitCommitAndPush(`Update Android images for ${hero}`);
+        heroEditSessions.delete(message.author.id);
+        return message.reply("Android images updated.");
+      }
+
+      if (message.attachments.size === 0) {
+        await message.reply("Send images or write `done`.");
+        return true;
+      }
+
+      const files = fs.existsSync(folder) ? fs.readdirSync(folder) : [];
+      let index = files.length + 1;
+
+      for (const attachment of message.attachments.values()) {
+        const ext = path.extname(attachment.name || "").toLowerCase();
+
+        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) continue;
+
+        const filePath = path.join(folder, `${index}${ext}`);
+        await downloadAttachment(attachment.url, filePath);
+        index++;
+      }
+
+      await message.reply("Image(s) added. Send more or write `done`.");
       return true;
     }
+
   } catch (err) {
     console.error("Edit hero error:", err);
     heroEditSessions.delete(message.author.id);
-    await message.reply("Error editing hero.");
+    await message.reply("Something went wrong.");
     return true;
   }
 
