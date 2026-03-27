@@ -150,6 +150,13 @@
       "images": [
         "healer-1774634455437-8065.png"
       ]
+    },
+    "Assist": {
+      "file": "assist.pdf",
+      "text": "__ASSIST__\n\nAn assist is a support-type unit that:\n\n• without being on field, it enhances allies through utility effects\n• provides indirect support such as energy gain, buffs, or synergy effects\n• contributes to the team without being a primary damage dealer\n• replacing your death unit to continue your team synergy\n\nIts objective is:\n\nSupport the team by improving overall performance through utility, enabling allies to perform better and maintain control of the fight.",
+      "images": [
+        "assist-1774645131324.png"
+      ]
     }
   }
 }
