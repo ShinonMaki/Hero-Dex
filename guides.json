@@ -164,6 +164,13 @@
       "images": [
         "bursty-mage-1774645212489.png"
       ]
+    },
+    "Bursty Assassin": {
+      "file": "bursty-assassin.pdf",
+      "text": "__BURSTY ASSASSIN__\n\nA bursty assassin is an assassin-type unit that:\n\n• deals very high burst damage\n• eliminates a target very quickly\n• often in the first seconds of the fight\n\nIts objective is:\n\nPrioritize neutralizing the opponent’s main damage sources or eliminating fragile supports early to prevent the fight from shifting in their favor",
+      "images": [
+        "bursty-assassin-1774645289636.png"
+      ]
     }
   }
 }
