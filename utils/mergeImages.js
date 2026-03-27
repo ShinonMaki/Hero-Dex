@@ -2,19 +2,25 @@ const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
 
-// tempo cache (in ms) → 10 minuti
-const CACHE_TTL = 10 * 60 * 1000;
+const CACHE_TTL = 10 * 60 * 1000; // 10 min
+const MAX_HEIGHT = 4000; // altezza max per immagine (safe Discord)
 
-async function mergeImagesVertically(imagePaths, outputPath) {
+async function mergeImagesVertically(imagePaths, outputBasePath) {
   try {
-    // ===== CACHE CHECK =====
-    if (fs.existsSync(outputPath)) {
-      const stats = fs.statSync(outputPath);
-      const now = Date.now();
+    const folder = path.dirname(outputBasePath);
+    const baseName = path.basename(outputBasePath, ".png");
 
-      if (now - stats.mtimeMs < CACHE_TTL) {
-        // file già valido → non rigenero
-        return outputPath;
+    // ===== CACHE CHECK =====
+    const existingParts = fs
+      .readdirSync(folder)
+      .filter(f => f.startsWith(baseName) && f.endsWith(".png"));
+
+    if (existingParts.length > 0) {
+      const firstFile = path.join(folder, existingParts[0]);
+      const stats = fs.statSync(firstFile);
+
+      if (Date.now() - stats.mtimeMs < CACHE_TTL) {
+        return existingParts.map(f => path.join(folder, f));
       }
     }
 
@@ -23,10 +29,9 @@ async function mergeImagesVertically(imagePaths, outputPath) {
       imagePaths.map(p => sharp(p).metadata())
     );
 
-    // larghezza massima
     const width = Math.max(...metadata.map(m => m.width || 0));
 
-    // ===== RESIZE IMMAGINI =====
+    // ===== RESIZE =====
     const resizedImages = await Promise.all(
       imagePaths.map(p =>
         sharp(p)
@@ -43,45 +48,79 @@ async function mergeImagesVertically(imagePaths, outputPath) {
       resizedImages.map(img => sharp(img).metadata())
     );
 
-    const totalHeight = resizedMetadata.reduce(
-      (sum, m) => sum + (m.height || 0),
-      0
-    );
+    // ===== SPLIT LOGIC =====
+    let parts = [];
+    let currentImages = [];
+    let currentHeight = 0;
 
-    // ===== COMPOSITE =====
-    let top = 0;
+    for (let i = 0; i < resizedImages.length; i++) {
+      const imgHeight = resizedMetadata[i].height || 0;
 
-    const composite = resizedImages.map((img, i) => {
-      const obj = {
-        input: img,
-        top: top,
-        left: 0
-      };
-
-      top += resizedMetadata[i].height || 0;
-      return obj;
-    });
-
-    // ===== OUTPUT =====
-    await sharp({
-      create: {
-        width,
-        height: totalHeight,
-        channels: 3,
-        background: { r: 255, g: 255, b: 255 }
+      if (currentHeight + imgHeight > MAX_HEIGHT && currentImages.length > 0) {
+        parts.push(currentImages);
+        currentImages = [];
+        currentHeight = 0;
       }
-    })
-      .composite(composite)
-      .png({
-        quality: 90,
-        compressionLevel: 9
-      })
-      .toFile(outputPath);
 
-    return outputPath;
+      currentImages.push({
+        buffer: resizedImages[i],
+        height: imgHeight
+      });
+
+      currentHeight += imgHeight;
+    }
+
+    if (currentImages.length > 0) {
+      parts.push(currentImages);
+    }
+
+    // ===== GENERATE FILES =====
+    const outputFiles = [];
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+
+      let top = 0;
+
+      const composite = part.map(img => {
+        const obj = {
+          input: img.buffer,
+          top,
+          left: 0
+        };
+        top += img.height;
+        return obj;
+      });
+
+      const totalHeight = part.reduce((sum, img) => sum + img.height, 0);
+
+      const outputPath =
+        parts.length === 1
+          ? outputBasePath
+          : path.join(folder, `${baseName}-part${i + 1}.png`);
+
+      await sharp({
+        create: {
+          width,
+          height: totalHeight,
+          channels: 3,
+          background: { r: 255, g: 255, b: 255 }
+        }
+      })
+        .composite(composite)
+        .png({
+          quality: 90,
+          compressionLevel: 9
+        })
+        .toFile(outputPath);
+
+      outputFiles.push(outputPath);
+    }
+
+    return outputFiles;
 
   } catch (err) {
-    console.error("Merge images error:", err);
+    console.error("Merge+Split error:", err);
     throw err;
   }
 }
