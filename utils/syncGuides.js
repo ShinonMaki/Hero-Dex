@@ -1,76 +1,75 @@
 const fs = require("fs");
 const path = require("path");
-const { createGuidePdf } = require("./guideUtils");
+const { getGuides, saveGuides, createGuidePdf, guidesFolderPath, slugify } = require("./guideUtils");
 
 const guidesPath = path.join(__dirname, "../guides.json");
-const guidesFolder = path.join(__dirname, "../guides");
 
-function getGuideNameFromFile(file) {
-  return file.split("-")[0];
+function isImageFile(file) {
+  return /\.(png|jpg|jpeg|webp)$/i.test(file);
+}
+
+function getImagesForGuide(files, guideTitle) {
+  const guideSlug = slugify(guideTitle);
+
+  return files
+    .filter(file => isImageFile(file))
+    .filter(file => file.toLowerCase().startsWith(`${guideSlug}-`))
+    .sort((a, b) => {
+      const numA = extractTrailingNumber(a);
+      const numB = extractTrailingNumber(b);
+
+      if (numA === null || numB === null) {
+        return a.localeCompare(b);
+      }
+
+      return numA - numB;
+    });
+}
+
+function extractTrailingNumber(filename) {
+  const name = path.parse(filename).name;
+  const match = name.match(/-(\d+)$/);
+  return match ? parseInt(match[1], 10) : null;
 }
 
 async function syncGuides() {
-  const guidesData = JSON.parse(fs.readFileSync(guidesPath, "utf-8"));
-
-  const files = fs.readdirSync(guidesFolder);
-
-  const imageMap = {};
-
-  for (const file of files) {
-    if (!file.endsWith(".png")) continue;
-
-    const guideName = getGuideNameFromFile(file);
-
-    if (!imageMap[guideName]) {
-      imageMap[guideName] = [];
-    }
-
-    imageMap[guideName].push(file);
-  }
+  const guidesData = getGuides();
+  const files = fs.readdirSync(guidesFolderPath);
 
   let updated = 0;
 
   for (const category of Object.keys(guidesData)) {
-    for (const guideName of Object.keys(guidesData[category])) {
-      const guide = guidesData[category][guideName];
+    const categoryGuides = guidesData[category];
 
-      const images = imageMap[guideName] || [];
+    if (!categoryGuides || typeof categoryGuides !== "object" || Array.isArray(categoryGuides)) {
+      continue;
+    }
 
-      // ordina per numero se possibile
-      images.sort((a, b) => {
-        const numA = parseInt(a.split("-")[1]);
-        const numB = parseInt(b.split("-")[1]);
-        return numA - numB;
-      });
+    for (const guideTitle of Object.keys(categoryGuides)) {
+      const guide = categoryGuides[guideTitle];
+      const images = getImagesForGuide(files, guideTitle);
 
       guide.images = images;
 
       try {
-        const imagePaths = images.map(img =>
-          path.join(guidesFolder, img)
-        );
-
-        const outputPath = path.join(
-          guidesFolder,
-          guide.file || `${guideName}.pdf`
-        );
+        const imagePaths = images.map(img => path.join(guidesFolderPath, img));
+        const outputPath = path.join(guidesFolderPath, guide.file || `${slugify(guideTitle)}.pdf`);
 
         await createGuidePdf(
           outputPath,
-          guideName,
+          guideTitle,
           guide.text || "",
           imagePaths
         );
 
         updated++;
       } catch (err) {
-        console.error(`Error regenerating ${guideName}:`, err);
+        console.error(`Error regenerating ${guideTitle}:`, err);
       }
     }
   }
 
-  fs.writeFileSync(guidesPath, JSON.stringify(guidesData, null, 2));
-
+  saveGuides(guidesData);
   return updated;
 }
 
