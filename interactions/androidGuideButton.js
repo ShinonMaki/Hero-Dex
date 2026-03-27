@@ -1,6 +1,8 @@
 const path = require("path");
 const fs = require("fs");
 
+const MAX_FILES_PER_MESSAGE = 10;
+
 async function handleAndroidGuideButton(interaction) {
   const hero = interaction.customId.replace("android_", "");
   const folder = path.join("./hero-guide-images", hero);
@@ -15,6 +17,7 @@ async function handleAndroidGuideButton(interaction) {
   const files = fs
     .readdirSync(folder)
     .filter(file => /\.(png|jpg|jpeg|webp)$/i.test(file))
+    .filter(file => !file.includes("merged"))
     .sort((a, b) => {
       const numA = parseInt(a, 10);
       const numB = parseInt(b, 10);
@@ -34,17 +37,21 @@ async function handleAndroidGuideButton(interaction) {
   }
 
   const imagePaths = files.map(file => path.join(folder, file));
+  const chunks = chunkArray(imagePaths, MAX_FILES_PER_MESSAGE);
 
   try {
     await interaction.reply({
-      content: `Sending ${files.length} image(s)...`,
+      content: `Sending ${files.length} image(s) in ${chunks.length} message(s)...`,
       ephemeral: true
     });
 
-    await interaction.followUp({
-      files: imagePaths,
-      ephemeral: true
-    });
+    for (let i = 0; i < chunks.length; i++) {
+      await interaction.followUp({
+        content: chunks.length > 1 ? `Part ${i + 1}/${chunks.length}` : undefined,
+        files: chunks[i],
+        ephemeral: true
+      });
+    }
   } catch (err) {
     console.error("Android/PC guide send error:", err);
 
@@ -60,6 +67,16 @@ async function handleAndroidGuideButton(interaction) {
       ephemeral: true
     });
   }
+}
+
+function chunkArray(array, size) {
+  const chunks = [];
+
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+
+  return chunks;
 }
 
 module.exports = { handleAndroidGuideButton };
