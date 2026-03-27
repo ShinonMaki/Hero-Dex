@@ -36,7 +36,7 @@ async function handleAndroidGuideButton(interaction) {
   }
 
   const imagePaths = files.map(f => path.join(folder, f));
-  const outputPath = path.join(folder, `${hero}-merged.png`);
+  const outputBasePath = path.join(folder, `${hero}-merged.png`);
 
   try {
     await interaction.reply({
@@ -44,10 +44,10 @@ async function handleAndroidGuideButton(interaction) {
       ephemeral: true
     });
 
-    await mergeImagesVertically(imagePaths, outputPath);
+    const outputFiles = await mergeImagesVertically(imagePaths, outputBasePath);
 
     await interaction.followUp({
-      files: [outputPath],
+      files: outputFiles,
       ephemeral: true
     });
   } catch (err) {
