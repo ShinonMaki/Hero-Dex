@@ -93,6 +93,7 @@
     }
   },
   "test": {},
-  "shop": [],
-  "hero roles": []
+  "shop": {},
+  "hero roles": {}
 }
+ 
