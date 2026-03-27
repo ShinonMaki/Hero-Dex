@@ -115,6 +115,13 @@
       "images": [
         "off-tank-1774615017769.png"
       ]
+    },
+    "DPS Mage": {
+      "file": "dps-mage.pdf",
+      "text": "__DPS MAGE__\n\nA DPS mage is a mage-type unit that:\n\n• deals consistent magic damage\n• relies on abilities to damage enemies over time\n• can pressure multiple targets with spells\n\nIts objective is:\n\nApply sustained magical damage to weaken the enemy team and support allies by constantly pressuring enemy units throughout the fight.\n\nDPS mages: Madara > Mai > Makima > Muzan > Frieren > Gojo",
+      "images": [
+        "dps-mage-1774615147664.png"
+      ]
     }
   }
 }
