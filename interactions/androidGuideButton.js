@@ -35,8 +35,8 @@ async function handleAndroidGuideButton(interaction) {
     });
   }
 
-  const imagePaths = files.map(f => path.join(folder, f));
-  const outputBasePath = path.join(folder, `${hero}-merged.png`);
+  const imagePaths = files.map(file => path.join(folder, file));
+  const outputPath = path.join(folder, `${hero}-merged.png`);
 
   try {
     await interaction.reply({
@@ -44,26 +44,26 @@ async function handleAndroidGuideButton(interaction) {
       ephemeral: true
     });
 
-    const outputFiles = await mergeImagesVertically(imagePaths, outputBasePath);
+    await mergeImagesVertically(imagePaths, outputPath);
 
     await interaction.followUp({
-      files: outputFiles,
+      files: [outputPath],
       ephemeral: true
     });
   } catch (err) {
     console.error("Android guide merge error:", err);
 
-    if (interaction.deferred || interaction.replied) {
-      await interaction.followUp({
-        content: "Error generating image.",
-        ephemeral: true
-      });
-    } else {
-      await interaction.reply({
+    if (interaction.replied || interaction.deferred) {
+      return interaction.followUp({
         content: "Error generating image.",
         ephemeral: true
       });
     }
+
+    return interaction.reply({
+      content: "Error generating image.",
+      ephemeral: true
+    });
   }
 }
 
