@@ -108,6 +108,13 @@
       "images": [
         "dps-assassin-1774614889968.png"
       ]
+    },
+    "Off Tank": {
+      "file": "off-tank.pdf",
+      "text": "__OFF-TANK__\n\nAn off-tank is a frontline unit that:\n\n• combines durability with utility or damage\n• can absorb a moderate amount of damage\n• supports the frontline while contributing with control, buffs, debuffs, or extra damage\n\nIts objective is:\n\nAssist the main tank in maintaining frontline stability while applying additional pressure and utility during the fight.",
+      "images": [
+        "off-tank-1774615017769.png"
+      ]
     }
   }
 }
