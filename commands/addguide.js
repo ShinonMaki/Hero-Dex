@@ -1,39 +1,30 @@
-const path = require("path");
-const fs = require("fs");
 const {
   ActionRowBuilder,
+  StringSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle
 } = require("discord.js");
 
-const {
-  guideAddSessions
-} = require("../sessions/guideSessions");
-
+const { guideAddSessions } = require("../sessions/guideSessions");
 const {
   getGuides,
   addCategory,
   addGuide,
   createGuidePdf,
-  ensureGuidesFolder,
+  guidesFolderPath,
   slugify,
-  guidesFolderPath
+  ensureGuidesFolder
 } = require("../utils/guideUtils");
 
-const {
-  gitCommitAndPush
-} = require("../utils/gitUtils");
-
-const {
-  formatFileLabel
-} = require("../utils/formatUtils");
+const path = require("path");
+const fs = require("fs");
 
 async function startAddGuide(interactionOrMessage) {
   const userId = interactionOrMessage.user?.id || interactionOrMessage.author?.id;
   const isInteraction = !!interactionOrMessage.isButton;
 
   if (guideAddSessions.has(userId)) {
-    return reply(interactionOrMessage, "You are already adding a guide.", isInteraction);
+    return sendReply(interactionOrMessage, "You are already creating a guide.", isInteraction);
   }
 
   guideAddSessions.set(userId, {
@@ -41,43 +32,83 @@ async function startAddGuide(interactionOrMessage) {
     data: {
       category: null,
       title: null,
-      text: null,
-      wantsImages: null,
-      imagePaths: [],
-      imageNames: []
+      text: "",
+      images: []
     }
   });
 
   const guides = getGuides();
   const categories = Object.keys(guides);
 
-  const buttons = categories.slice(0, 4).map(category =>
-    new ButtonBuilder()
-      .setCustomId(`guide_add_category_${category}`)
-      .setLabel(formatFileLabel(category))
-      .setStyle(ButtonStyle.Primary)
-  );
+  const selectMenu = new StringSelectMenuBuilder()
+    .setCustomId("guide_add_select_category")
+    .setPlaceholder("Choose a category")
+    .addOptions(
+      categories.slice(0, 25).map(category => ({
+        label: category.slice(0, 100),
+        value: category
+      }))
+    );
 
-  buttons.push(
+  const row1 = new ActionRowBuilder().addComponents(selectMenu);
+
+  const row2 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("guide_add_category_new")
       .setLabel("Add Category")
       .setStyle(ButtonStyle.Success)
   );
 
-  const row = new ActionRowBuilder().addComponents(buttons);
-
   if (isInteraction) {
     return interactionOrMessage.reply({
-      content: "Choose a category.",
-      components: [row],
+      content: "Choose a category or create a new one.",
+      components: [row1, row2],
       ephemeral: true
     });
   }
 
   return interactionOrMessage.reply({
-    content: "Choose a category.",
-    components: [row]
+    content: "Choose a category or create a new one.",
+    components: [row1, row2]
+  });
+}
+
+async function handleAddGuideCategorySelect(interaction) {
+  const session = guideAddSessions.get(interaction.user.id);
+
+  if (!session) {
+    return interaction.reply({
+      content: "No active session.",
+      ephemeral: true
+    });
+  }
+
+  const category = interaction.values[0];
+
+  session.data.category = category;
+  session.step = 2;
+
+  return interaction.reply({
+    content: `Category selected: ${category}\nNow send the guide title.`,
+    ephemeral: true
+  });
+}
+
+async function handleAddGuideNewCategory(interaction) {
+  const session = guideAddSessions.get(interaction.user.id);
+
+  if (!session) {
+    return interaction.reply({
+      content: "No active session.",
+      ephemeral: true
+    });
+  }
+
+  session.step = 99;
+
+  return interaction.reply({
+    content: "Send the new category name.",
+    ephemeral: true
   });
 }
 
@@ -87,138 +118,52 @@ async function handleAddGuideFlow(message) {
   const session = guideAddSessions.get(message.author.id);
   const content = message.content.trim();
 
-  if (content.toLowerCase() === ".cancelguide") {
+  if (content.toLowerCase() === ".canceladdguide") {
     guideAddSessions.delete(message.author.id);
     await message.reply("Guide creation cancelled.");
     return true;
   }
 
   try {
-    // STEP 2 - NEW CATEGORY NAME
-    if (session.step === 2) {
-      const newCategory = content.toLowerCase().trim();
-
-      if (!newCategory) {
-        await message.reply("Write the new category name.");
-        return true;
-      }
+    // ===== NEW CATEGORY =====
+    if (session.step === 99) {
+      const newCategory = content.toLowerCase();
 
       addCategory(newCategory);
+
       session.data.category = newCategory;
+      session.step = 2;
+
+      await message.reply(`Category created: ${newCategory}\nNow send the guide title.`);
+      return true;
+    }
+
+    // ===== TITLE =====
+    if (session.step === 2) {
+      session.data.title = content;
       session.step = 3;
 
-      await message.reply(`Category created: ${formatFileLabel(newCategory)}\nNow send the guide title.`);
+      await message.reply("Send the guide text.");
       return true;
     }
 
-    // STEP 3 - TITLE
+    // ===== TEXT =====
     if (session.step === 3) {
-      if (!content) {
-        await message.reply("Guide title?");
-        return true;
-      }
-
-      session.data.title = content;
+      session.data.text = content;
       session.step = 4;
 
-      await message.reply("Guide text?");
+      await message.reply("Send images (or type `skip`).");
       return true;
     }
 
-    // STEP 4 - TEXT
+    // ===== IMAGES =====
     if (session.step === 4) {
-      if (!content) {
-        await message.reply("Guide text?");
-        return true;
-      }
-
-      session.data.text = content;
-      session.step = 5;
-
-      await message.reply("Do you want to add images? (yes/no)");
-      return true;
-    }
-
-    // STEP 5 - IMAGES YES/NO
-    if (session.step === 5) {
-      const choice = content.toLowerCase();
-
-      if (choice !== "yes" && choice !== "no") {
-        await message.reply("Reply with yes or no.");
-        return true;
-      }
-
-      session.data.wantsImages = choice === "yes";
-
-      if (choice === "yes") {
-        session.step = 6;
-        await message.reply("Send the images now. When you are done, write `done`.");
-        return true;
-      }
-
-      ensureGuidesFolder();
-
-      const safeFileName = `${slugify(session.data.title)}.pdf`;
-      const outputPath = path.join(guidesFolderPath, safeFileName);
-
-      await createGuidePdf(
-        outputPath,
-        session.data.title,
-        session.data.text,
-        []
-      );
-
-      addGuide(
-        session.data.category,
-        session.data.title,
-        safeFileName,
-        session.data.text,
-        []
-      );
-
-      const guideTitle = session.data.title;
-      guideAddSessions.delete(message.author.id);
-
-      gitCommitAndPush(`Add guide: ${guideTitle}`);
-
-      await message.reply(`Guide added successfully: ${guideTitle}`);
-      return true;
-    }
-
-    // STEP 6 - RECEIVE IMAGES
-    if (session.step === 6) {
-      if (content.toLowerCase() === "done") {
-        ensureGuidesFolder();
-
-        const safeFileName = `${slugify(session.data.title)}.pdf`;
-        const outputPath = path.join(guidesFolderPath, safeFileName);
-
-        await createGuidePdf(
-          outputPath,
-          session.data.title,
-          session.data.text,
-          session.data.imagePaths
-        );
-
-        addGuide(
-          session.data.category,
-          session.data.title,
-          safeFileName,
-          session.data.text,
-          session.data.imageNames
-        );
-
-        const guideTitle = session.data.title;
-        guideAddSessions.delete(message.author.id);
-
-        gitCommitAndPush(`Add guide: ${guideTitle}`);
-
-        await message.reply(`Guide added successfully: ${guideTitle}`);
-        return true;
+      if (content.toLowerCase() === "skip") {
+        return finalizeGuide(message, session);
       }
 
       if (message.attachments.size === 0) {
-        await message.reply("Send image files, or write `done` when finished.");
+        await message.reply("Send images or type `skip`.");
         return true;
       }
 
@@ -226,43 +171,73 @@ async function handleAddGuideFlow(message) {
 
       for (const attachment of message.attachments.values()) {
         const ext = path.extname(attachment.name || "").toLowerCase();
+        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) continue;
 
-        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
-          continue;
-        }
-
-        const safeTitle = slugify(session.data.title || "guide");
-        const imageName = `${safeTitle}-${Date.now()}-${Math.floor(Math.random() * 10000)}${ext}`;
-        const imagePath = path.join(guidesFolderPath, imageName);
+        const fileName = `${slugify(session.data.title)}-${Date.now()}${ext}`;
+        const filePath = path.join(guidesFolderPath, fileName);
 
         const res = await fetch(attachment.url);
         const buffer = Buffer.from(await res.arrayBuffer());
-        fs.writeFileSync(imagePath, buffer);
 
-        session.data.imagePaths.push(imagePath);
-        session.data.imageNames.push(imageName);
+        fs.writeFileSync(filePath, buffer);
+
+        session.data.images.push(fileName);
       }
 
-      await message.reply("Image(s) added. Send more images or write `done`.");
+      await message.reply("Image(s) added. Send more or type `done`.");
+
+      session.step = 5;
       return true;
     }
+
+    // ===== DONE IMAGES =====
+    if (session.step === 5) {
+      if (content.toLowerCase() !== "done") {
+        await message.reply("Type `done` when finished.");
+        return true;
+      }
+
+      return finalizeGuide(message, session);
+    }
+
   } catch (err) {
     console.error("Add guide error:", err);
     guideAddSessions.delete(message.author.id);
-    await message.reply("Something went wrong while creating the guide.");
+    await message.reply("Something went wrong.");
     return true;
   }
 
   return false;
 }
 
-async function reply(target, content, ephemeral = false) {
-  if (target.reply) {
-    return target.reply(ephemeral ? { content, ephemeral: true } : content);
+async function finalizeGuide(message, session) {
+  const { category, title, text, images } = session.data;
+
+  const fileName = `${slugify(title)}.pdf`;
+  const pdfPath = path.join(guidesFolderPath, fileName);
+
+  const imagePaths = images.map(img => path.join(guidesFolderPath, img));
+
+  await createGuidePdf(pdfPath, title, text, imagePaths);
+
+  addGuide(category, title, fileName, text, images);
+
+  guideAddSessions.delete(message.author.id);
+
+  await message.reply(`Guide created: ${title}`);
+}
+
+async function sendReply(target, content, isInteraction = false) {
+  if (isInteraction) {
+    return target.reply({ content, ephemeral: true });
   }
+
+  return target.reply(content);
 }
 
 module.exports = {
   startAddGuide,
-  handleAddGuideFlow
+  handleAddGuideFlow,
+  handleAddGuideCategorySelect,
+  handleAddGuideNewCategory
 };
