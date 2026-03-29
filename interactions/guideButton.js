@@ -1,9 +1,18 @@
 const { findPdf } = require("../utils/fileUtils");
+const { isPremium } = require("../utils/premiumUtils");
 
 async function handleGuideButton(interaction) {
   const hero = interaction.customId.replace("guide_", "");
 
   try {
+    // 🔒 CONTROLLO PREMIUM
+    if (!isPremium(interaction.user.id)) {
+      return interaction.reply({
+        content: "🔒 This guide is premium only.",
+        ephemeral: true
+      });
+    }
+
     await interaction.deferReply({ ephemeral: true });
 
     const pdf = findPdf(hero);
