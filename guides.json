@@ -483,6 +483,13 @@
       "images": [
         "star-stone-1774820719848.png"
       ]
+    },
+    "Map & Mine Level": {
+      "file": "map-mine-level.pdf",
+      "text": "**Map**\nThe more you mine. The better the map you will unlock, prizes like red star stone will have a higher chance of appearing in the map.\n\n**Mine Level**\nMine Levels are easy to understand, you mine for star stone or other rewards, you get extra ore to level up your mine, the higher the level it unlocks extra stats and more slots for placing your star stone.",
+      "images": [
+        "map-mine-level-1774820834950.png"
+      ]
     }
   }
 }
