@@ -535,6 +535,11 @@
       "images": [
         "noble-phantasm-1774821502402.png"
       ]
+    },
+    "Auction Dividend": {
+      "file": "auction-dividend.pdf",
+      "text": "## Auction Dividend by RandomStranger\nNA & EU:\n- Anyone hit on the alliance world boss (before auction start ofc) will get % commission from auction diamonds spent on Alliance Bidding.\n- Max cap is 3000 diamonds from % commission.\n- The ideal number is: people hit on bosss should be ≤ 8.\n- The ammount of diamond recieve would be: [total diamonds spent on auction] ÷ number of people hitting boss = 3000 diamonds max.\n`for example: 3000 max of 8 people = 3000 * 8 = 24.000 diamonds need to be spent in alliance auction`\n- Any spare NP, goddess gear, reform gear & timewheel that didn't get bought will be transfer into World Bidding.\n- If anyone bid/ buyout the spare items from your alliance, you will get another split of commission (max is still 3000)\n- So basically if the server on has less than 3 guilds, you can manipulate to have 6.000 diamonds a day.",
+      "images": []
     }
   }
 }
