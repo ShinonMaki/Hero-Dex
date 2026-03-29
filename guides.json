@@ -334,5 +334,13 @@
       ]
     }
   },
-  "summon & hero assembly": {}
+  "summon & hero assembly": {
+    "Summon & Hero Assembly": {
+      "file": "summon-hero-assembly.pdf",
+      "text": "**Advance Summons**\nIt is recommended to save your summon ticket for the Hero Assembly Event especially for early game F2P players.\n\n**Specific Summons**\nIt is recommended to save you special card for hero assembly event.\n\nThe Special Point you get can be use to exchange new LTD unit upon their first release.\n\nFuture Summon Point Shop might update LTD unit like Gilgamesh, Rem & Saber into it. So if you don't plan on using on random light/dark unit is best to save for new LTD or LTD unit being added to it.\n\nThe point card draw you can choose a fraction and summon it with 1k/2k points accumulated when using your special ticket to get a random 5star unit.\n\n**Hero Assembly**\nYou will start seeing Hero Assembly Event on Day 31 of your server age. Main place to get extra resources.\n\nEvent on going for 30 days, and it refreshed monthly.\n\nThere will be up to 3 rounds for you to complete monthly. Each round takes 260 heroes to complete. Do take note merging 4 star units to 5 star units doesn't count.\n\n**Hero Conversion**\nPeople mainly use this feature if they are lacking the specific copy to star up a unit.\n\nDo note it is possible to get Shining unit from refreshing but the odds of getting them are low and RNG.",
+      "images": [
+        "summon-hero-assembly-1774817803346.png"
+      ]
+    }
+  }
 }
