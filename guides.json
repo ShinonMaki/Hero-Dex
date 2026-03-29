@@ -542,5 +542,11 @@
       "images": []
     }
   },
-  "cross server event": {}
+  "cross server event": {
+    "Ninja War pt1": {
+      "file": "ninja-war-pt1.pdf",
+      "text": "**1. What is Ninja War**\nNinja War is a guild event where 48 guilds compete against each other, divided into groups of 12 guilds.\nThe objective of the event is to capture as many fortresses as possible, including those controlled by rival guilds.\nGuilds must fight and compete for control of these fortresses in order to gain an advantage during the event.\n\n**2. Starting the Event**\nAt the beginning of the event, each player starts at their guild’s base.\nFrom there, players must capture adjacent fortresses in order to move across the map and expand their control.\nSome fortresses provide special advantages, making them strategic points that guilds should prioritize capturing and defending.\n\n**3. Ninja War Phases**\nThe Ninja War event is divided into two phases:\nPhase 1 – Fortress Conquest and Defense\nDuration: 9 hours\nDuring this phase, guilds focus on capturing and defending fortresses across the map.\n\nPhase 2 – Base Destruction\nDuration: 3 hours\nDuring this phase, the shields protecting guild bases are removed, allowing players to attack and destroy enemy guild bases.\n\n**4. How to Win Ninja War**\nThere are two ways to win the Ninja War event:\n1. Victory by Points\nThe guild that controls the highest number of fortresses will gain the advantage in points.\n2. Total Domination\nA guild can also win by capturing all fortresses on the map and destroying all enemy guild bases.",
+      "images": []
+    }
+  }
 }
