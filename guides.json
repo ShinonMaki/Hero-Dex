@@ -492,5 +492,14 @@
       ]
     }
   },
-  "fish realm": {}
+  "fish realm": {
+    "Fishing": {
+      "file": "fishing.pdf",
+      "text": "**Fishing**\nFishing is the best way for you to obtain stats.\n\nSo how do we maximize fishing?\nFirst off we need to understand that we will be getting 90 breads per fishing day, and our max breads we can save are 180, the fishing order mission says if you fish 200 times, it will automatically help you to complete the quest no matter what progression your on.\n\nKnowing that information, we first have to save 180 days on 2 fishing days, use 30 bread so that you will be on 150 breads before the end of the day.\n\nOn the third fishing day of the week, you will first obtain 30 breads, which put you on 180, start refreshing the fishing order to easy quests like fishing for aquatic debris like rock, socks, heart of the ocean and etc. Those easy 3 star fishing orders which don't require you to fish for actual fish, are the most easy to complete.\n\nDo keep an eye out when you complete the order for those debris quests, submit the order and refresh for another easy 1-3 star quest. Upon finishing the 180 breads, we will get another 60 more breads here's where you need to pay attention, fish 19 bread so our total goes to 199, and stop fishing, go to the fish order refresh for those 3-5star order, and fish 1 time and boom it will automatically complete all those hard quest orders so that you can maximize the rewards earn.",
+      "images": [
+        "fishing-1774821018422.png",
+        "fishing-1774821019638.png"
+      ]
+    }
+  }
 }
