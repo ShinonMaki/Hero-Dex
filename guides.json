@@ -223,6 +223,11 @@
       "file": "capricorn-.pdf",
       "text": "## __♑ Capricorn Set__\n\n__Set Bonus__\n\n2 pieces\n• CRIT Rate +6%\n\nThis increases the chance of landing critical hits.\n\n4 pieces — Skill: Delta Capricorni\n\nDeals:\n\n+13.5% damage\n\nagainst two specific classes:\n• Warriors\n• Supports\n\n__How It Actually Works__\n\nThe bonus only applies when attacking those classes.\n\nSo:\n• Against Warriors → +13.5% damage\n• Against Supports → +13.5% damage\n• Against other classes → no bonus\n\n__Real Function of the Set__\n\n__This set is used to__\n\nkill supports and off-tanks faster.\n\nIn many teams:\n• Warriors are the frontline\n• Supports keep the team alive\n\nSo Capricorn helps break the enemy team structure.\n\n__Best Heroes for This Set__\n\nPerfect for:\n\n• Single-target DPS\n• Assassins\n• Heroes that eliminate the backline\n\nIdeal for:\n• Carries that target supports\n• Assassins that jump to the backline\n• DPS that need to eliminate healers\n\n__Not Useful For__\n\n• Tanks\n• Healers\n• Supports\n\nbecause the bonus is designed to increase offensive damage.",
       "images": []
+    },
+    "Aquarius ♒️": {
+      "file": "aquarius-.pdf",
+      "text": "## __♒ Aquarius Set__\n\n__Set Bonus__\n\n2 pieces\n• Heal Effect +9%\n\n4 pieces\n• Heal Effect +13.5% total\n\n__How It Actually Works__\n\nAll healing done by the hero is increased.\n\n__Real Function of the Set__\n\nThis set is used to:\n\nmaximize pure healing.\n\nIt does not provide shields.\nIt does not provide special effects.\n\nIt simply increases healing.\nMainly people use for early game as is easier to obtain. \nCan be combine with virgo 2piece+2piece for a higher healing effect bonus. \n\n__Best Heroes for This Set__\n\nPerfect for:\n\nPure healers\n\nHeroes that provide:\n• AoE healing\n• Continuous healing\n• Very strong single-target healing.",
+      "images": []
     }
   }
 }
