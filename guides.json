@@ -1,5 +1,4 @@
 {
-  "events": {},
   "weekly event": {
     "Limited Time Summon": {
       "file": "limited-time-summon.pdf",
@@ -234,5 +233,6 @@
       "text": "## __♓ Pisces Set__\n\n__Set Bonus__\n\n2 pieces\n• CRIT Rate +6%\n\nThis increases the chance for attacks to land critical hits.\n\n4 pieces — Skill: Eta Piscium\n\nDeals:\n\n+13.5% damage\n\nagainst two specific classes:\n• Mages\n• Assassins\n\n__How it actually works__\n\nThe bonus only applies against those classes.\n\nMage → +13.5% DMG\nAssassin → +13.5% DMG\nOther classes → No bonus\n\n__Real function of the set__\n\nPisces is designed to eliminate enemy DPS faster.\n\nUsually in most teams:\n• Mage = main DPS\n• Assassin = burst DPS\n\nBecause of this, the set is built to neutralize offensive threats quickly.\n\n__Best hero type__\n\nSingle-target DPS\nAssassin hunters\nCarry heroes focused on eliminating enemy damage dealers\n\n__Ideal for__\n\n• Heroes that attack the backline\n• DPS that need to eliminate fragile mages\n• Teams that want to remove the main damage dealer early\n\nIn PvP this set can be very strong because most teams include mages or assassins.\n\n__Common strategy__\n\nIf the meta is full of powerful mages, some DPS players equip Pisces to eliminate them before they can cast their skills.",
       "images": []
     }
-  }
+  },
+  "soul king palace": {}
 }
