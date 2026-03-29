@@ -453,5 +453,13 @@
       ]
     }
   },
-  "artifacts": {}
+  "artifacts": {
+    "Sigill Engrave & Artifact Mirror": {
+      "file": "sigill-engrave-artifact-mirror.pdf",
+      "text": "**Artifacts**\nArtifacts are pretty straightforward you get sigil you combine it and you get better artifacts unlocks.\n\n**Sigil Engrave & Artifact Mirror**\nSigil Engrave is where you dump all the blue, purple and orange sigil into it to level up to get extra stats.\n\nArtifact Mirror is basically you mirror the current artifact and get an extra duplication of it. It doesn't duplicate the sigil you engrave onto it. It only just duplicates the artifact itself.\n\nFor example the millennium puzzle currently I got my millennium puzzle activated. If I want another millennium puzzle for my team 2 unit, I need to mirror it to get another millennium puzzle, and I also need another 6 prismatic sigil to engrave in activating it.\n\nIn short, Artifact Mirror is a very very late game thing to do, most people won't even use that feature.",
+      "images": [
+        "sigill-engrave-artifact-mirror-1774819879640.png"
+      ]
+    }
+  }
 }
