@@ -444,5 +444,13 @@
       ]
     }
   },
-  "card collection": {}
+  "card collection": {
+    "Card Collection": {
+      "file": "card-collection.pdf",
+      "text": "**Card Collection**\nCards are pretty straightforward to understand, you get the card, you level it up for extra stats.\n\nYou can further enhance the stats in Duel Disk Enchantment.\n\nAs for whether you should save your card pack ticket for an event like spend tickets get extra rewards similar to Hero Assembly or Companion Summons, unfortunately NA server till now still don't have the event for it. TW(Taiwan Server) has an event for it. So whether you wanna save just in case a future event might have it, the choice is up to you",
+      "images": [
+        "card-collection-1774819717452.png"
+      ]
+    }
+  }
 }
