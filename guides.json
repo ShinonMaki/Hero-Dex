@@ -362,5 +362,16 @@
       ]
     }
   },
-  "karin tower": {}
+  "karin tower": {
+    "Karin Tower": {
+      "file": "karin-tower.pdf",
+      "text": "**Karin Tower**\nYour top 5 highest level character will be automatically added into Karin Tower. Among the top 5 units, your lowest level character will be the level of your Karin Tower.\n\nUnits that are being placed into the slot in Karin Tower will share the level of your Karin Tower.\n\n**Holy Water Refining**\nThe Holy Water Refining is a late game stats boost where you convert your EXP Candies into stats. The higher your level for leveling up your refining, the more EXP Candies is needed to convert into Holy Water.",
+      "images": [
+        "karin-tower-1774818364810.png",
+        "karin-tower-1774818365870.png",
+        "karin-tower-1774818366925.png",
+        "karin-tower-1774818367879.png"
+      ]
+    }
+  }
 }
