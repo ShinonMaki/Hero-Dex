@@ -469,5 +469,20 @@
       ]
     }
   },
-  "star mine": {}
+  "star mine": {
+    "Hook": {
+      "file": "hook.pdf",
+      "text": "**Hook**\nThere's multiple hooks you can buy and each hook has its own effect, hooks effect stacks.\n\nOn the mining page as a F2P player your main goal will be hunting special card summon, while hunting for special cards, grab all the star stone on the way. Sometimes when you see some star stone are glowing, those are basically % stats star stone.\n\nRefresh after getting your special card.\n\nThe TNT is used to bomb those items you don't want.\n\nThe apple is used to speed up by 60 second. A cool feature, if u got 5 or more apple, when u use on item that are more than 5min it will instantly obtain it, for example a red gem might need to wait around 2hour but with 5 apple you can get it instantly.\n\nThe macaroon helps u get the item instantly no matter what the time is.",
+      "images": [
+        "hook-1774820629580.png"
+      ]
+    },
+    "Star Stone": {
+      "file": "star-stone.pdf",
+      "text": "**Star Stone**\nFor this feature you will be able to reduce the size of your star stone you get from 5 all the way down to 1.\n\nUnderstanding the basics, when we mine for star stone, our stones are basically a 5 block stone.\n\nSo how do we reduce the size so we could put more stone on screen?\n\nIf you look closely there's a star stone bag feature, you'll tap on tap and it will open up your bag.\n\nIn your bag there are two features, which are Smelt and Combine.\n\nYou will first click combine, in the combine page you can click auto craft, after crafting it, go back to the smelt and combine page.\n\nClick on Smelt feature, on screen there's a quick melt feature upon clicking it it will show you 4 options to check 5-slot star stone, 4,3 & 2.\n\nWe will start by clicking 5-slot star stone, checking it and clicking yes, it will automatically help you smelt those 5-slot into 4-slot.\n\nAfter that, go back to combine, and click auto craft, you should be getting some extra new 4 star combine if you have a lot of star stone saved up.\n\nRepeat the process again, going back to smelt now check for 4-slot star stone and auto melt it, go back to auto combine and repeat the process until you get the smallest 1 block star stone.\n\nWhy do we need 1 block star stone? Cause there's a limited amount of space and if we can get the whole page filled with a 1 block prismatic our stats would be super ideal and fats chunks of stats.",
+      "images": [
+        "star-stone-1774820719848.png"
+      ]
+    }
+  }
 }
