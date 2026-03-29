@@ -311,6 +311,13 @@
       "images": [
         "warrior-tierlist-1774816327325.png"
       ]
+    },
+    "Support Tierlist": {
+      "file": "support-tierlist.pdf",
+      "text": "**PVE Soul Jade Tier List**\nSwift on all unit is essential.\n\nArmor Breaker should be equip on 1/2 unit getting the defense break helps boost DMG in PVE.\n\nPenetration, Shapeless & Strength is your main soul for your DPS. Shapeless is best on your DPS as it give extra dmg after 20s.\n\nTenacity, Dodge & Shield are mainly used on your debuffer/support to keep them alive. Cure is mainly for support for the healing to sustain your team in not dying.\n\nBlade, Enrage & Crit just not a very great Soul against PVE boss.\n\n**Support Soul Jade Tier List**\n> **S:** Purification, Cure, Swift, Tenacity, Dodge \n> **A:** Shield, DMG Reflection, Silence, Guardian\n> **B:** Shapeless, Armor Breaker, Slow, Divine Body, Dispel, Restoration, Divine Blessing, First Aid, DMG Reduction, Regeneration\n> **C:** Lifesteal, Enrage, Strength, Crit, Blade, Precision, Penetration, Cruelty, Resilience, Devotion, Inspiration, Healing Reduction",
+      "images": [
+        "support-tierlist-1774816473576.png"
+      ]
     }
   }
 }
