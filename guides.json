@@ -297,5 +297,13 @@
       ]
     }
   },
-  "soul jade": {}
+  "soul jade": {
+    "DPS- Assassin & Mage": {
+      "file": "dps--assassin-mage.pdf",
+      "text": "**DPS - Assassin & Mage Soul Jade Tier List**\nAssassin & Mage are mainly running either Shapeless + Taurus(Gold Cloth) or Enrage + Sagittarius(Gold Cloth). The common soul that they share are Swift, Strength & Penetration.\n\nSilence & Armor Breaker are mainly use for debuffing. \n\nBlade mainly use for unit that ULT a lot like Sukuna, Gojo, etc.\n\nCrit is a debatable soul as if your running a high crit unit with Crimson NP you might want to use Crit Soul, but overall if your crit is about 50% without Crit Soul I do say you can bring another soul that buffs dmg, as you will still crit eventually, it really depends on what you need.\n\nPenetration & Precision, both soul jade are good for dps, overall penetration is used more than precision due to penetration provide better value in general, precision will have more value if your fighting someone with dodge soul jade on all their support+warrior unit.\n\nStarting from Tier B to C, the soul are mainly your sub option, testing different build + soul, not really recommend for main lineup unless your cooking a new comp with it.\n\n**DPS - Assassin & Mage Soul Jade Tier List**\n> **S:** Shapeless, Strength, Swift, Enrage, Silence, Penetration\n> **A:** Blade, Crit, Armor Breaker, Dodge, Precision\n> **B:** Tenacity, Lifesteal, Slow, Cruelty\n> **C:** Divine Body, Shield, Purification, Cure, Guardian, Restoration, Divine Blessing, First Aid, DMG Reduction, DMG Reflection, Regeneration, Resilience, Dispel, Devotion, Inspiration, Healing Reduction\n> \n**Explanation:**https://discord.com/channels/1294310749757247519/1439793320577732712/1439800460331454485",
+      "images": [
+        "dps--assassin-mage-1774793082644.png"
+      ]
+    }
+  }
 }
