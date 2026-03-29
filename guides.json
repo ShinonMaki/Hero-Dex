@@ -343,5 +343,14 @@
       ]
     }
   },
-  "treasure ship": {}
+  "treasure ship": {
+    "Common Treasure Hunt , Advance Treasure Hunt": {
+      "file": "common-treasure-hunt-advance-treasure-hunt.pdf",
+      "text": "**Common Treasure Hunt**\nNormally you would just hit sail 15 times until you get the grand prize and refresh for the next grand prize.\n\n**Advanced Treasure Hunt**\nFor Advanced Treasure Hunt early game player would need to save at least sail 10 times before you start refreshing for Madoka. But is recommended that you save a lot more Sail before you refresh for Madoka since there's a 70 pull pity for Grand Prize.\n\nThis is the easiest way for you to get a strong healer Madoka, which can be used until the end of the game.\n\nFor mid/late game player when your Madoka is done building, you can refresh for DIO/Legendary Soul.",
+      "images": [
+        "common-treasure-hunt-advance-treasure-hunt-1774818091451.png",
+        "common-treasure-hunt-advance-treasure-hunt-1774818092570.png"
+      ]
+    }
+  }
 }
