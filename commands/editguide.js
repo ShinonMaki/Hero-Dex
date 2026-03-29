@@ -47,14 +47,17 @@ async function startEditGuide(interactionOrMessage) {
     return sendReply(interactionOrMessage, "No guide categories found.", isInteraction);
   }
 
-  const buttons = categories.slice(0, 5).map(category =>
-    new ButtonBuilder()
-      .setCustomId(`guide_edit_category_${category}`)
-      .setLabel(formatFileLabel(category))
-      .setStyle(ButtonStyle.Primary)
-  );
+  const options = categories.map(category => ({
+    label: formatFileLabel(category).slice(0, 100),
+    value: category
+  }));
 
-  const row = new ActionRowBuilder().addComponents(buttons);
+  const row = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId("guide_edit_category_select")
+      .setPlaceholder("Choose a category")
+      .addOptions(options.slice(0, 25))
+  );
 
   if (isInteraction) {
     return interactionOrMessage.reply({
@@ -81,7 +84,7 @@ async function handleEditGuideCategorySelection(interaction) {
   }
 
   const session = guideEditSessions.get(userId);
-  const category = interaction.customId.replace("guide_edit_category_", "");
+  const category = interaction.values[0];
   const guides = getGuides();
   const categoryGuides = guides[category];
 
