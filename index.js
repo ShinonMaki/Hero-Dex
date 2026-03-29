@@ -90,22 +90,24 @@ client.on("messageCreate", async (message) => {
 
   if (!message.content.startsWith(PREFIX)) return;
 
-  const command = message.content.slice(1).trim().toLowerCase();
-  if (!command) return;
+  const args = message.content.slice(1).trim().split(/\s+/);
+const command = args.shift()?.toLowerCase();
+if (!command) return;
 
-  if (command === "addhero") return startAddHero(message);
-  if (command === "edithero") return startEditHero(message);
-  if (command === "deletehero") return startDeleteHero(message);
-  if (command === "managehero") return handleManageHero(message);
-  if (command === "manageguide") return handleManageGuide(message);
-  if (command === "heroes") return handleHeroes(message);
-  if (command === "tierlist") return handleTierlist(message);
-  if (command === "guide") return handleGuide(message);
-  if (command === "syncguides") return handleSyncGuides(message);
-  if (command === "register") return handleRegister(message);
-  if (command === "unregister") return handleUnregister(message);
+if (command === "addhero") return startAddHero(message);
+if (command === "edithero") return startEditHero(message);
+if (command === "deletehero") return startDeleteHero(message);
+if (command === "managehero") return handleManageHero(message);
+if (command === "manageguide") return handleManageGuide(message);
+if (command === "heroes") return handleHeroes(message);
+if (command === "tierlist") return handleTierlist(message);
+if (command === "guide") return handleGuide(message);
+if (command === "syncguides") return handleSyncGuides(message);
+if (command === "register") return handleRegister(message);
+if (command === "unregister") return handleUnregister(message);
+if (command === "premiumlist") return handlePremiumList(message);
 
-  const hero = command;
+const hero = command;
   const data = heroesData[hero];
 
   const pdf = findPdf(hero);
