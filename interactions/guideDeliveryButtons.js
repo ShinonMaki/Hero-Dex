@@ -55,10 +55,19 @@ async function handleGuideDeliveryButtons(interaction) {
 
     guideViewSessions.delete(interaction.user.id);
 
+    const chunks = splitText(text, 1900);
+
     await interaction.reply({
-      content: `**${session.guideName}**\n\n${text.slice(0, 4000)}`,
+      content: `**${session.guideName}**\n\n${chunks[0] || "No text available."}`,
       ephemeral: true
     });
+
+    for (let i = 1; i < chunks.length; i++) {
+      await interaction.followUp({
+        content: chunks[i],
+        ephemeral: true
+      });
+    }
 
     for (const imageName of images) {
       const imagePath = path.join(__dirname, "..", "guides", imageName);
@@ -73,6 +82,33 @@ async function handleGuideDeliveryButtons(interaction) {
 
     return;
   }
+}
+
+function splitText(text, maxLength) {
+  const chunks = [];
+
+  if (!text || text.length <= maxLength) {
+    return [text || ""];
+  }
+
+  let remaining = text;
+
+  while (remaining.length > maxLength) {
+    let splitIndex = remaining.lastIndexOf("\n", maxLength);
+
+    if (splitIndex === -1 || splitIndex < maxLength * 0.5) {
+      splitIndex = maxLength;
+    }
+
+    chunks.push(remaining.slice(0, splitIndex).trim());
+    remaining = remaining.slice(splitIndex).trim();
+  }
+
+  if (remaining.length > 0) {
+    chunks.push(remaining);
+  }
+
+  return chunks;
 }
 
 module.exports = { handleGuideDeliveryButtons };
