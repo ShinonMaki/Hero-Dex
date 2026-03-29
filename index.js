@@ -22,6 +22,8 @@ const { handleManageHero } = require("./commands/managehero");
 const { handleManageGuide } = require("./commands/manageguide");
 const { handleGuide } = require("./commands/guide");
 const { handleSyncGuides } = require("./commands/syncguides");
+const { handleRegister } = require("./commands/register");
+const { handleUnregister } = require("./commands/unregister");
 
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
@@ -100,6 +102,8 @@ client.on("messageCreate", async (message) => {
   if (command === "tierlist") return handleTierlist(message);
   if (command === "guide") return handleGuide(message);
   if (command === "syncguides") return handleSyncGuides(message);
+  if (command === "register") return handleRegister(message);
+  if (command === "unregister") return handleUnregister(message);
 
   const hero = command;
   const data = heroesData[hero];
