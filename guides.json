@@ -234,5 +234,15 @@
       "images": []
     }
   },
-  "soul king palace": {}
+  "soul king palace": {
+    "Omotesando": {
+      "file": "omotesando.pdf",
+      "text": "__Omotesando Guide__\n\n__What is Omotesando__\n\nOmotesando is a progression mode where all heroes are affected by a Curse that greatly reduces their attributes.\nTo compensate for this penalty, players receive Soul King Blessings, which increase hero stats while progressing.\nThese effects are only active inside Omotesando.\n\n__Basic Rules__\n\n__Reduced Attributes__\n\nAll heroes have their attributes heavily reduced due to the Curse.\nAs you progress, Soul King Blessings increase your stats and allow you to climb higher ranks.\n\n__Rank System__\n\nPlayers are divided into different Omotesando ranks depending on their strength.\n\nHigher ranks provide:\n\n• better progression\n• more AFK rewards\n\n__AFK Rewards__\n\nThe higher your rank, the more Twisted Energy you gain from AFK rewards.\nThis resource is important for progressing in Omotesando.\n\n\n__Actions Limit__\n\nEach session allows a maximum of:\n\n200 actions\n\nActions are consumed when progressing through battles.\n\n__Progression__\n\n__Guards__\n\nTo advance in Omotesando you must defeat guards.\nEach guard you defeat allows you to move forward in the progression path.\n\n__Mirror Battles__\n\nYour Mirror Image will challenge other players.\n\nIf you lose:\nthe incident disappears.\n\nIf you win:\nyou receive rewards.\n\n__Blessings__\n\nYou can receive up to: 6 Blessings per day from other players.\nIf you do not receive Blessings for a while, your heroes will automatically bless you.\nBlessings increase your stats and help you progress further.\n\n__Weekly Reset__\n\nOmotesando resets every week.\n\n__Auto Progress__\n\nOnce you reach:\n\nLevel 80\n\nand defeat:\n\n80 guards\n\nyou unlock the Auto-Progress feature, which allows automatic progression.\n\n__Action Priority__\n\nWhen choosing which action to take, it is recommended to follow this order:\n\nLove Letter → Chest → Hourglass → Mirror → Prayer → Swords",
+      "images": [
+        "omotesando-1774789261942.png",
+        "omotesando-1774789263094.png",
+        "omotesando-1774789264256.png"
+      ]
+    }
+  }
 }
