@@ -304,6 +304,13 @@
       "images": [
         "dps--assassin-mage-1774793082644.png"
       ]
+    },
+    "Warrior Tierlist": {
+      "file": "warrior-tierlist.pdf",
+      "text": "**Warrior Soul Jade Tier List**\n**DPS/Half Tank**\nShapeless, Strength, Swift & Tenacity is a common build use for a half tank warrior. You can swap in Penetration/Precision/Silence/Armor Breaker depending on your needs. As mention being a half tank the combo going to be Shapeless + Taurus(Gold Cloth) or if your running a Rage Debuffer would go with Gemini(Gold Cloth) + debuffing soul jade like Silence/Armor Breaker.\n\n**Full Tank**\nTenacity, Swift, Dodge & Shapeless is a common full tank build for warrior. For Shapeless, you could change it to DMG Reflection/Shield/DMG Reduction depending on your need.\n\nSilence & Armor Breaker are both good debuffing soul jade.\n\nShield & DMG Reflection are good only if your HP is highest, the higher the better outcome. DO NOTE on Shield can't be stack so only need 1 unit in team to use it.\n\nStarting from Tier B to C, the soul are mainly your sub option, testing different build + soul, not really recommend for main lineup unless your cooking a new comp with it.\n\n**Warrior Soul Jade Tier List**\n> **S:** Shapeless, Silence, Tenacity, Swift, Dodge, Strength\n> **A:** Shield, Armor Breaker, DMG Reduction, Penetration, Precision, DMG Reflection\n> **B:** Lifesteal, Crit, Divine Body, Enrage, Blade, Guardian, Dispel, Regeneration, Restoration, Slow, Divine Blessing, First Aid, Healing Reduction\n> **C:** Purification, Cure, Cruelty, Resilience, Devotion, Inspiration",
+      "images": [
+        "warrior-tierlist-1774816327325.png"
+      ]
     }
   }
 }
