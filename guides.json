@@ -173,5 +173,11 @@
       ]
     }
   },
-  "soul armor": {}
+  "soul armor": {
+    "Aries ♈️": {
+      "file": "aries-.pdf",
+      "text": "## __♈ Aries Set__\n\nSet Bonus:\n• 2 pieces: ATK +6%\n• 4 pieces: ATK +9%\n\n__Set Function__\n\nThis is a purely offensive set.\n\nIt increases the base damage of heroes because:\n• it increases total ATK\n• which increases skill damage, basic attacks, and burst damage\n\nIt is the classic “sharp sword” set: simple and direct.\n\n__Best Heroes for This Set__\n\nWorks best on:\n\nPure DPS\nHeroes that scale directly with ATK.\nTypical examples:\n• Single target DPS\n• Burst damage heroes\n• Main team carries\n• Healers \n• Buffer\n\nNot ideal for:\n• Tanks\n• Supports (That doesn't required ATK scaling)\n\n\nbecause these usually scale with HP / DEF / Energy / Speed.\n\n__When to Use It__\n\nEarly game: ⭐⭐⭐⭐\nVery strong because it is easy to obtain.\n\nMid game: ⭐⭐⭐\nStill useful on secondary DPS.\n\nLate game: ⭐⭐\nUsually replaced by sets with more complex effects (crit, skill damage, energy, etc.).\n\n__Set Logic__\n\nThis set is designed as a:\n\n__Universal raw damage set__\n\nIf you are unsure what to equip on a DPS, Aries almost always works.\n\nIt is the set the game gives you to stabilize your damage output in the early stages.\n\nUseful tip:\nThe Aries set is often used as a temporary set while you are farming better gear sets.",
+      "images": []
+    }
+  }
 }
