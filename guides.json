@@ -92,7 +92,19 @@
       ]
     }
   },
-  "shop": {},
+  "shop": {
+    "Daily Shop, Item Shop , Medal Hero & Cloth": {
+      "file": "daily-shop-item-shop-medal-hero-cloth.pdf",
+      "text": "**Daily Shop**\nSelect all gold item - when you have excess gold\nLow gold priority:\nChallenge voucher & Helm\n\n**Item Shop**\nPretty much 25 diamonds for the advance summon sticker.\n\n**Medal Hero & Cloth**\nMedal Hero is not recommended  ❌ \n\nMedal Cloth is where you truly spend your medal on  ✅\nBuy sets for your main dps unit > support.\n\nIf you have extra diamonds you can buy the 750 special card, not really recommended if your low on diamonds, buying event item comes in priority.\n\nOther item buy at your own needs.",
+      "images": [
+        "daily-shop-item-shop-medal-hero-cloth-1774790084165.png",
+        "daily-shop-item-shop-medal-hero-cloth-1774790085170.png",
+        "daily-shop-item-shop-medal-hero-cloth-1774790086088.png",
+        "daily-shop-item-shop-medal-hero-cloth-1774790086805.png",
+        "daily-shop-item-shop-medal-hero-cloth-1774790087457.png"
+      ]
+    }
+  },
   "hero roles": {
     "Full Tank": {
       "file": "full-tank.pdf",
