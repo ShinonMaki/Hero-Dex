@@ -353,5 +353,13 @@
       ]
     }
   },
-  "commission": {}
+  "commission": {
+    "Commission": {
+      "file": "commission.pdf",
+      "text": "**Commission**\nFor commission you would always want to refresh and accept quests that give diamonds and special cards.\n\nRefresh for epic, legendary, mythic & eternal diamond commissions.",
+      "images": [
+        "commission-1774818219433.png"
+      ]
+    }
+  }
 }
