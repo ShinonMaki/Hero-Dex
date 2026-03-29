@@ -1,8 +1,4 @@
 const {
-  guideAddSessions
-} = require("../sessions/guideSessions");
-
-const {
   getGuides
 } = require("../utils/guideUtils");
 
@@ -16,40 +12,9 @@ const {
 } = require("discord.js");
 
 async function handleGuideCategoryButtons(interaction) {
-  const userId = interaction.user.id;
-
-  // ADD GUIDE FLOW category selection
-  if (interaction.customId.startsWith("guide_add_category_")) {
-    if (!guideAddSessions.has(userId)) {
-      return interaction.reply({
-        content: "No active guide creation session found.",
-        ephemeral: true
-      });
-    }
-
-    const session = guideAddSessions.get(userId);
-    const selected = interaction.customId.replace("guide_add_category_", "");
-
-    if (selected === "new") {
-      session.step = 2;
-      return interaction.reply({
-        content: "Write the new category name.",
-        ephemeral: true
-      });
-    }
-
-    session.data.category = selected;
-    session.step = 3;
-
-    return interaction.reply({
-      content: `Category selected: ${formatFileLabel(selected)}\nNow send the guide title.`,
-      ephemeral: true
-    });
-  }
-
-  // GUIDE HUB category selection
-  if (interaction.customId.startsWith("guide_category_")) {
-    const category = interaction.customId.replace("guide_category_", "");
+  // GUIDE HUB category selection via select menu
+  if (interaction.customId === "guide_category_select") {
+    const category = interaction.values[0];
     const guides = getGuides();
     const categoryData = guides[category];
 
