@@ -170,16 +170,8 @@ client.on("interactionCreate", async (interaction) => {
       return handleAddGuideNewCategory(interaction);
     }
 
-    if (interaction.customId.startsWith("guide_edit_category_")) {
-      return handleEditGuideCategorySelection(interaction);
-    }
-
     if (interaction.customId.startsWith("guide_edit_mode_")) {
       return handleEditGuideModeSelection(interaction);
-    }
-
-    if (interaction.customId.startsWith("guide_category_")) {
-      return handleGuideCategoryButtons(interaction);
     }
 
     if (interaction.customId.startsWith("guide_")) {
@@ -217,6 +209,20 @@ client.on("interactionCreate", async (interaction) => {
     interaction.customId === "guide_add_select_category"
   ) {
     return handleAddGuideCategorySelect(interaction);
+  }
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "guide_category_select"
+  ) {
+    return handleGuideCategoryButtons(interaction);
+  }
+
+  if (
+    interaction.isStringSelectMenu() &&
+    interaction.customId === "guide_edit_category_select"
+  ) {
+    return handleEditGuideCategorySelection(interaction);
   }
 
   if (
