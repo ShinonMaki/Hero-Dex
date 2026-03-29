@@ -1,10 +1,21 @@
 const path = require("path");
 const fs = require("fs");
 
+const { isPremium } = require("../utils/premiumUtils");
+
 const MAX_FILES_PER_MESSAGE = 10;
 
 async function handleAndroidGuideButton(interaction) {
   const hero = interaction.customId.replace("android_", "");
+
+  // 🔒 CONTROLLO PREMIUM
+  if (!isPremium(interaction.user.id)) {
+    return interaction.reply({
+      content: "🔒 This guide is premium only.",
+      ephemeral: true
+    });
+  }
+
   const folder = path.join("./hero-guide-images", hero);
 
   if (!fs.existsSync(folder)) {
