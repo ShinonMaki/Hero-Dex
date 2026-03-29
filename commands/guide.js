@@ -1,8 +1,7 @@
 const {
   EmbedBuilder,
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
+  StringSelectMenuBuilder
 } = require("discord.js");
 
 const {
@@ -21,14 +20,17 @@ async function handleGuide(message) {
     return message.reply("No guide categories found.");
   }
 
-  const buttons = categories.slice(0, 5).map(category =>
-    new ButtonBuilder()
-      .setCustomId(`guide_category_${category}`)
-      .setLabel(formatFileLabel(category))
-      .setStyle(ButtonStyle.Primary)
-  );
+  const options = categories.map(category => ({
+    label: formatFileLabel(category).slice(0, 100),
+    value: category
+  }));
 
-  const row = new ActionRowBuilder().addComponents(buttons);
+  const row = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId("guide_category_select")
+      .setPlaceholder("Choose a category")
+      .addOptions(options.slice(0, 25))
+  );
 
   const embed = new EmbedBuilder()
     .setColor(0x5865F2)
