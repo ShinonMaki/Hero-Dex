@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const { PDFDocument: PDFLibDocument } = require("pdf-lib");
 const { gitCommitAndPush } = require("./gitUtils");
 
 const guidesFilePath = path.join(__dirname, "..", "guides.json");
@@ -154,6 +155,105 @@ function createGuidePdf(outputPath, title, text, imagePaths = []) {
   });
 }
 
+function getBaseGuideName(guideName) {
+  return guideName.replace(/\s+pt\d+$/i, "").trim();
+}
+
+function extractPartNumber(guideName) {
+  const match = guideName.match(/\s+pt(\d+)$/i);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function sortGuideParts(a, b) {
+  const partA = extractPartNumber(a);
+  const partB = extractPartNumber(b);
+
+  if (partA === null && partB === null) {
+    return a.localeCompare(b);
+  }
+
+  if (partA === null) return -1;
+  if (partB === null) return 1;
+
+  return partA - partB;
+}
+
+function getGuidePartsForBaseName(categoryGuides, baseGuideName) {
+  return Object.keys(categoryGuides)
+    .filter((guideName) => getBaseGuideName(guideName) === baseGuideName)
+    .sort(sortGuideParts)
+    .map((guideName) => ({
+      name: guideName,
+      data: categoryGuides[guideName]
+    }))
+    .filter((part) => part.data);
+}
+
+function getCombinedGuidePdfPath(baseGuideName) {
+  const safeName = `${slugify(baseGuideName)}-complete.pdf`;
+  return path.join(guidesFolderPath, safeName);
+}
+
+function needsCombinedPdfRebuild(sourcePdfPaths, outputPath) {
+  if (!fs.existsSync(outputPath)) return true;
+
+  const outputStat = fs.statSync(outputPath);
+  const outputTime = outputStat.mtimeMs;
+
+  for (const sourcePath of sourcePdfPaths) {
+    if (!fs.existsSync(sourcePath)) return true;
+
+    const sourceStat = fs.statSync(sourcePath);
+    if (sourceStat.mtimeMs > outputTime) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+async function buildCombinedGuidePdf(baseGuideName, partObjects) {
+  ensureGuidesFolder();
+
+  const sourcePdfPaths = partObjects
+    .map((part) => {
+      const fileName = part.data.file;
+      if (!fileName) return null;
+
+      const filePath = path.join(guidesFolderPath, fileName);
+      return fs.existsSync(filePath) ? filePath : null;
+    })
+    .filter(Boolean);
+
+  if (sourcePdfPaths.length === 0) {
+    throw new Error("No PDF parts found.");
+  }
+
+  const outputPath = getCombinedGuidePdfPath(baseGuideName);
+
+  if (!needsCombinedPdfRebuild(sourcePdfPaths, outputPath)) {
+    return outputPath;
+  }
+
+  const mergedPdf = await PDFLibDocument.create();
+
+  for (const pdfPath of sourcePdfPaths) {
+    const pdfBytes = fs.readFileSync(pdfPath);
+    const pdf = await PDFLibDocument.load(pdfBytes);
+    const pageIndices = pdf.getPageIndices();
+    const copiedPages = await mergedPdf.copyPages(pdf, pageIndices);
+
+    for (const page of copiedPages) {
+      mergedPdf.addPage(page);
+    }
+  }
+
+  const mergedBytes = await mergedPdf.save();
+  fs.writeFileSync(outputPath, mergedBytes);
+
+  return outputPath;
+}
+
 module.exports = {
   getGuides,
   saveGuides,
@@ -164,5 +264,11 @@ module.exports = {
   addGuide,
   deleteGuide,
   createGuidePdf,
-  guidesFolderPath
+  guidesFolderPath,
+  getBaseGuideName,
+  extractPartNumber,
+  sortGuideParts,
+  getGuidePartsForBaseName,
+  getCombinedGuidePdfPath,
+  buildCombinedGuidePdf
 };
