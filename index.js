@@ -24,7 +24,6 @@ const { handleGuide } = require("./commands/guide");
 const { handleSyncGuides } = require("./commands/syncguides");
 const { handleRegister } = require("./commands/register");
 const { handleUnregister } = require("./commands/unregister");
-const { handlePremiumList } = require("./commands/premiumlist");
 const { handleCompare } = require("./commands/compare");
 
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
@@ -89,7 +88,6 @@ client.on("messageCreate", async (message) => {
   if (await handleAddGuideFlow(message)) return;
   if (await handleEditGuideFlow(message)) return;
   if (await handleRenameCategoryFlow(message)) return;
-
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(1).trim().split(/\s+/);
@@ -108,7 +106,7 @@ client.on("messageCreate", async (message) => {
   if (command === "syncguides") return handleSyncGuides(message);
   if (command === "register") return handleRegister(message);
   if (command === "unregister") return handleUnregister(message);
-  if (command === "premiumlist") return handlePremiumList(message);
+  
   if (command === "compare") return handleCompare(message);
 
   const hero = command;
