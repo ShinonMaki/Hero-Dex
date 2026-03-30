@@ -600,6 +600,11 @@
       "images": [
         "final-battle-island-pt1-1774873885673.png"
       ]
+    },
+    "Final Battle Island pt2": {
+      "file": "final-battle-island-pt2.pdf",
+      "text": "__**MATCHING**__\n\n__During the announcement phase__\n    \n• alliances are grouped based on power\n• all alliances start in the Beginner Battlefield\n    \n__Each round__\n    \n• alliances with the highest damage in their group advance\n• others remain in their current position\n\nDetailed rankings can be viewed in the event interface\n    \n__In later rounds__\n    \n• alliances are reshuffled\n• matchmaking is based on:\n• current alliance points\n• if tied → total damage\n    \n__Alliance damage is determined by__\n    \n• total damage dealt\n• total HP of all members\n\n⚠️ When an alliance island HP reaches 0:\nany further damage will NOT be counted",
+      "images": []
     }
   }
 }
