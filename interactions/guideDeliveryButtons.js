@@ -8,6 +8,8 @@ const {
   guideViewSessions
 } = require("../sessions/guideSessions");
 
+const MAX_FILES_PER_MESSAGE = 10;
+
 async function handleGuideDeliveryButtons(interaction) {
   const session = guideViewSessions.get(interaction.user.id);
 
@@ -19,9 +21,28 @@ async function handleGuideDeliveryButtons(interaction) {
   }
 
   const guides = getGuides();
-  const guide = guides[session.category]?.[session.guideName];
+  const categoryGuides = guides[session.category];
 
-  if (!guide) {
+  if (!categoryGuides || typeof categoryGuides !== "object") {
+    guideViewSessions.delete(interaction.user.id);
+    return interaction.reply({
+      content: "Guide not found.",
+      ephemeral: true
+    });
+  }
+
+  const guideParts = Array.isArray(session.guideParts) && session.guideParts.length > 0
+    ? session.guideParts
+    : [session.guideName];
+
+  const partObjects = guideParts
+    .map(partName => ({
+      name: partName,
+      data: categoryGuides[partName]
+    }))
+    .filter(part => part.data);
+
+  if (partObjects.length === 0) {
     guideViewSessions.delete(interaction.user.id);
     return interaction.reply({
       content: "Guide not found.",
@@ -30,9 +51,17 @@ async function handleGuideDeliveryButtons(interaction) {
   }
 
   if (interaction.customId === "guide_delivery_ios") {
-    const filePath = path.join(__dirname, "..", "guides", guide.file);
+    const pdfPaths = partObjects
+      .map(part => {
+        const fileName = part.data.file;
+        if (!fileName) return null;
 
-    if (!fs.existsSync(filePath)) {
+        const filePath = path.join(__dirname, "..", "guides", fileName);
+        return fs.existsSync(filePath) ? filePath : null;
+      })
+      .filter(Boolean);
+
+    if (pdfPaths.length === 0) {
       guideViewSessions.delete(interaction.user.id);
       return interaction.reply({
         content: "Guide file missing.",
@@ -42,20 +71,38 @@ async function handleGuideDeliveryButtons(interaction) {
 
     guideViewSessions.delete(interaction.user.id);
 
-    return interaction.reply({
+    const chunks = chunkArray(pdfPaths, MAX_FILES_PER_MESSAGE);
+
+    await interaction.reply({
       content: `📄 ${session.guideName}`,
-      files: [filePath],
+      files: chunks[0],
       ephemeral: true
     });
+
+    for (let i = 1; i < chunks.length; i++) {
+      await interaction.followUp({
+        content: chunks.length > 1 ? `PDF Part ${i + 1}/${chunks.length}` : undefined,
+        files: chunks[i],
+        ephemeral: true
+      });
+    }
+
+    return;
   }
 
   if (interaction.customId === "guide_delivery_chat") {
-    const text = guide.text || "No text available.";
-    const images = Array.isArray(guide.images) ? guide.images : [];
+    const combinedText = partObjects
+      .map(part => part.data.text || "")
+      .filter(Boolean)
+      .join("\n\n");
+
+    const allImages = partObjects.flatMap(part =>
+      Array.isArray(part.data.images) ? part.data.images : []
+    );
 
     guideViewSessions.delete(interaction.user.id);
 
-    const chunks = splitText(text, 1900);
+    const chunks = splitText(combinedText || "No text available.", 1900);
 
     await interaction.reply({
       content: `**${session.guideName}**\n\n${chunks[0] || "No text available."}`,
@@ -69,15 +116,18 @@ async function handleGuideDeliveryButtons(interaction) {
       });
     }
 
-    for (const imageName of images) {
-      const imagePath = path.join(__dirname, "..", "guides", imageName);
+    const imagePaths = allImages
+      .map(imageName => path.join(__dirname, "..", "guides", imageName))
+      .filter(imagePath => fs.existsSync(imagePath));
 
-      if (fs.existsSync(imagePath)) {
-        await interaction.followUp({
-          files: [imagePath],
-          ephemeral: true
-        });
-      }
+    const imageChunks = chunkArray(imagePaths, MAX_FILES_PER_MESSAGE);
+
+    for (let i = 0; i < imageChunks.length; i++) {
+      await interaction.followUp({
+        content: imageChunks.length > 1 ? `Images ${i + 1}/${imageChunks.length}` : undefined,
+        files: imageChunks[i],
+        ephemeral: true
+      });
     }
 
     return;
@@ -106,6 +156,16 @@ function splitText(text, maxLength) {
 
   if (remaining.length > 0) {
     chunks.push(remaining);
+  }
+
+  return chunks;
+}
+
+function chunkArray(array, size) {
+  const chunks = [];
+
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
   }
 
   return chunks;
