@@ -24,6 +24,8 @@ const { handleGuide } = require("./commands/guide");
 const { handleSyncGuides } = require("./commands/syncguides");
 const { handleRegister } = require("./commands/register");
 const { handleUnregister } = require("./commands/unregister");
+const { handlePremiumList } = require("./commands/premiumlist");
+const { handleCompare } = require("./commands/compare");
 
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
@@ -91,23 +93,25 @@ client.on("messageCreate", async (message) => {
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(1).trim().split(/\s+/);
-const command = args.shift()?.toLowerCase();
-if (!command) return;
+  const command = args.shift()?.toLowerCase();
 
-if (command === "addhero") return startAddHero(message);
-if (command === "edithero") return startEditHero(message);
-if (command === "deletehero") return startDeleteHero(message);
-if (command === "managehero") return handleManageHero(message);
-if (command === "manageguide") return handleManageGuide(message);
-if (command === "heroes") return handleHeroes(message);
-if (command === "tierlist") return handleTierlist(message);
-if (command === "guide") return handleGuide(message);
-if (command === "syncguides") return handleSyncGuides(message);
-if (command === "register") return handleRegister(message);
-if (command === "unregister") return handleUnregister(message);
-if (command === "premiumlist") return handlePremiumList(message);
+  if (!command) return;
 
-const hero = command;
+  if (command === "addhero") return startAddHero(message);
+  if (command === "edithero") return startEditHero(message);
+  if (command === "deletehero") return startDeleteHero(message);
+  if (command === "managehero") return handleManageHero(message);
+  if (command === "manageguide") return handleManageGuide(message);
+  if (command === "heroes") return handleHeroes(message);
+  if (command === "tierlist") return handleTierlist(message);
+  if (command === "guide") return handleGuide(message);
+  if (command === "syncguides") return handleSyncGuides(message);
+  if (command === "register") return handleRegister(message);
+  if (command === "unregister") return handleUnregister(message);
+  if (command === "premiumlist") return handlePremiumList(message);
+  if (command === "compare") return handleCompare(message);
+
+  const hero = command;
   const data = heroesData[hero];
 
   const pdf = findPdf(hero);
