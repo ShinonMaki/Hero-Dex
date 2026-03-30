@@ -612,6 +612,14 @@
       "images": [
         "final-battle-island-pt3-1774874180310.png"
       ]
+    },
+    "Final Battle Island pt4": {
+      "file": "final-battle-island-pt4.pdf",
+      "text": "__**BATTLE**__\n\n__Player attacks__\n    \n• use their power as attack value\n• deal equivalent damage\n\n__Alliance base HP is determined by__\n    \n• total member power\n• construction bonuses\n\n⚠️ HP is locked at the start of each round\nchanges apply in the next round\n\n__Each attack__\n\n• consumes 1 stamina\n• stamina regenerates over time\n\n__Stamina__\n\n• must be used before tokens\n• token cost increases with usage\n• resets every round\n\n__Each attack__\n    \n• can defeat a limited number of defenders\n• after reaching the limit → no more damage is dealt\n    \n__Each battle__\n    \n• grants Treasure Hammers\n• defeating players gives additional rewards",
+      "images": [
+        "final-battle-island-pt4-1774875356849.png",
+        "final-battle-island-pt4-1774875358014.png"
+      ]
     }
   }
 }
