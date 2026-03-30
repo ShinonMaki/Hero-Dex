@@ -12,7 +12,6 @@ const {
 } = require("discord.js");
 
 async function handleGuideCategoryButtons(interaction) {
-  // GUIDE HUB category selection via select menu
   if (interaction.customId === "guide_category_select") {
     const category = interaction.values[0];
     const guides = getGuides();
@@ -25,9 +24,11 @@ async function handleGuideCategoryButtons(interaction) {
       });
     }
 
-    const options = Object.keys(categoryData).map((guideName) => ({
-      label: guideName.slice(0, 100),
-      value: guideName
+    const groupedGuides = groupGuideParts(Object.keys(categoryData));
+
+    const options = Object.keys(groupedGuides).map((baseGuideName) => ({
+      label: baseGuideName.slice(0, 100),
+      value: baseGuideName
     }));
 
     const menu = new StringSelectMenuBuilder()
@@ -43,6 +44,26 @@ async function handleGuideCategoryButtons(interaction) {
       ephemeral: true
     });
   }
+}
+
+function groupGuideParts(guideNames) {
+  const grouped = {};
+
+  for (const guideName of guideNames) {
+    const baseName = getBaseGuideName(guideName);
+
+    if (!grouped[baseName]) {
+      grouped[baseName] = [];
+    }
+
+    grouped[baseName].push(guideName);
+  }
+
+  return grouped;
+}
+
+function getBaseGuideName(guideName) {
+  return guideName.replace(/\s+pt\d+$/i, "").trim();
 }
 
 module.exports = { handleGuideCategoryButtons };
