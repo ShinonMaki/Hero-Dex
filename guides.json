@@ -605,6 +605,13 @@
       "file": "final-battle-island-pt2.pdf",
       "text": "__**MATCHING**__\n\n__During the announcement phase__\n    \n• alliances are grouped based on power\n• all alliances start in the Beginner Battlefield\n    \n__Each round__\n    \n• alliances with the highest damage in their group advance\n• others remain in their current position\n\nDetailed rankings can be viewed in the event interface\n    \n__In later rounds__\n    \n• alliances are reshuffled\n• matchmaking is based on:\n• current alliance points\n• if tied → total damage\n    \n__Alliance damage is determined by__\n    \n• total damage dealt\n• total HP of all members\n\n⚠️ When an alliance island HP reaches 0:\nany further damage will NOT be counted",
       "images": []
+    },
+    "Final Battle Island pt3": {
+      "file": "final-battle-island-pt3.pdf",
+      "text": "__**CONSTRUCTION**__\n\n__Construction includes__\n    \n• Gold Donations\n• Item Donations\n\n__Gold Donations__\n    \n• consume gold\n• have a limit per round\n• once the limit is reached → no more gold donations allowed\n\n__Item Donations__\n    \n• no limit\n• require specific items\n    \n__Each donation__\n\n• grants construction rewards\n• grants alliance EXP\n\n__When requirements are met__\n\n- the alliance levels up\n- island HP increases\n\n__Some construction levels__\n    \n• increase alliance star rating\n• this is only a visual indicator\n\n__All changes__\n    \n• construction\n• power\n⚠️ take effect in the next round",
+      "images": [
+        "final-battle-island-pt3-1774874180310.png"
+      ]
     }
   }
 }
