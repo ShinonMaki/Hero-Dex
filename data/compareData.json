@@ -1,0 +1,147 @@
+{
+  "madara": {
+    "name": "Uchiha Madara",
+    "element": "Chaos",
+    "heroType": "Hyper Carry Fixed DMG Dealer Mage",
+    "roles": ["Carry", "Burst DPS", "Mage"],
+    "profile": {
+      "damage": 9,
+      "survivability": 8,
+      "utility": 6,
+      "control": 5,
+      "scaling": 9
+    },
+    "fightPhases": {
+      "early": 6,
+      "mid": 9,
+      "late": 9
+    },
+    "tags": [
+      "burst",
+      "dps",
+      "hybrid-damage",
+      "fixed-damage",
+      "aoe",
+      "single-target",
+      "scaling",
+      "self-sustain",
+      "revive",
+      "shield",
+      "invincibility",
+      "carry",
+      "mage"
+    ],
+    "strengths": [
+      "Very high hybrid damage output",
+      "Strong mid/late scaling",
+      "Reliable pressure through Technique and Susanoo",
+      "Can survive burst through shield, healing, invincibility and revive"
+    ],
+    "weaknesses": [
+      "Needs investment",
+      "Less explosive in very early fights than pure frontloaded units",
+      "Depends on build and stack flow to reach full value"
+    ],
+    "matchupNotes": {
+      "favoredAgainst": ["squishy carries", "slow backlines"],
+      "strugglesAgainst": ["heavy anti-burst teams", "damage suppression comps"]
+    },
+    "summary": "Hybrid carry with strong scaling, mixed normal and fixed damage, and unusually high survivability for a DPS."
+  },
+
+  "saitama": {
+    "name": "Saitama",
+    "element": "Light",
+    "heroType": "Nearly All-in-One",
+    "roles": ["Tank", "Support", "Healer", "Enabler"],
+    "profile": {
+      "damage": 6,
+      "survivability": 10,
+      "utility": 9,
+      "control": 9,
+      "scaling": 8
+    },
+    "fightPhases": {
+      "early": 10,
+      "mid": 9,
+      "late": 8
+    },
+    "tags": [
+      "tank",
+      "healer",
+      "support",
+      "crowd-control",
+      "cleanse",
+      "damage-share",
+      "fixed-damage",
+      "scaling",
+      "all-in-one",
+      "frontline",
+      "survivability",
+      "utility"
+    ],
+    "strengths": [
+      "Guaranteed full-team stun on Ultimate",
+      "Massive sustain and frontline durability",
+      "Cleanse plus damage-share utility",
+      "Can stabilize teams and absorb pressure extremely well"
+    ],
+    "weaknesses": [
+      "Not a primary DPS carry",
+      "Damage is more situational than dedicated carries",
+      "Needs proper build direction to maximize value"
+    ],
+    "matchupNotes": {
+      "favoredAgainst": ["aggressive burst comps", "teams that rely on early kill pressure"],
+      "strugglesAgainst": ["long attrition against stronger scaling defensive cores", "anti-heal pressure"]
+    },
+    "summary": "All-in-one frontline anchor with elite sustain, control, support value and strong anti-burst presence."
+  },
+
+  "lux": {
+    "name": "Lux",
+    "element": "Light",
+    "heroType": "Utility Tanker / Support",
+    "roles": ["Tank", "Support", "Anti-Burst Core"],
+    "profile": {
+      "damage": 2,
+      "survivability": 10,
+      "utility": 10,
+      "control": 8,
+      "scaling": 10
+    },
+    "fightPhases": {
+      "early": 7,
+      "mid": 9,
+      "late": 10
+    },
+    "tags": [
+      "tank",
+      "support",
+      "anti-burst",
+      "damage-redirection",
+      "healing",
+      "damage-reduction",
+      "control",
+      "block-scaling",
+      "frontline",
+      "stall"
+    ],
+    "strengths": [
+      "Absorbs and redirects massive incoming damage through Full Power",
+      "Excellent anti-burst utility",
+      "High healing and defensive team value",
+      "Very strong long-fight scaling"
+    ],
+    "weaknesses": [
+      "Very low offensive pressure",
+      "More vulnerable into damage types that bypass normal defensive patterns",
+      "Needs proper frontline/support setup to reach full value"
+    ],
+    "matchupNotes": {
+      "favoredAgainst": ["burst carries", "glass-cannon teams"],
+      "strugglesAgainst": ["true damage", "fixed damage", "anti-heal pressure"]
+    },
+    "summary": "Defensive core support that excels at damage soaking, healing, anti-burst play and long-fight control."
+  }
+}
