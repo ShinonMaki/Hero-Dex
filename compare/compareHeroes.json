@@ -11,7 +11,7 @@
       "hp": 1078528,
       "def": 3441,
       "critRate": 0,
-      "critDmg": 150,
+      "critDmg": 1.5,
       "dmgBonus": 0,
       "dmgReduction": 0,
       "pDmgReduction": 0,
@@ -45,9 +45,9 @@
       "chaosTalent": {
         "level": 5,
         "stats": {
-          "baseHpBonus": 10,
-          "baseAtkBonus": 25,
-          "critRate": 24
+          "baseHpBonus": 0.1,
+          "baseAtkBonus": 0.25,
+          "critRate": 0.24
         },
         "effects": [
           {
@@ -62,7 +62,7 @@
             "type": "allyBuff",
             "name": "Demon King",
             "stat": "critReduction",
-            "value": 4
+            "value": 0.04
           }
         ]
       }
@@ -72,19 +72,19 @@
       "manaPerception": {
         "type": "stack",
         "maxStacks": 8,
-        "critRatePerStack": 8,
+        "critRatePerStack": 0.08,
         "duration": "entire_battle"
       },
       "deterrence": {
         "type": "debuff",
         "durationSec": 5,
         "preventsUltimate": true,
-        "targetDmgDealtReduction": 10
+        "targetDmgDealtReduction": 0.1
       },
       "dissolve": {
         "type": "debuff",
         "durationSec": 5,
-        "targetDamageReductionDown": 20,
+        "targetDamageReductionDown": 0.2,
         "stackable": true,
         "onExpireTargetRageReduction": 500
       },
@@ -109,7 +109,7 @@
         "targeting": "all_enemies",
         "damageType": "normal",
         "scalingStat": "atk",
-        "scalingPercent": 350,
+        "scalingMultiplier": 3.5,
         "effects": [
           {
             "type": "resourceGain",
@@ -118,11 +118,11 @@
           },
           {
             "type": "additionalFixedDamageFromTargetShield",
-            "value": 50,
+            "value": 0.5,
             "valueType": "targetCurrentShieldPercent",
             "condition": "manaPerceptionStacksGte3AndTargetHasShield",
             "capType": "selfAtkPercent",
-            "capValue": 500
+            "capValue": 5
           }
         ]
       },
@@ -134,12 +134,12 @@
         "targeting": "front_targets",
         "damageType": "normal",
         "scalingStat": "atk",
-        "scalingPercent": 300,
+        "scalingMultiplier": 3,
         "effects": [
           {
             "type": "applyDebuff",
             "debuffId": "deterrence",
-            "chance": 50,
+            "chance": 0.5,
             "durationSec": 5
           }
         ]
@@ -180,18 +180,18 @@
         "effects": [
           {
             "type": "combatStartSoulArmorGain",
-            "value": 25,
+            "value": 0.25,
             "valueType": "selfMaxHpPercent"
           },
           {
             "type": "increaseSoulArmorCap",
-            "value": 25,
+            "value": 0.25,
             "valueType": "selfMaxHpPercent"
           },
           {
             "type": "onUltimateCast",
             "effect": "restoreSoulArmorPerTargetHit",
-            "value": 100,
+            "value": 1,
             "valueType": "selfAtkPercent"
           },
           {
@@ -220,7 +220,7 @@
         {
           "type": "damageBonus",
           "subtype": "ultimateDmg",
-          "value": 50
+          "value": 0.5
         },
         {
           "type": "skillMultiplierOverride",
@@ -243,10 +243,10 @@
             },
             {
               "type": "heal",
-              "value": 10,
+              "value": 0.1,
               "valueType": "selfMaxHpPercent",
               "capType": "selfAtkPercent",
-              "capValue": 400
+              "capValue": 4
             }
           ]
         },
@@ -259,10 +259,10 @@
         {
           "type": "onUltimateCrit",
           "effect": "additionalFixedDamageFromTargetMaxHp",
-          "value": 8,
+          "value": 0.08,
           "valueType": "targetMaxHpPercent",
           "capType": "selfAtkPercent",
-          "capValue": 320
+          "capValue": 3.2
         },
         {
           "type": "immunity",
