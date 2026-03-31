@@ -287,6 +287,13 @@ function buildFighter(heroKey, heroData, loadout = {}, modules = {}) {
   const fighter = createFighterRuntime(heroKey, heroData, deepClone(loadout));
   fighter.statModifiers = createStatModifiers();
 
+  // Salva i moduli sul fighter runtime
+  fighter.equipmentSet = modules.equipmentSetData ?? null;
+  fighter.runeSet = modules.runeSetData ?? null;
+  fighter.noblePhantasm = modules.noblePhantasmData ?? null;
+  fighter.soulJades = modules.soulJadeDataList ?? [];
+  fighter.clothesSet = modules.clothesSetData ?? null;
+
   applyTalentStats(fighter);
   applyEquipmentSet(fighter, modules.equipmentSetData);
   applyRuneSet(fighter, modules.runeSetData);
