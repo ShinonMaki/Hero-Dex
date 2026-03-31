@@ -33,6 +33,45 @@ function resolveEffectTarget(effect, ctx) {
   }
 }
 
+function hasDamageImmunity(target) {
+  return Boolean(target.flags?.damageImmunity);
+}
+
+function canTriggerFatalRecovery(target) {
+  return !target.flags?.fatalRecoveryUsed;
+}
+
+function triggerFatalRecovery(target, battleState) {
+  const selfRegeneration = target.heroData?.mechanics?.selfRegeneration;
+  if (!selfRegeneration) return false;
+  if (!canTriggerFatalRecovery(target)) return false;
+
+  target.flags = target.flags ?? {};
+  target.states = target.states ?? {};
+
+  target.flags.fatalRecoveryUsed = true;
+  target.current.hp = 1;
+
+  target.states.selfRegeneration = {
+    active: true,
+    remainingSec: selfRegeneration.durationSec ?? 5
+  };
+
+  if (selfRegeneration.damageImmunity) {
+    target.flags.damageImmunity = true;
+  }
+
+  pushLog(battleState, {
+    kind: "fatal_recovery_triggered",
+    target: target.id,
+    hpAfter: target.current.hp,
+    state: "selfRegeneration",
+    durationSec: selfRegeneration.durationSec ?? 5
+  });
+
+  return true;
+}
+
 /**
  * =========================
  * HP / SOUL ARMOR HANDLING
@@ -40,6 +79,15 @@ function resolveEffectTarget(effect, ctx) {
  */
 
 function applyHpLoss(target, damage, battleState) {
+  if (hasDamageImmunity(target)) {
+    pushLog(battleState, {
+      kind: "damage_immune",
+      target: target.id,
+      preventedDamage: damage
+    });
+    return;
+  }
+
   let remaining = damage;
 
   if (target.current.soulArmor > 0) {
@@ -55,7 +103,11 @@ function applyHpLoss(target, damage, battleState) {
   }
 
   if (remaining > 0) {
-    target.current.hp = Math.max(0, target.current.hp - remaining);
+    const hpBefore = target.current.hp;
+    const hpAfter = Math.max(0, hpBefore - remaining);
+    const wouldDie = hpAfter <= 0;
+
+    target.current.hp = hpAfter;
 
     pushLog(battleState, {
       kind: "hp_loss",
@@ -64,13 +116,17 @@ function applyHpLoss(target, damage, battleState) {
       hpLeft: target.current.hp
     });
 
-    if (target.current.hp <= 0) {
-      target.alive = false;
+    if (wouldDie) {
+      const recovered = triggerFatalRecovery(target, battleState);
 
-      pushLog(battleState, {
-        kind: "death",
-        target: target.id
-      });
+      if (!recovered) {
+        target.alive = false;
+
+        pushLog(battleState, {
+          kind: "death",
+          target: target.id
+        });
+      }
     }
   }
 }
@@ -330,7 +386,6 @@ function grantSoulArmor(effect, ctx) {
 
   amount = Math.max(0, amount);
 
-  // Se non esiste ancora un cap, usiamo un cap molto alto temporaneo
   if (!target.current.maxSoulArmor || target.current.maxSoulArmor <= 0) {
     target.current.maxSoulArmor = amount;
   }
@@ -379,7 +434,7 @@ function applyShield(effect, ctx) {
 
 /**
  * =========================
- * STAT MODIFIERS PLACEHOLDER
+ * STATE / SPECIAL MECHANICS
  * =========================
  */
 
@@ -402,6 +457,48 @@ function applyUltimateFixedDamageBonus(effect, ctx) {
     effectType: "ultimateFixedDamageBonus",
     source: source.id,
     detail: effect
+  });
+}
+
+function applySetHp(effect, ctx) {
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+
+  target.current.hp = clamp(effect.value ?? 1, 0, target.computedStats.hp);
+
+  pushLog(battleState, {
+    kind: "set_hp",
+    target: target.id,
+    hpAfter: target.current.hp
+  });
+}
+
+function enterState(effect, ctx) {
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+  const stateId = effect.stateId;
+
+  if (!stateId) return;
+
+  const mechanicState = target.heroData?.mechanics?.[stateId];
+
+  target.states = target.states ?? {};
+  target.flags = target.flags ?? {};
+
+  target.states[stateId] = {
+    active: true,
+    remainingSec: mechanicState?.durationSec ?? null
+  };
+
+  if (mechanicState?.damageImmunity) {
+    target.flags.damageImmunity = true;
+  }
+
+  pushLog(battleState, {
+    kind: "state_entered",
+    target: target.id,
+    stateId,
+    durationSec: mechanicState?.durationSec ?? null
   });
 }
 
@@ -494,6 +591,12 @@ function applyEffect(effect, ctx) {
 
     case "ultimateFixedDamageBonus":
       return applyUltimateFixedDamageBonus(effect, ctx);
+
+    case "setHp":
+      return applySetHp(effect, ctx);
+
+    case "enterState":
+      return enterState(effect, ctx);
 
     default:
       pushLog(ctx.battleState, {
