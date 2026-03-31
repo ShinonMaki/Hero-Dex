@@ -1,15 +1,16 @@
 // compare/compareResolver.js
 
 const { getFighter, getOpponent, pushLog } = require("./compareState");
+const { applyEffect } = require("./compareEffects");
 
 /**
- * Qui mettiamo un evaluator minimo.
- * Più avanti lo sposteremo in compareConditions.js
+ * Evaluator minimo.
+ * Più avanti potrai spostarlo in compareConditions.js
  */
 function evaluateCondition(condition, ctx) {
   if (!condition) return true;
 
-  const { source, target, event } = ctx;
+  const { source, target, event, opponent } = ctx;
 
   if (typeof condition !== "object") return true;
 
@@ -34,27 +35,38 @@ function evaluateCondition(condition, ctx) {
   }
 
   if (condition.highestInitialAtk === true) {
-    const opponent = ctx.opponent;
     if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
       return false;
     }
+  }
+
+  if (condition.debuff) {
+    const hasDebuff = target.debuffs.some(d => d.id === condition.debuff);
+    if (!hasDebuff) return false;
+  }
+
+  if (condition.targetCountExact !== undefined) {
+    const count = event.payload?.targetCount ?? 1;
+    if (count !== condition.targetCountExact) return false;
   }
 
   return true;
 }
 
 /**
- * Per ora raccogliamo effetti solo da:
+ * Raccoglie tutti gli effetti attivi lato source.
+ * Per ora:
  * - skill dell'eroe
  * - arma exclusive
  * - talenti
  *
- * Più avanti aggiungerai:
+ * Più avanti:
  * - noble phantasm
  * - runes
  * - clothes
  * - soul jades
- * - buff/debuff runtime
+ * - buff runtime
+ * - debuff runtime
  */
 function collectActiveEffects(source) {
   const collected = [];
@@ -99,22 +111,6 @@ function collectActiveEffects(source) {
   return collected;
 }
 
-/**
- * Qui per ora non applichiamo davvero gli effetti.
- * Li logghiamo soltanto, così il telaio è già funzionante.
- * Nel prossimo giro collegheremo compareEffects.js.
- */
-function applyEffectPlaceholder(battleState, effectEntry, ctx) {
-  pushLog(battleState, {
-    kind: "effect_triggered",
-    ownerType: effectEntry.ownerType,
-    ownerId: effectEntry.ownerId,
-    effectType: effectEntry.effect.type ?? "unknown",
-    source: ctx.event.source ?? null,
-    target: ctx.event.target ?? null
-  });
-}
-
 function resolveEvent(battleState, event) {
   const source = getFighter(battleState, event.source);
   const target = getOpponent(battleState, event.source);
@@ -142,7 +138,23 @@ function resolveEvent(battleState, event) {
     if (entry.trigger !== event.type) continue;
     if (!evaluateCondition(entry.condition, ctx)) continue;
 
-    applyEffectPlaceholder(battleState, entry, ctx);
+    pushLog(battleState, {
+      kind: "effect_triggered",
+      ownerType: entry.ownerType,
+      ownerId: entry.ownerId,
+      effectType: entry.effect.type ?? "unknown",
+      source: event.source ?? null,
+      target: event.target ?? null
+    });
+
+    applyEffect(entry.effect, {
+      battleState,
+      event,
+      source,
+      target,
+      opponent: target,
+      entry
+    });
   }
 }
 
