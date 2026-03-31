@@ -5,31 +5,62 @@
 
     "stats": {
       "atkFlat": 28035,
-      "hpFlat": 315625,
-      "atkBonus": 29,
-      "hpBonus": 17
+      "hpFlat": 315625
     },
 
     "bonus": {
-      "atkBonus": 50,
-      "hpBonus": 50
+      "atkBonus": 0.29,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
     },
 
     "effects": [
       {
-        "type": "damageBonus",
-        "subtype": "allDamage",
-        "value": 20
+        "name": "standoff_vi",
+        "type": "critRate",
+        "value": 0.12
       },
       {
-        "type": "onBattleStart",
-        "effects": [
-          {
-            "type": "atkBonus",
-            "value": 20,
-            "durationSec": 10
-          }
-        ]
+        "name": "standoff_vi_fixed_dmg_res_down",
+        "trigger": "battleStart",
+        "condition": "critRateCompetitionWin",
+        "effect": {
+          "type": "enemyDebuff",
+          "stat": "fixedDmgRes",
+          "value": 0.16
+        }
+      },
+      {
+        "name": "turbulence_ii",
+        "trigger": "battleStart",
+        "condition": "critRateCompetitionWin",
+        "effect": {
+          "type": "fixedDamageBonusFromCritRate",
+          "valuePerStep": 0.05,
+          "step": 0.4,
+          "maxValue": 0.25,
+          "duration": "entireBattle"
+        }
+      },
+      {
+        "name": "turbulence_ii_enemy_crit_down",
+        "trigger": "battleStart",
+        "condition": "critRateCompetitionWin",
+        "effect": {
+          "type": "enemyDebuff",
+          "stat": "critRate",
+          "value": 0.25
+        }
+      },
+      {
+        "name": "invasion_ii",
+        "trigger": "battleStart",
+        "condition": "critRateCompetitionWin",
+        "effect": {
+          "type": "ultimateFixedDamageBonus",
+          "value": 0.2
+        }
       }
     ]
   }
