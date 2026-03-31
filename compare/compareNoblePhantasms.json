@@ -609,5 +609,80 @@
         }
       }
     ]
+  },
+  "rose_dual_spears": {
+    "id": "rose_dual_spears",
+    "name": "Rose Dual Spears",
+
+    "stats": {
+      "atkFlat": 28035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.29,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "fury_vi",
+        "trigger": "onNormalAttack",
+        "effect": {
+          "type": "ignoreDefense",
+          "value": 0.35
+        }
+      },
+      {
+        "name": "third_hit_bonus",
+        "trigger": "onAttackSequence",
+        "condition": {
+          "hitCount": 3
+        },
+        "effect": {
+          "type": "increaseSkillDamage",
+          "value": 0.25
+        }
+      },
+      {
+        "name": "harvest_hp_damage",
+        "trigger": "onAttackSequence",
+        "condition": {
+          "hitCount": 3
+        },
+        "effect": {
+          "type": "hpBasedDamage",
+          "value": 0.20,
+          "capMultiplier": 8.0
+        }
+      },
+      {
+        "name": "flow_mark",
+        "trigger": "onAttackSequence",
+        "condition": {
+          "hitCount": 3
+        },
+        "effect": {
+          "type": "increaseFinalDamage",
+          "value": 0.16
+        }
+      },
+      {
+        "name": "discipline_field",
+        "trigger": "onHit",
+        "effect": {
+          "type": "dot",
+          "value": 0.03,
+          "durationSec": 5,
+          "tickInterval": 1,
+          "capMultiplier": 1.2,
+          "extra": {
+            "healingReduction": 0.16
+          }
+        }
+      }
+    ]
   }
 }
