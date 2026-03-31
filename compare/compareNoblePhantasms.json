@@ -504,5 +504,110 @@
         }
       }
     ]
+  },
+  "rho_aias": {
+    "id": "rho_aias",
+    "name": "Rho Aias",
+
+    "stats": {
+      "atkFlat": 18035,
+      "hpFlat": 490625
+    },
+
+    "bonus": {
+      "atkBonus": 0.17,
+      "hpBonus": 0.29,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "isolation_vi",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "stats": {
+            "blockRate": 0.12
+          }
+        }
+      },
+      {
+        "name": "vanish_apply",
+        "trigger": "onBlock",
+        "chance": 0.6,
+        "cooldownSec": 15,
+        "effect": {
+          "type": "applyDebuff",
+          "target": "enemyHighestAtk",
+          "targetCount": 2,
+          "debuff": {
+            "name": "vanish",
+            "durationSec": 15,
+            "effects": {
+              "damageDealtReduction": 0.05
+            }
+          }
+        }
+      },
+      {
+        "name": "retrospection_heal",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "vanish"
+        },
+        "effect": {
+          "type": "grantSoulArmor",
+          "target": "allAllies",
+          "scaling": {
+            "casterMaxHpPercent": 0.05
+          }
+        }
+      },
+      {
+        "name": "retrospection_eternity",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "vanish"
+        },
+        "effect": {
+          "type": "buff",
+          "target": "allAllies",
+          "stats": {
+            "fixedDamageRes": 0.10
+          },
+          "durationSec": 15
+        }
+      },
+      {
+        "name": "suppression_apply",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "vanish"
+        },
+        "effect": {
+          "type": "applyDebuff",
+          "debuff": {
+            "name": "suppression",
+            "maxStacks": 2,
+            "duration": "infinite"
+          }
+        }
+      },
+      {
+        "name": "suppression_effect",
+        "trigger": "onUltimateHit",
+        "condition": {
+          "targetHasDebuff": "suppression",
+          "targetCountMin": 3
+        },
+        "effect": {
+          "type": "modifyFinalDamage",
+          "value": -0.15,
+          "consumeStack": true
+        }
+      }
+    ]
   }
 }
