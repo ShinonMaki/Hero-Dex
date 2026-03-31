@@ -24,6 +24,11 @@ function evaluateCondition(condition, ctx) {
     if (count < condition.targetCountMin) return false;
   }
 
+  if (condition.targetCountExact !== undefined) {
+    const count = event.payload?.targetCount ?? 1;
+    if (count !== condition.targetCountExact) return false;
+  }
+
   if (condition.hpBelow !== undefined) {
     const hpRatio = source.current.hp / Math.max(source.computedStats.hp, 1);
     if (hpRatio >= condition.hpBelow) return false;
@@ -34,20 +39,15 @@ function evaluateCondition(condition, ctx) {
     if (!hasDebuff) return false;
   }
 
-  if (condition.highestInitialAtk === true) {
-    if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
-      return false;
-    }
-  }
-
   if (condition.debuff) {
     const hasDebuff = target.debuffs.some(d => d.id === condition.debuff);
     if (!hasDebuff) return false;
   }
 
-  if (condition.targetCountExact !== undefined) {
-    const count = event.payload?.targetCount ?? 1;
-    if (count !== condition.targetCountExact) return false;
+  if (condition.highestInitialAtk === true) {
+    if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
+      return false;
+    }
   }
 
   return true;
@@ -55,22 +55,15 @@ function evaluateCondition(condition, ctx) {
 
 /**
  * Raccoglie tutti gli effetti attivi lato source.
- * Per ora:
- * - skill dell'eroe
- * - arma exclusive
- * - talenti
- *
- * Più avanti:
- * - noble phantasm
- * - runes
- * - clothes
- * - soul jades
- * - buff runtime
- * - debuff runtime
  */
 function collectActiveEffects(source) {
   const collected = [];
 
+  /**
+   * =========================
+   * HERO SKILLS
+   * =========================
+   */
   const skills = source.heroData.skills ?? {};
   for (const [skillKey, skillData] of Object.entries(skills)) {
     for (const effect of skillData.effects ?? []) {
@@ -84,6 +77,11 @@ function collectActiveEffects(source) {
     }
   }
 
+  /**
+   * =========================
+   * EXCLUSIVE WEAPON
+   * =========================
+   */
   const weaponEffects = source.heroData.exclusiveWeapon?.effects ?? [];
   for (const effect of weaponEffects) {
     collected.push({
@@ -95,12 +93,71 @@ function collectActiveEffects(source) {
     });
   }
 
+  /**
+   * =========================
+   * TALENTS
+   * =========================
+   */
   const talents = source.heroData.talents ?? {};
   for (const [talentKey, talentData] of Object.entries(talents)) {
     for (const effect of talentData.effects ?? []) {
       collected.push({
         ownerType: "talent",
         ownerId: talentKey,
+        trigger: effect.trigger ?? "passive",
+        condition: effect.condition,
+        effect
+      });
+    }
+  }
+
+  /**
+   * =========================
+   * NOBLE PHANTASM
+   * =========================
+   */
+  const noblePhantasmEffects = source.noblePhantasm?.effects ?? [];
+  for (const effect of noblePhantasmEffects) {
+    collected.push({
+      ownerType: "noblePhantasm",
+      ownerId: source.noblePhantasm?.id ?? "noble_phantasm",
+      trigger: effect.trigger ?? "passive",
+      condition: effect.condition,
+      effect
+    });
+  }
+
+  /**
+   * =========================
+   * ACTIVE BUFFS (runtime)
+   * =========================
+   */
+  for (const buff of source.buffs ?? []) {
+    if (!Array.isArray(buff.effects)) continue;
+
+    for (const effect of buff.effects) {
+      collected.push({
+        ownerType: "buff",
+        ownerId: buff.id ?? "runtime_buff",
+        trigger: effect.trigger ?? "passive",
+        condition: effect.condition,
+        effect
+      });
+    }
+  }
+
+  /**
+   * =========================
+   * ACTIVE DEBUFFS (runtime)
+   * =========================
+   */
+  for (const debuff of source.debuffs ?? []) {
+    if (!Array.isArray(debuff.effects)) continue;
+
+    for (const effect of debuff.effects) {
+      collected.push({
+        ownerType: "debuff",
+        ownerId: debuff.id ?? "runtime_debuff",
         trigger: effect.trigger ?? "passive",
         condition: effect.condition,
         effect
