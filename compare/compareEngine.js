@@ -9,6 +9,7 @@ const {
 
 const { emitEvent, processQueue } = require("./compareTriggers");
 const { buildFighter } = require("./compareBuild");
+const { dealBasicAttackDamage } = require("./compareEffects");
 
 /**
  * Costruisce un fighter usando il compareBuild.
@@ -112,8 +113,55 @@ function emitTickEvents(battleState) {
 }
 
 /**
+ * Esegue un basic attack completo:
+ * 1. emette onNormalAttack
+ * 2. risolve i trigger collegati
+ * 3. infligge danno base
+ * 4. emette onNormalAttackHit
+ * 5. risolve eventuali effetti after-hit
+ */
+function performBasicAttack(battleState, sourceSide) {
+  const source = getFighter(battleState, sourceSide);
+  const targetSide = sourceSide === "a" ? "b" : "a";
+  const target = getFighter(battleState, targetSide);
+
+  if (!source?.alive || !target?.alive) return;
+
+  emitEvent(battleState, {
+    type: "onNormalAttack",
+    source: sourceSide,
+    target: targetSide,
+    payload: { targetCount: 1 }
+  });
+
+  processQueue(battleState);
+
+  // se uno dei due è morto durante i trigger, stop
+  if (!source.alive || !target.alive) return;
+
+  dealBasicAttackDamage({
+    source,
+    target,
+    battleState
+  });
+
+  checkWinner(battleState);
+  if (battleState.winner) return;
+
+  emitEvent(battleState, {
+    type: "onNormalAttackHit",
+    source: sourceSide,
+    target: targetSide,
+    payload: { targetCount: 1 }
+  });
+
+  processQueue(battleState);
+  checkWinner(battleState);
+}
+
+/**
  * Placeholder temporaneo:
- * per ora emettiamo solo normal attack base.
+ * per ora facciamo solo basic attack reali.
  * Più avanti qui entreranno:
  * - rage logic
  * - technique
@@ -127,19 +175,32 @@ function simulateActionsPlaceholder(battleState) {
 
   if (!a.alive || !b.alive) return;
 
-  emitEvent(battleState, {
-    type: "onNormalAttack",
-    source: "a",
-    target: "b",
-    payload: { targetCount: 1 }
-  });
+  performBasicAttack(battleState, "a");
+  if (battleState.winner) return;
 
-  emitEvent(battleState, {
-    type: "onNormalAttack",
-    source: "b",
-    target: "a",
-    payload: { targetCount: 1 }
-  });
+  performBasicAttack(battleState, "b");
+}
+
+/**
+ * Riduce la durata di buff/debuff runtime.
+ * Per ora semplice: decrementa di tickSize e rimuove se scaduti.
+ */
+function updateDurations(battleState) {
+  const fighters = [battleState.fighters.a, battleState.fighters.b];
+
+  for (const fighter of fighters) {
+    fighter.buffs = fighter.buffs.filter(buff => {
+      if (buff.remainingSec == null) return true;
+      buff.remainingSec = Number((buff.remainingSec - battleState.tickSize).toFixed(2));
+      return buff.remainingSec > 0;
+    });
+
+    fighter.debuffs = fighter.debuffs.filter(debuff => {
+      if (debuff.remainingSec == null) return true;
+      debuff.remainingSec = Number((debuff.remainingSec - battleState.tickSize).toFixed(2));
+      return debuff.remainingSec > 0;
+    });
+  }
 }
 
 function advanceTick(battleState) {
@@ -151,9 +212,15 @@ function advanceTick(battleState) {
   });
 
   emitTickEvents(battleState);
-  simulateActionsPlaceholder(battleState);
-
   processQueue(battleState);
+
+  checkWinner(battleState);
+  if (battleState.winner) return;
+
+  simulateActionsPlaceholder(battleState);
+  if (battleState.winner) return;
+
+  updateDurations(battleState);
   checkWinner(battleState);
 }
 
@@ -206,6 +273,7 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
 
   emitBattleStart(battleState);
   processQueue(battleState);
+  checkWinner(battleState);
 
   while (!battleState.winner && battleState.time < battleState.maxTime) {
     advanceTick(battleState);
@@ -247,5 +315,7 @@ module.exports = {
   emitBattleStart,
   emitTickEvents,
   advanceTick,
-  simulateActionsPlaceholder
+  simulateActionsPlaceholder,
+  performBasicAttack,
+  updateDurations
 };
