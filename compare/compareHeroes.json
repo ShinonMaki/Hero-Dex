@@ -1,0 +1,274 @@
+{
+  "rimuru": {
+    "id": "rimuru",
+    "name": "Rimuru",
+    "role": "mage",
+    "type": "chaos",
+    "rarity": "immortal legendary",
+
+    "baseStats": {
+      "atk": 81939,
+      "hp": 1078528,
+      "def": 3441,
+      "critRate": 0,
+      "critDmg": 150,
+      "dmgBonus": 0,
+      "dmgReduction": 0,
+      "pDmgReduction": 0,
+      "mDmgReduction": 0,
+      "soulArmor": 0,
+      "hitRate": 0,
+      "dodge": 0,
+      "block": 0,
+      "blockPiercing": 0,
+      "haste": 0,
+      "rageLimit": 1000
+    },
+
+    "fixedBuild": {
+      "equipmentSetId": "eternal_splendor",
+      "exclusiveWeaponId": "grand_sage",
+      "exclusiveWeaponLevel": 30
+    },
+
+    "loadoutSlots": {
+      "noblePhantasm": true,
+      "clothesSet": true,
+      "soulJades": 4,
+      "runeSet": {
+        "enabled": true,
+        "filterByRole": true
+      }
+    },
+
+    "talents": {
+      "chaosTalent": {
+        "level": 5,
+        "stats": {
+          "baseHpBonus": 10,
+          "baseAtkBonus": 25,
+          "critRate": 24
+        },
+        "effects": [
+          {
+            "type": "allyAura",
+            "name": "Chaos Aura",
+            "allyHpBonus": null,
+            "allyAtkBonus": null,
+            "dispellable": false,
+            "stackable": false
+          },
+          {
+            "type": "allyBuff",
+            "name": "Demon King",
+            "stat": "critReduction",
+            "value": 4
+          }
+        ]
+      }
+    },
+
+    "mechanics": {
+      "manaPerception": {
+        "type": "stack",
+        "maxStacks": 8,
+        "critRatePerStack": 8,
+        "duration": "entire_battle"
+      },
+      "deterrence": {
+        "type": "debuff",
+        "durationSec": 5,
+        "preventsUltimate": true,
+        "targetDmgDealtReduction": 10
+      },
+      "dissolve": {
+        "type": "debuff",
+        "durationSec": 5,
+        "targetDamageReductionDown": 20,
+        "stackable": true,
+        "onExpireTargetRageReduction": 500
+      },
+      "rageProhibition": {
+        "type": "debuff",
+        "durationSec": 5
+      },
+      "selfRegeneration": {
+        "type": "state",
+        "durationSec": 5,
+        "damageImmunity": true,
+        "ragePerSec": 80,
+        "cooldownSec": 40
+      }
+    },
+
+    "skills": {
+      "ultimate": {
+        "name": "God's Wrath",
+        "level": 3,
+        "category": "ultimate",
+        "targeting": "all_enemies",
+        "damageType": "normal",
+        "scalingStat": "atk",
+        "scalingPercent": 350,
+        "effects": [
+          {
+            "type": "resourceGain",
+            "resource": "manaPerceptionStacks",
+            "value": 1
+          },
+          {
+            "type": "additionalFixedDamageFromTargetShield",
+            "value": 50,
+            "valueType": "targetCurrentShieldPercent",
+            "condition": "manaPerceptionStacksGte3AndTargetHasShield",
+            "capType": "selfAtkPercent",
+            "capValue": 500
+          }
+        ]
+      },
+
+      "technique": {
+        "name": "Black Thunder",
+        "level": 4,
+        "category": "technique",
+        "targeting": "front_targets",
+        "damageType": "normal",
+        "scalingStat": "atk",
+        "scalingPercent": 300,
+        "effects": [
+          {
+            "type": "applyDebuff",
+            "debuffId": "deterrence",
+            "chance": 50,
+            "durationSec": 5
+          }
+        ]
+      },
+
+      "passive1": {
+        "name": "Awakened Demon King",
+        "level": 3,
+        "category": "passive",
+        "effects": [
+          {
+            "type": "combatStartResourceGain",
+            "resource": "manaPerceptionStacks",
+            "value": 2
+          },
+          {
+            "type": "onRageReduced",
+            "cooldownSec": 10,
+            "effects": [
+              {
+                "type": "resourceGain",
+                "resource": "rage",
+                "value": 200
+              },
+              {
+                "type": "applyDebuffToSource",
+                "debuffId": "dissolve"
+              }
+            ]
+          }
+        ]
+      },
+
+      "passive2": {
+        "name": "Wisdom King",
+        "level": 3,
+        "category": "passive",
+        "effects": [
+          {
+            "type": "combatStartSoulArmorGain",
+            "value": 25,
+            "valueType": "selfMaxHpPercent"
+          },
+          {
+            "type": "increaseSoulArmorCap",
+            "value": 25,
+            "valueType": "selfMaxHpPercent"
+          },
+          {
+            "type": "onUltimateCast",
+            "effect": "restoreSoulArmorPerTargetHit",
+            "value": 100,
+            "valueType": "selfAtkPercent"
+          },
+          {
+            "type": "onFatalDamage",
+            "cooldownSec": 40,
+            "effects": [
+              {
+                "type": "setHp",
+                "value": 1
+              },
+              {
+                "type": "enterState",
+                "stateId": "selfRegeneration"
+              }
+            ]
+          }
+        ]
+      }
+    },
+
+    "exclusiveWeapon": {
+      "id": "grand_sage",
+      "name": "Grand Sage",
+      "level": 30,
+      "effects": [
+        {
+          "type": "damageBonus",
+          "subtype": "ultimateDmg",
+          "value": 50
+        },
+        {
+          "type": "skillMultiplierOverride",
+          "subtype": "ultimateDamageMultiplier",
+          "value": 1.5,
+          "condition": "manaPerceptionStacksGte3"
+        },
+        {
+          "type": "combatStartResourceGain",
+          "resource": "rage",
+          "value": 200
+        },
+        {
+          "type": "onEnemyDeath",
+          "effects": [
+            {
+              "type": "resourceGain",
+              "resource": "manaPerceptionStacks",
+              "value": 1
+            },
+            {
+              "type": "heal",
+              "value": 10,
+              "valueType": "selfMaxHpPercent",
+              "capType": "selfAtkPercent",
+              "capValue": 400
+            }
+          ]
+        },
+        {
+          "type": "onDebuffApplied",
+          "triggerDebuffId": "deterrence",
+          "applyDebuffId": "rageProhibition",
+          "durationSec": 5
+        },
+        {
+          "type": "onUltimateCrit",
+          "effect": "additionalFixedDamageFromTargetMaxHp",
+          "value": 8,
+          "valueType": "targetMaxHpPercent",
+          "capType": "selfAtkPercent",
+          "capValue": 320
+        },
+        {
+          "type": "immunity",
+          "targetEffectId": "dissolve"
+        }
+      ]
+    }
+  }
+}
