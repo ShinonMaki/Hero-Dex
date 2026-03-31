@@ -1,0 +1,137 @@
+{
+  "mage_divineatk": {
+    "id": "mage_divineatk",
+    "name": "Mage Divine ATK",
+    "allowedRoles": ["mage"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+    ],
+    "setBonus": {
+      "atkBonus": 15
+    }
+  },
+
+  "mage_divinehp": {
+    "id": "mage_divinehp",
+    "name": "Mage Divine HP",
+    "allowedRoles": ["mage"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+    ],
+    "setBonus": {
+      "atkBonus": 15
+    }
+  },
+
+  "assassin_divineatk": {
+    "id": "assassin_divineatk",
+    "name": "Assassin Divine ATK",
+    "allowedRoles": ["assassin"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+    ],
+    "setBonus": {
+      "atkBonus": 15
+    }
+  },
+
+  "assassin_divinehp": {
+    "id": "assassin_divinehp",
+    "name": "Assassin Divine HP",
+    "allowedRoles": ["assassin"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+    ],
+    "setBonus": {
+      "atkBonus": 15
+    }
+  },
+
+  "warrior_divineatk": {
+    "id": "warrior_divineatk",
+    "name": "Warrior Divine ATK",
+    "allowedRoles": ["warrior"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+    ],
+    "setBonus": {
+      "hpBonus": 15
+    }
+  },
+
+  "warrior_divinehp": {
+    "id": "warrior_divinehp",
+    "name": "Warrior Divine HP",
+    "allowedRoles": ["warrior"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+    ],
+    "setBonus": {
+      "hpBonus": 15
+    }
+  },
+
+  "support_divineatk": {
+    "id": "support_divineatk",
+    "name": "Support Divine ATK",
+    "allowedRoles": ["support"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+    ],
+    "setBonus": {
+      "hpBonus": 15
+    }
+  },
+
+  "support_divinehp": {
+    "id": "support_divinehp",
+    "name": "Support Divine HP",
+    "allowedRoles": ["support"],
+    "slots": [
+      { "type": "atk", "atkFlat": 19761 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "hp", "hpFlat": 345833 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+    ],
+    "setBonus": {
+      "hpBonus": 15
+    }
+  }
+}
