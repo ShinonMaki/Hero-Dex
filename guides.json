@@ -708,5 +708,13 @@
       ]
     }
   },
-  "explore wonderland": {}
+  "explore wonderland": {
+    "Set Out To Explore": {
+      "file": "set-out-to-explore.pdf",
+      "text": "**Explore Wonderland**\n\n__Set Out to Explore__\n\nThis is the main core of the event and the primary way to farm Crystals.\n\nIn this mode you can see:\n    •    The 2 cars you previously created (2 cars if you buy privilege)\n    •    All cars created by other players\n\nEach car is composed of:\n    •    1 Captain\n    •    4 Players\n\nIf you created two cars, a total of 8 players can participate (4 players per car).\n\nMaximum Crystal Farming\n\nEach player can farm with up to 4 cars simultaneously:\n    •    2 cars created by you → guaranteed farming slots\n    •    2 cars joined from other players → slots that can be lost\n\nThe two cars you create are safe, meaning your position cannot be taken.\nHowever, the two cars you join from other players can be contested.\n\n__Combat System__\n\nThis mode also includes a combat mechanic.\n\nPlayers can attack others to take their position in cars that produce more Crystals.\nHowever, they can also lose the battle and fail to take the spot.\n\n__Combat Rules__\n\nBattles for stealing a player’s position depend on two factors:\n    1.    Player Title\n    2.    Team Power\n\n__Title Priority Rule__\n\nCombat follows this hierarchy:\n\nNo Title < 20% Title < 40% Title < 60% Title\n\nIf you attack a player who has a higher title than yours, the attack automatically fails.\n\nExample:\n    •    Player with 20% title attacking 40% title → automatic failure\n    •    Player with no title attacking 20% title → automatic failure\n\n__Team Power Rule__\n\nIf both players have the same title level, the outcome is determined by a normal team battle.\n\nExamples:\n    •    No Title vs No Title\n    •    20% Title vs 20% Title\n    •    40% Title vs 40% Title\n    •    60% Title vs 60% Title\n\n__Battle Results__\n\nIf the attacker wins:\n    •    The attacker steals the defender’s position in the car\n    •    The attacker gains 30 minutes of protection (attack immunity)\n\nIf the attacker loses:\n    •    The attacker does not take the position\n    •    A 60-second cooldown is applied before attacking another player\n\n__Car Duration__\n\nCars have a limited duration.\nOnce the time expires, the cars must be created again.",
+      "images": [
+        "set-out-to-explore-1774938790771.png"
+      ]
+    }
+  }
 }
