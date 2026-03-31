@@ -416,5 +416,93 @@
         }
       }
     ]
+  },
+  "maria_the_ripper": {
+    "id": "maria_the_ripper",
+    "name": "Maria the Ripper",
+
+    "stats": {
+      "atkFlat": 18035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.17,
+      "hpBonus": 0.29,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "starfall_vi",
+        "trigger": "onUltimate",
+        "condition": {
+          "targetCount": 1
+        },
+        "cooldownSec": 10,
+        "effect": {
+          "type": "modifyUltimateDamage",
+          "value": 0.28
+        }
+      },
+      {
+        "name": "divine_punishment_apply",
+        "trigger": "onUltimate",
+        "condition": {
+          "targetCount": 1
+        },
+        "effect": {
+          "type": "applyDebuff",
+          "debuff": {
+            "name": "divine_punishment",
+            "durationSec": 6,
+            "dispellable": false,
+            "tickIntervalSec": 1,
+            "onTick": {
+              "type": "trueDamage",
+              "scaling": {
+                "atkMultiplier": 4.0
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "starshards_ii",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "divine_punishment"
+        },
+        "effect": {
+          "type": "trueDamage",
+          "scaling": {
+            "atkMultiplier": 5.0
+          }
+        }
+      },
+      {
+        "name": "stars_wrath_ii_on_kill",
+        "trigger": "onTargetDeath",
+        "condition": {
+          "targetHasDebuff": "divine_punishment"
+        },
+        "effect": {
+          "type": "restoreRage",
+          "value": 400
+        }
+      },
+      {
+        "name": "stars_wrath_ii_on_expire",
+        "trigger": "onDebuffExpire",
+        "condition": {
+          "debuff": "divine_punishment"
+        },
+        "effect": {
+          "type": "reduceRage",
+          "value": 300
+        }
+      }
+    ]
   }
 }
