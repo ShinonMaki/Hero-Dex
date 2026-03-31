@@ -95,6 +95,15 @@ function inferTriggerFromEffectType(effectType) {
 }
 
 /**
+ * Se un effect è annidato dentro { effect: {...} }
+ * restituisce quello interno, altrimenti restituisce l'oggetto stesso.
+ */
+function unwrapEffect(effect) {
+  if (!effect) return effect;
+  return effect.effect ?? effect;
+}
+
+/**
  * Evaluator minimo.
  * Più avanti potrai spostarlo in compareConditions.js
  */
@@ -163,9 +172,10 @@ function collectActiveEffects(source) {
   const skills = source.heroData.skills ?? {};
   for (const [skillKey, skillData] of Object.entries(skills)) {
     for (const effect of skillData.effects ?? []) {
+      const unwrappedEffect = unwrapEffect(effect);
       const inferredTrigger =
         normalizeTrigger(effect.trigger) ||
-        inferTriggerFromEffectType(effect.type) ||
+        inferTriggerFromEffectType(unwrappedEffect?.type) ||
         normalizeSkillCategory(skillData.category);
 
       collected.push({
@@ -185,9 +195,10 @@ function collectActiveEffects(source) {
    */
   const weaponEffects = source.heroData.exclusiveWeapon?.effects ?? [];
   for (const effect of weaponEffects) {
+    const unwrappedEffect = unwrapEffect(effect);
     const inferredTrigger =
       normalizeTrigger(effect.trigger) ||
-      inferTriggerFromEffectType(effect.type) ||
+      inferTriggerFromEffectType(unwrappedEffect?.type) ||
       "passive";
 
     collected.push({
@@ -207,9 +218,10 @@ function collectActiveEffects(source) {
   const talents = source.heroData.talents ?? {};
   for (const [talentKey, talentData] of Object.entries(talents)) {
     for (const effect of talentData.effects ?? []) {
+      const unwrappedEffect = unwrapEffect(effect);
       const inferredTrigger =
         normalizeTrigger(effect.trigger) ||
-        inferTriggerFromEffectType(effect.type) ||
+        inferTriggerFromEffectType(unwrappedEffect?.type) ||
         "passive";
 
       collected.push({
@@ -229,9 +241,10 @@ function collectActiveEffects(source) {
    */
   const noblePhantasmEffects = source.noblePhantasm?.effects ?? [];
   for (const effect of noblePhantasmEffects) {
+    const unwrappedEffect = unwrapEffect(effect);
     const inferredTrigger =
       normalizeTrigger(effect.trigger) ||
-      inferTriggerFromEffectType(effect.type) ||
+      inferTriggerFromEffectType(unwrappedEffect?.type) ||
       "passive";
 
     collected.push({
@@ -252,9 +265,10 @@ function collectActiveEffects(source) {
     if (!Array.isArray(buff.effects)) continue;
 
     for (const effect of buff.effects) {
+      const unwrappedEffect = unwrapEffect(effect);
       const inferredTrigger =
         normalizeTrigger(effect.trigger) ||
-        inferTriggerFromEffectType(effect.type) ||
+        inferTriggerFromEffectType(unwrappedEffect?.type) ||
         "passive";
 
       collected.push({
@@ -276,9 +290,10 @@ function collectActiveEffects(source) {
     if (!Array.isArray(debuff.effects)) continue;
 
     for (const effect of debuff.effects) {
+      const unwrappedEffect = unwrapEffect(effect);
       const inferredTrigger =
         normalizeTrigger(effect.trigger) ||
-        inferTriggerFromEffectType(effect.type) ||
+        inferTriggerFromEffectType(unwrappedEffect?.type) ||
         "passive";
 
       collected.push({
@@ -322,16 +337,18 @@ function resolveEvent(battleState, event) {
     if (entry.trigger !== event.type) continue;
     if (!evaluateCondition(entry.condition, ctx)) continue;
 
+    const resolvedEffect = unwrapEffect(entry.effect);
+
     pushLog(battleState, {
       kind: "effect_triggered",
       ownerType: entry.ownerType,
       ownerId: entry.ownerId,
-      effectType: entry.effect.type ?? "unknown",
+      effectType: resolvedEffect?.type ?? "unknown",
       source: event.source ?? null,
       target: event.target ?? null
     });
 
-    applyEffect(entry.effect, {
+    applyEffect(resolvedEffect, {
       battleState,
       event,
       source,
@@ -348,5 +365,6 @@ module.exports = {
   evaluateCondition,
   normalizeTrigger,
   normalizeSkillCategory,
-  inferTriggerFromEffectType
+  inferTriggerFromEffectType,
+  unwrapEffect
 };
