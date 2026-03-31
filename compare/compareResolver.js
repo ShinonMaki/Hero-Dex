@@ -103,6 +103,39 @@ function unwrapEffect(effect) {
   return effect.effect ?? effect;
 }
 
+function hasDebuff(target, debuffId) {
+  return (target.debuffs ?? []).some(
+    d => d.id === debuffId || d.status === debuffId || d.type === debuffId
+  );
+}
+
+/**
+ * Gestisce condizioni stringa.
+ */
+function evaluateStringCondition(condition, ctx) {
+  const { source, target, opponent } = ctx;
+
+  switch (condition) {
+    case "targetHasSilence":
+      return hasDebuff(target, "silence");
+
+    case "critRateCompetitionWin":
+      return (source.computedStats.critRate ?? 0) > (opponent.computedStats.critRate ?? 0);
+
+    case "manaPerceptionStacksGte3":
+      return (source.flags?.manaPerceptionStacks ?? 0) >= 3;
+
+    case "manaPerceptionStacksGte3AndTargetHasShield":
+      return (
+        (source.flags?.manaPerceptionStacks ?? 0) >= 3 &&
+        (target.current?.soulArmor ?? 0) > 0
+      );
+
+    default:
+      return true;
+  }
+}
+
 /**
  * Evaluator minimo.
  * Più avanti potrai spostarlo in compareConditions.js
@@ -111,6 +144,10 @@ function evaluateCondition(condition, ctx) {
   if (!condition) return true;
 
   const { source, target, event, opponent } = ctx;
+
+  if (typeof condition === "string") {
+    return evaluateStringCondition(condition, ctx);
+  }
 
   if (typeof condition !== "object") return true;
 
@@ -135,24 +172,28 @@ function evaluateCondition(condition, ctx) {
   }
 
   if (condition.targetHasDebuff) {
-    const hasDebuff = target.debuffs.some(d => d.id === condition.targetHasDebuff);
-    if (!hasDebuff) return false;
+    if (!hasDebuff(target, condition.targetHasDebuff)) return false;
   }
 
   if (condition.debuff) {
-    const hasDebuff = target.debuffs.some(d => d.id === condition.debuff);
-    if (!hasDebuff) return false;
+    if (!hasDebuff(target, condition.debuff)) return false;
   }
 
   if (condition.targetDebuff) {
-    const hasDebuff = target.debuffs.some(d => d.id === condition.targetDebuff);
-    if (!hasDebuff) return false;
+    if (!hasDebuff(target, condition.targetDebuff)) return false;
   }
 
   if (condition.highestInitialAtk === true) {
     if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
       return false;
     }
+  }
+
+  if (condition.stacks !== undefined && condition.targetDebuff) {
+    const debuff = (target.debuffs ?? []).find(
+      d => d.id === condition.targetDebuff || d.status === condition.targetDebuff
+    );
+    if (!debuff || (debuff.stacks ?? 1) < condition.stacks) return false;
   }
 
   return true;
