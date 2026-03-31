@@ -61,9 +61,9 @@
           "type": "ultimateFixedDamageBonus",
           "value": 0.2
         }
-       }
-      ]
-    },
+      }
+    ]
+  },
    "primeval_flame": {
     "id": "primeval_flame",
     "name": "Primeval Flame",
