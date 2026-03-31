@@ -216,5 +216,56 @@
         }
       }
     ]
+  },
+  "no_name_dagger": {
+    "id": "no_name_dagger",
+    "name": "No Name - Dagger",
+
+    "stats": {
+      "atkFlat": 28035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.29,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "soul_shatter_i",
+        "trigger": "onHpBelowThreshold",
+        "condition": {
+          "hpBelow": 0.35
+        },
+        "cooldownSec": 40,
+        "effect": {
+          "type": "selfBuff",
+          "stat": "directDmgBonus",
+          "value": 0.35,
+          "appliesTo": ["normalAttack", "skill"],
+          "durationSec": 10
+        }
+      },
+      {
+        "name": "forgetfulness_ii",
+        "trigger": "always",
+        "effect": {
+          "type": "techniqueDamageMultiplier",
+          "value": 2
+        }
+      },
+      {
+        "name": "farewell_ii",
+        "trigger": "onUltimate",
+        "effect": {
+          "type": "additionalDamageFromAtk",
+          "value": 4,
+          "distribution": "split_evenly_across_hit_targets"
+        }
+      }
+    ]
   }
 }
