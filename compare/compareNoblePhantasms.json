@@ -348,5 +348,73 @@
         }
       }
     ]
+  },
+  "sword_of_rupture": {
+    "id": "sword_of_rupture",
+    "name": "Sword of Rupture",
+
+    "stats": {
+      "atkFlat": 18035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.17,
+      "hpBonus": 0.29,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "judgment_vi",
+        "trigger": "onUltimate",
+        "chance": 0.7,
+        "effect": {
+          "type": "applyDebuff",
+          "debuff": {
+            "name": "extermination",
+            "durationSec": 5,
+            "stackable": false,
+            "dispellable": false,
+            "tickIntervalSec": 1,
+            "onTick": {
+              "type": "trueDamage",
+              "scaling": {
+                "atkMultiplier": 0.5
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "disruption_ii",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "extermination"
+        },
+        "cooldownPerTargetSec": 10,
+        "effect": {
+          "type": "reduceRage",
+          "value": 300
+        }
+      },
+      {
+        "name": "doom_ii",
+        "trigger": "onApplyDebuff",
+        "condition": {
+          "debuff": "extermination"
+        },
+        "cooldownPerTargetSec": 10,
+        "effect": {
+          "type": "damage",
+          "damageType": "additional",
+          "scaling": {
+            "targetMaxHpPercent": 0.10,
+            "capAtkMultiplier": 4.0
+          }
+        }
+      }
+    ]
   }
 }
