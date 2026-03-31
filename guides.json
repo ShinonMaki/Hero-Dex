@@ -670,5 +670,14 @@
       ]
     }
   },
-  "help unit": {}
+  "help unit": {
+    "Exclusive Weapon": {
+      "file": "exclusive-weapon.pdf",
+      "text": "**Exclusive Weapon**\nUnit Exclusive Weapon material required to get lvl30.\n\nLegendary unit cost lesser, while shining legendary unit and up cost the same.\n\nLegendary Unit: 700Basic+360Advance+240Super\n\nShining Legendary and above: 877Basic+452Advance+300Super",
+      "images": [
+        "exclusive-weapon-1774938147063.png",
+        "exclusive-weapon-1774938147990.png"
+      ]
+    }
+  }
 }
