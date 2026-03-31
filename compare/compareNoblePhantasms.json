@@ -684,5 +684,72 @@
         }
       }
     ]
+  },
+  "prelati_spellbook": {
+    "id": "prelati_spellbook",
+    "name": "Prelati's Spellbook",
+
+    "stats": {
+      "atkFlat": 28035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.29,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "fervor",
+        "condition": {
+          "highestInitialAtk": true
+        },
+        "effect": {
+          "fixedDamageBonus": 0.02,
+          "stealAtk": {
+            "chance": 0.3,
+            "value": 0.02,
+            "cap": 0.3,
+            "duration": 5
+          }
+        }
+      },
+      {
+        "name": "record",
+        "trigger": "onBattleStart",
+        "effect": {
+          "atkIncrease": 0.15,
+          "storeMaxAtk": true,
+          "restoreMaxAtk": {
+            "capInitialAtkMultiplier": 0.8
+          }
+        }
+      },
+      {
+        "name": "pursuit",
+        "effect": {
+          "fixedDamageBonus": 0.15,
+          "earlyBonus": {
+            "duration": 30,
+            "value": 0.15
+          },
+          "extraAttack": {
+            "chance": 0.5,
+            "damageMultiplier": 1.0,
+            "cooldown": 10
+          },
+          "applyDebuff": {
+            "chance": 0.5,
+            "debuff": {
+              "fixedDamageResReduction": 0.2,
+              "duration": 5
+            }
+          }
+        }
+      }
+    ]
   }
 }
