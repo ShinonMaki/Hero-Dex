@@ -4,6 +4,37 @@ const { pushLog } = require("./compareState");
 
 /**
  * =========================
+ * HELPERS
+ * =========================
+ */
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function resolveEffectTarget(effect, ctx) {
+  if (!effect?.target) return ctx.target;
+
+  switch (effect.target) {
+    case "self":
+      return ctx.source;
+    case "enemy":
+      return ctx.target;
+    case "lowestHpAlly":
+      return ctx.source; // in 1v1 per ora coincide
+    case "highestAtkAlly":
+      return ctx.source; // in 1v1 per ora coincide
+    case "shieldedAlly":
+      return ctx.source; // placeholder 1v1
+    case "allAllies":
+      return ctx.source; // placeholder 1v1
+    default:
+      return ctx.target;
+  }
+}
+
+/**
+ * =========================
  * HP / SOUL ARMOR HANDLING
  * =========================
  */
@@ -11,7 +42,6 @@ const { pushLog } = require("./compareState");
 function applyHpLoss(target, damage, battleState) {
   let remaining = damage;
 
-  // 1. Consuma Soul Armor
   if (target.current.soulArmor > 0) {
     const absorbed = Math.min(target.current.soulArmor, remaining);
     target.current.soulArmor -= absorbed;
@@ -24,7 +54,6 @@ function applyHpLoss(target, damage, battleState) {
     });
   }
 
-  // 2. Danno su HP
   if (remaining > 0) {
     target.current.hp = Math.max(0, target.current.hp - remaining);
 
@@ -52,29 +81,53 @@ function applyHpLoss(target, damage, battleState) {
  * =========================
  */
 
+function computeDamageBase(effect, ctx) {
+  const { source, target } = ctx;
+
+  if (effect.scaling && typeof effect.scaling === "object") {
+    let damage = 0;
+
+    if (effect.scaling.atkMultiplier) {
+      damage += source.computedStats.atk * effect.scaling.atkMultiplier;
+    }
+
+    if (effect.scaling.targetMaxHpPercent) {
+      damage += target.computedStats.hp * effect.scaling.targetMaxHpPercent;
+    }
+
+    if (effect.scaling.capAtkMultiplier) {
+      const cap = source.computedStats.atk * effect.scaling.capAtkMultiplier;
+      damage = Math.min(damage, cap);
+    }
+
+    return damage;
+  }
+
+  if (effect.value) {
+    if (effect.scaling === "hp") {
+      return source.computedStats.hp * effect.value;
+    }
+
+    return source.computedStats.atk * effect.value;
+  }
+
+  return 0;
+}
+
 function dealDamage(effect, ctx) {
   const { source, target, battleState } = ctx;
 
-  let damage = 0;
+  let damage = computeDamageBase(effect, ctx);
 
-  // base formula
-  if (effect.value) {
-    damage = source.computedStats.atk * effect.value;
-  }
-
-  // scaling override (se vuoi usarlo in futuro)
-  if (effect.scaling === "hp") {
-    damage = source.computedStats.hp * effect.value;
-  }
-
-  // TYPE
   if (effect.damageType === "true") {
-    damage *= (1 + source.computedStats.fixedDmgBonus);
-    damage *= (1 - target.computedStats.fixedDmgRes);
+    damage *= 1 + (source.computedStats.fixedDmgBonus ?? 0);
+    damage *= 1 - (target.computedStats.fixedDmgRes ?? 0);
   } else {
-    damage *= (1 + source.computedStats.dmgBonus + source.computedStats.finalDamageBonus);
-    damage *= (1 - target.computedStats.dmgReduction);
+    damage *= 1 + (source.computedStats.dmgBonus ?? 0) + (source.computedStats.finalDamageBonus ?? 0);
+    damage *= 1 - (target.computedStats.dmgReduction ?? 0);
   }
+
+  damage = Math.max(0, damage);
 
   pushLog(battleState, {
     kind: "damage",
@@ -87,6 +140,27 @@ function dealDamage(effect, ctx) {
   applyHpLoss(target, damage, battleState);
 }
 
+function dealBasicAttackDamage(ctx) {
+  const { source, target, battleState } = ctx;
+
+  let damage = source.computedStats.atk;
+  damage *= 1 + (source.computedStats.normalAttackDamage ?? 0);
+  damage *= 1 + (source.computedStats.dmgBonus ?? 0) + (source.computedStats.finalDamageBonus ?? 0);
+  damage *= 1 - (target.computedStats.dmgReduction ?? 0);
+
+  damage = Math.max(0, damage);
+
+  pushLog(battleState, {
+    kind: "damage",
+    source: source.id,
+    target: target.id,
+    amount: damage,
+    type: "basic_attack"
+  });
+
+  applyHpLoss(target, damage, battleState);
+}
+
 /**
  * =========================
  * HEAL
@@ -94,20 +168,23 @@ function dealDamage(effect, ctx) {
  */
 
 function applyHeal(effect, ctx) {
-  const { source, target, battleState } = ctx;
+  const { source, battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
 
   let heal = 0;
 
-  if (effect.value) {
+  if (effect.scaling === "atk" || effect.valueType === "selfAtkPercent") {
+    heal = source.computedStats.atk * (effect.value ?? 0);
+  } else if (effect.valueType === "selfMaxHpPercent") {
+    heal = source.computedStats.hp * (effect.value ?? 0);
+  } else if (effect.value) {
     heal = source.computedStats.atk * effect.value;
   }
 
-  heal *= (1 + source.computedStats.healEffect);
+  heal *= 1 + (source.computedStats.healEffect ?? 0);
+  heal = Math.max(0, heal);
 
-  target.current.hp = Math.min(
-    target.computedStats.hp,
-    target.current.hp + heal
-  );
+  target.current.hp = Math.min(target.computedStats.hp, target.current.hp + heal);
 
   pushLog(battleState, {
     kind: "heal",
@@ -120,20 +197,26 @@ function applyHeal(effect, ctx) {
 
 /**
  * =========================
- * BUFF / DEBUFF
+ * BUFF / DEBUFF / STATUS
  * =========================
  */
 
 function applyBuff(effect, ctx) {
-  const { target, battleState } = ctx;
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+
+  const buffId = effect.name ?? effect.id ?? effect.stat ?? "buff";
 
   const buff = {
-    id: effect.id,
+    id: buffId,
     type: effect.type,
-    value: effect.value,
-    duration: effect.duration ?? null,
-    remaining: effect.duration ?? null,
-    dispellable: effect.dispellable ?? true
+    stats: effect.stats ?? null,
+    stat: effect.stat ?? null,
+    value: effect.value ?? null,
+    durationSec: effect.durationSec ?? effect.duration ?? null,
+    remainingSec: effect.durationSec ?? effect.duration ?? null,
+    dispellable: effect.dispellable ?? true,
+    effects: effect.effects ?? null
   };
 
   target.buffs.push(buff);
@@ -146,15 +229,28 @@ function applyBuff(effect, ctx) {
 }
 
 function applyDebuff(effect, ctx) {
-  const { target, battleState } = ctx;
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+
+  const debuffId =
+    effect.debuffId ??
+    effect.name ??
+    effect.status ??
+    effect.stat ??
+    "debuff";
 
   const debuff = {
-    id: effect.id,
+    id: debuffId,
     type: effect.type,
-    value: effect.value,
-    duration: effect.duration ?? null,
-    remaining: effect.duration ?? null,
-    dispellable: effect.dispellable ?? true
+    stat: effect.stat ?? null,
+    status: effect.status ?? null,
+    value: effect.value ?? null,
+    durationSec: effect.durationSec ?? effect.duration ?? null,
+    remainingSec: effect.durationSec ?? effect.duration ?? null,
+    dispellable: effect.dispellable ?? true,
+    effects: effect.effects ?? null,
+    stacks: effect.stacks ?? 1,
+    maxStacks: effect.maxStacks ?? 1
   };
 
   target.debuffs.push(debuff);
@@ -166,6 +262,14 @@ function applyDebuff(effect, ctx) {
   });
 }
 
+function applyStatus(effect, ctx) {
+  return applyDebuff(effect, ctx);
+}
+
+function applyEnemyDebuff(effect, ctx) {
+  return applyDebuff(effect, ctx);
+}
+
 /**
  * =========================
  * RAGE
@@ -173,11 +277,13 @@ function applyDebuff(effect, ctx) {
  */
 
 function restoreRage(effect, ctx) {
-  const { target, battleState } = ctx;
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
 
-  target.current.rage = Math.min(
-    target.computedStats.rageLimit,
-    target.current.rage + effect.value
+  target.current.rage = clamp(
+    target.current.rage + (effect.value ?? 0),
+    0,
+    target.computedStats.rageLimit
   );
 
   pushLog(battleState, {
@@ -189,9 +295,10 @@ function restoreRage(effect, ctx) {
 }
 
 function reduceRage(effect, ctx) {
-  const { target, battleState } = ctx;
+  const { battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
 
-  target.current.rage = Math.max(0, target.current.rage - effect.value);
+  target.current.rage = Math.max(0, target.current.rage - (effect.value ?? 0));
 
   pushLog(battleState, {
     kind: "rage_loss",
@@ -203,24 +310,116 @@ function reduceRage(effect, ctx) {
 
 /**
  * =========================
- * SOUL ARMOR
+ * SOUL ARMOR / SHIELD
  * =========================
  */
 
 function grantSoulArmor(effect, ctx) {
-  const { target, battleState } = ctx;
+  const { source, battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+
+  let amount = effect.value ?? 0;
+
+  if (effect.scaling?.casterMaxHpPercent) {
+    amount = source.computedStats.hp * effect.scaling.casterMaxHpPercent;
+  }
 
   target.current.soulArmor = Math.min(
-    target.current.maxSoulArmor,
-    target.current.soulArmor + effect.value
+    target.current.maxSoulArmor || Number.MAX_SAFE_INTEGER,
+    target.current.soulArmor + amount
   );
 
   pushLog(battleState, {
     kind: "soul_armor_gain",
     target: target.id,
-    amount: effect.value,
+    amount,
     soulArmor: target.current.soulArmor
   });
+}
+
+function applyShield(effect, ctx) {
+  const { source, battleState } = ctx;
+  const target = resolveEffectTarget(effect, ctx);
+
+  let amount = 0;
+
+  if (effect.valueType === "selfAtkPercent") {
+    amount = source.computedStats.atk * (effect.value ?? 0);
+  } else {
+    amount = effect.value ?? 0;
+  }
+
+  target.current.soulArmor += amount;
+  target.current.maxSoulArmor += amount;
+
+  pushLog(battleState, {
+    kind: "shield_applied",
+    source: source.id,
+    target: target.id,
+    amount,
+    soulArmor: target.current.soulArmor,
+    maxSoulArmor: target.current.maxSoulArmor
+  });
+}
+
+/**
+ * =========================
+ * STAT MODIFIERS PLACEHOLDER
+ * =========================
+ */
+
+function applyFixedDamageBonusFromCritRate(effect, ctx) {
+  const { source, battleState } = ctx;
+
+  pushLog(battleState, {
+    kind: "effect_placeholder",
+    effectType: "fixedDamageBonusFromCritRate",
+    source: source.id,
+    detail: effect
+  });
+}
+
+function applyUltimateFixedDamageBonus(effect, ctx) {
+  const { source, battleState } = ctx;
+
+  pushLog(battleState, {
+    kind: "effect_placeholder",
+    effectType: "ultimateFixedDamageBonus",
+    source: source.id,
+    detail: effect
+  });
+}
+
+/**
+ * =========================
+ * RESOURCE / SPECIAL WRAPPERS
+ * =========================
+ */
+
+function applyCombatStartResourceGain(effect, ctx) {
+  if (effect.resource === "rage") {
+    return restoreRage(effect, ctx);
+  }
+
+  const { source, battleState } = ctx;
+
+  pushLog(battleState, {
+    kind: "resource_gain_placeholder",
+    source: source.id,
+    resource: effect.resource,
+    value: effect.value ?? 0
+  });
+}
+
+function applyCombatStartSoulArmorGain(effect, ctx) {
+  const wrapped = {
+    type: "grantSoulArmor",
+    target: "self",
+    value: effect.value,
+    valueType: effect.valueType
+  };
+
+  return grantSoulArmor(wrapped, ctx);
 }
 
 /**
@@ -230,6 +429,8 @@ function grantSoulArmor(effect, ctx) {
  */
 
 function applyEffect(effect, ctx) {
+  if (!effect?.type) return;
+
   switch (effect.type) {
     case "damage":
       return dealDamage(effect, ctx);
@@ -243,8 +444,17 @@ function applyEffect(effect, ctx) {
     case "buff":
       return applyBuff(effect, ctx);
 
-    case "applyDebuff":
+    case "debuff":
       return applyDebuff(effect, ctx);
+
+    case "status":
+      return applyStatus(effect, ctx);
+
+    case "enemyDebuff":
+      return applyEnemyDebuff(effect, ctx);
+
+    case "applyDebuff":
+      return applyDebuff(effect.debuff ?? effect, ctx);
 
     case "restoreRage":
       return restoreRage(effect, ctx);
@@ -255,11 +465,33 @@ function applyEffect(effect, ctx) {
     case "grantSoulArmor":
       return grantSoulArmor(effect, ctx);
 
+    case "shield":
+      return applyShield(effect, ctx);
+
+    case "combatStartResourceGain":
+      return applyCombatStartResourceGain(effect, ctx);
+
+    case "combatStartSoulArmorGain":
+      return applyCombatStartSoulArmorGain(effect, ctx);
+
+    case "fixedDamageBonusFromCritRate":
+      return applyFixedDamageBonusFromCritRate(effect, ctx);
+
+    case "ultimateFixedDamageBonus":
+      return applyUltimateFixedDamageBonus(effect, ctx);
+
     default:
+      pushLog(ctx.battleState, {
+        kind: "effect_unhandled",
+        effectType: effect.type,
+        source: ctx.source?.id ?? null,
+        target: ctx.target?.id ?? null
+      });
       return;
   }
 }
 
 module.exports = {
-  applyEffect
+  applyEffect,
+  dealBasicAttackDamage
 };
