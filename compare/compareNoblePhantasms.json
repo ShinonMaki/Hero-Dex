@@ -115,5 +115,54 @@
         }
       }
     ]
+  },
+  "rule_breaker": {
+    "id": "rule_breaker",
+    "name": "Rule Breaker",
+
+    "stats": {
+      "atkFlat": 28035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.29,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "demon_shadow_vi",
+        "trigger": "onUltimate",
+        "effect": {
+          "type": "selfBuff",
+          "stat": "atkBonus",
+          "value": 0.14,
+          "durationSec": 10
+        }
+      },
+      {
+        "name": "abyss_ii",
+        "trigger": "onUltimateHit",
+        "effect": {
+          "type": "selfBuffPerTargetHit",
+          "stat": "atkBonus",
+          "value": 0.03,
+          "durationSec": 10
+        }
+      },
+      {
+        "name": "nightmare_ii",
+        "trigger": "onUltimate",
+        "effect": {
+          "type": "additionalDamageFromTargetMaxHp",
+          "value": 0.06,
+          "capType": "selfAtkPercent",
+          "capValue": 2.4
+        }
+      }
+    ]
   }
 }
