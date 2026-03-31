@@ -9,10 +9,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 0.10 }
     ],
     "setBonus": {
-      "atkBonus": 15
+      "atkBonus": 0.15
     }
   },
 
@@ -26,10 +26,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 0.10 }
     ],
     "setBonus": {
-      "atkBonus": 15
+      "atkBonus": 0.15
     }
   },
 
@@ -43,10 +43,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 0.10 }
     ],
     "setBonus": {
-      "atkBonus": 15
+      "atkBonus": 0.15
     }
   },
 
@@ -60,10 +60,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 0.10 }
     ],
     "setBonus": {
-      "atkBonus": 15
+      "atkBonus": 0.15
     }
   },
 
@@ -77,10 +77,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 0.10 }
     ],
     "setBonus": {
-      "hpBonus": 15
+      "hpBonus": 0.15
     }
   },
 
@@ -94,10 +94,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 0.10 }
     ],
     "setBonus": {
-      "hpBonus": 15
+      "hpBonus": 0.15
     }
   },
 
@@ -111,10 +111,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 10 }
+      { "type": "divineatk", "atkFlat": 13809, "atkBonus": 0.10 }
     ],
     "setBonus": {
-      "hpBonus": 15
+      "hpBonus": 0.15
     }
   },
 
@@ -128,10 +128,10 @@
       { "type": "hp", "hpFlat": 345833 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
       { "type": "willpower", "atkFlat": 9880, "hpFlat": 172916 },
-      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 10 }
+      { "type": "divinehp", "hpFlat": 241666, "hpBonus": 0.10 }
     ],
     "setBonus": {
-      "hpBonus": 15
+      "hpBonus": 0.15
     }
   }
 }
