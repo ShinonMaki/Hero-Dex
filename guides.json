@@ -729,6 +729,13 @@
       "images": [
         "energy-supply-station-1774940217353.png"
       ]
+    },
+    "Wonderland Shop": {
+      "file": "wonderland-shop.pdf",
+      "text": "**Wonderland Shop**\n**Resource Shop**\n\nIn the Resource Shop, players can spend Crystals, which are obtained from Wonderland Exploration.\n\nIn this section of the shop, you should mainly focus on buying:\n    1.    Dryton Meteonis Draconids Shard\n    2.    Myth Card Selection II\n    3.    Legend Card Selection\n    4.    White Rose\n\nThese items provide valuable resources that help improve your characters and overall progression.",
+      "images": [
+        "wonderland-shop-1774940330760.png"
+      ]
     }
   }
 }
