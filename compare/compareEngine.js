@@ -1,7 +1,6 @@
 // compare/compareEngine.js
 
 const {
-  createFighterRuntime,
   createBattleState,
   getFighter,
   getOpponent,
@@ -9,30 +8,56 @@ const {
 } = require("./compareState");
 
 const { emitEvent, processQueue } = require("./compareTriggers");
+const { buildFighter } = require("./compareBuild");
 
 /**
- * MVP professionale:
- * - crea fighter runtime
- * - imposta hp/rage iniziali
- * - fa partire onBattleStart
- * - avanza a tick
- * - per ora non esegue ancora danni reali
+ * Costruisce un fighter usando il compareBuild.
+ * Qui colleghiamo il runtime ai moduli statici:
+ * - rune
+ * - noble phantasm
+ * - equipment
+ * - soul jade
+ * - clothes
  */
-
-function initializeFighter(fighter) {
-  fighter.current.hp = fighter.computedStats.hp;
-  fighter.current.rage = 0;
-  fighter.current.soulArmor = fighter.computedStats.soulArmor ?? 0;
-  fighter.current.maxSoulArmor = fighter.computedStats.soulArmor ?? 0;
-
-  fighter.snapshots.initialAtk = fighter.computedStats.atk;
-  fighter.snapshots.maxRecordedAtk = fighter.computedStats.atk;
+function buildBattleFighter(heroKey, heroData, sideOptions = {}) {
+  return buildFighter(
+    heroKey,
+    heroData,
+    sideOptions.loadout ?? {},
+    {
+      runeSetData: sideOptions.runeSetData ?? null,
+      noblePhantasmData: sideOptions.noblePhantasmData ?? null,
+      equipmentSetData: sideOptions.equipmentSetData ?? null,
+      soulJadeDataList: sideOptions.soulJadeDataList ?? [],
+      clothesSetData: sideOptions.clothesSetData ?? null
+    }
+  );
 }
 
-function buildSimpleFighter(heroKey, heroData, loadout = {}) {
-  const fighter = createFighterRuntime(heroKey, heroData, loadout);
-  initializeFighter(fighter);
-  return fighter;
+function logFighterSnapshot(battleState, side, fighter) {
+  pushLog(battleState, {
+    kind: "fighter_built",
+    side,
+    fighterId: fighter.id,
+    fighterName: fighter.name,
+    computedStats: {
+      atk: fighter.computedStats.atk,
+      hp: fighter.computedStats.hp,
+      def: fighter.computedStats.def,
+      critRate: fighter.computedStats.critRate,
+      critDmg: fighter.computedStats.critDmg,
+      dmgBonus: fighter.computedStats.dmgBonus,
+      fixedDmgBonus: fighter.computedStats.fixedDmgBonus,
+      fixedDmgRes: fighter.computedStats.fixedDmgRes,
+      blockRate: fighter.computedStats.blockRate
+    },
+    current: {
+      hp: fighter.current.hp,
+      rage: fighter.current.rage,
+      soulArmor: fighter.current.soulArmor,
+      maxSoulArmor: fighter.current.maxSoulArmor
+    }
+  });
 }
 
 function checkWinner(battleState) {
@@ -86,27 +111,35 @@ function emitTickEvents(battleState) {
   });
 }
 
+/**
+ * Placeholder temporaneo:
+ * per ora emettiamo solo normal attack base.
+ * Più avanti qui entreranno:
+ * - rage logic
+ * - technique
+ * - ultimate
+ * - velocità / haste
+ * - target count dinamico
+ */
 function simulateActionsPlaceholder(battleState) {
-  // Qui per ora non facciamo ancora auto/technique/ultimate reali.
-  // Serve solo a far girare il telaio.
   const a = getFighter(battleState, "a");
-  const b = getOpponent(battleState, "a");
+  const b = getFighter(battleState, "b");
 
-  if (a.alive && b.alive) {
-    emitEvent(battleState, {
-      type: "onNormalAttack",
-      source: "a",
-      target: "b",
-      payload: { targetCount: 1 }
-    });
+  if (!a.alive || !b.alive) return;
 
-    emitEvent(battleState, {
-      type: "onNormalAttack",
-      source: "b",
-      target: "a",
-      payload: { targetCount: 1 }
-    });
-  }
+  emitEvent(battleState, {
+    type: "onNormalAttack",
+    source: "a",
+    target: "b",
+    payload: { targetCount: 1 }
+  });
+
+  emitEvent(battleState, {
+    type: "onNormalAttack",
+    source: "b",
+    target: "a",
+    payload: { targetCount: 1 }
+  });
 }
 
 function advanceTick(battleState) {
@@ -124,9 +157,38 @@ function advanceTick(battleState) {
   checkWinner(battleState);
 }
 
+/**
+ * options:
+ * {
+ *   tickSize,
+ *   maxTime,
+ *   verboseLog,
+ *
+ *   sideA: {
+ *     loadout,
+ *     runeSetData,
+ *     noblePhantasmData,
+ *     equipmentSetData,
+ *     soulJadeDataList,
+ *     clothesSetData
+ *   },
+ *
+ *   sideB: {
+ *     loadout,
+ *     runeSetData,
+ *     noblePhantasmData,
+ *     equipmentSetData,
+ *     soulJadeDataList,
+ *     clothesSetData
+ *   }
+ * }
+ */
 function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
-  const fighterA = buildSimpleFighter(heroAKey, heroAData, options.loadoutA ?? {});
-  const fighterB = buildSimpleFighter(heroBKey, heroBData, options.loadoutB ?? {});
+  const sideA = options.sideA ?? {};
+  const sideB = options.sideB ?? {};
+
+  const fighterA = buildBattleFighter(heroAKey, heroAData, sideA);
+  const fighterB = buildBattleFighter(heroBKey, heroBData, sideB);
 
   const battleState = createBattleState(fighterA, fighterB, {
     tickSize: options.tickSize ?? 0.5,
@@ -138,6 +200,9 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
     kind: "battle_starting",
     fighters: [fighterA.name, fighterB.name]
   });
+
+  logFighterSnapshot(battleState, "a", fighterA);
+  logFighterSnapshot(battleState, "b", fighterB);
 
   emitBattleStart(battleState);
   processQueue(battleState);
@@ -152,7 +217,19 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
 
   pushLog(battleState, {
     kind: "battle_finished",
-    winner: battleState.winner
+    winner: battleState.winner,
+    finalHp: {
+      a: battleState.fighters.a.current.hp,
+      b: battleState.fighters.b.current.hp
+    },
+    finalRage: {
+      a: battleState.fighters.a.current.rage,
+      b: battleState.fighters.b.current.rage
+    },
+    finalSoulArmor: {
+      a: battleState.fighters.a.current.soulArmor,
+      b: battleState.fighters.b.current.soulArmor
+    }
   });
 
   return {
@@ -165,8 +242,10 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
 
 module.exports = {
   runBattle,
-  buildSimpleFighter,
-  initializeFighter,
+  buildBattleFighter,
   checkWinner,
-  advanceTick
+  emitBattleStart,
+  emitTickEvents,
+  advanceTick,
+  simulateActionsPlaceholder
 };
