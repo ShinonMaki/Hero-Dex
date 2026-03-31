@@ -322,10 +322,21 @@ function grantSoulArmor(effect, ctx) {
 
   if (effect.scaling?.casterMaxHpPercent) {
     amount = source.computedStats.hp * effect.scaling.casterMaxHpPercent;
+  } else if (effect.valueType === "selfMaxHpPercent") {
+    amount = source.computedStats.hp * (effect.value ?? 0);
+  } else if (effect.valueType === "selfAtkPercent") {
+    amount = source.computedStats.atk * (effect.value ?? 0);
+  }
+
+  amount = Math.max(0, amount);
+
+  // Se non esiste ancora un cap, usiamo un cap molto alto temporaneo
+  if (!target.current.maxSoulArmor || target.current.maxSoulArmor <= 0) {
+    target.current.maxSoulArmor = amount;
   }
 
   target.current.soulArmor = Math.min(
-    target.current.maxSoulArmor || Number.MAX_SAFE_INTEGER,
+    target.current.maxSoulArmor,
     target.current.soulArmor + amount
   );
 
@@ -345,9 +356,13 @@ function applyShield(effect, ctx) {
 
   if (effect.valueType === "selfAtkPercent") {
     amount = source.computedStats.atk * (effect.value ?? 0);
+  } else if (effect.valueType === "selfMaxHpPercent") {
+    amount = source.computedStats.hp * (effect.value ?? 0);
   } else {
     amount = effect.value ?? 0;
   }
+
+  amount = Math.max(0, amount);
 
   target.current.soulArmor += amount;
   target.current.maxSoulArmor += amount;
