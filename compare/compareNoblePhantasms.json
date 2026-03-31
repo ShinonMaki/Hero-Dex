@@ -267,5 +267,86 @@
         }
       }
     ]
+  },
+ "gae_bolg": {
+    "id": "gae_bolg",
+    "name": "Gae Bolg",
+
+    "stats": {
+      "atkFlat": 18035,
+      "hpFlat": 315625
+    },
+
+    "bonus": {
+      "atkBonus": 0.17,
+      "hpBonus": 0.29,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "soul_forge_vi",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "stats": {
+            "normalAttackDamage": 0.15
+          }
+        }
+      },
+      {
+        "name": "soul_flame_apply",
+        "trigger": "onNormalAttackHit",
+        "chance": 0.15,
+        "effect": {
+          "type": "applyDebuff",
+          "debuff": {
+            "name": "soul_flame",
+            "durationSec": 15,
+            "maxStacks": 6,
+            "tickIntervalSec": 3,
+            "onTick": {
+              "type": "trueDamage",
+              "scaling": {
+                "atkMultiplier": 0.10,
+                "perStack": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "scorching_heart_ii",
+        "trigger": "onNormalAttackCrit",
+        "cooldownSec": 1.5,
+        "effect": {
+          "type": "damage",
+          "damageType": "additional",
+          "scaling": {
+            "targetMaxHpPercent": 0.05,
+            "capAtkMultiplier": 2.0
+          }
+        }
+      },
+      {
+        "name": "bone_crush_ii",
+        "trigger": "onCondition",
+        "condition": {
+          "targetDebuff": "soul_flame",
+          "stacks": 6
+        },
+        "cooldownSec": 15,
+        "effect": {
+          "type": "trueDamage",
+          "scaling": {
+            "targetMaxHpPercent": 0.20,
+            "capAtkMultiplier": 8.0
+          },
+          "consumeDebuff": true
+        }
+      }
+    ]
   }
 }
