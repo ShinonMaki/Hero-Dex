@@ -722,6 +722,13 @@
       "images": [
         "tower-of-babel-1774940143093.png"
       ]
+    },
+    "Energy Supply Station": {
+      "file": "energy-supply-station.pdf",
+      "text": "**Energy Supply Station**\n\nThe Energy Supply Station is a feature of Wonderland Exploration.\n\nIn this system, players can create up to two cars simultaneously.\nThese cars are used to farm Crystals through the “Set Out to Explore” activity.\n\nEach car can host:\n    •    4 players\n    •    1 captain\n\nCar Duration\n\nPlayers can use Energy Stones to increase the duration of a car.\n\nThe duration can range from:\n    •    Minimum: 2 hours\n    •    Maximum: 24 hours\n\nThe longer the duration, the higher the Crystal production, but it will also require more Energy Stones to create the car.\n\nEnergy Stone cost per car:\n    •    Minimum: 1 Energy Stone\n    •    Maximum: 12 Energy Stones\n\nCrystal Farming Formula\n\nThe amount of Crystals obtained is calculated with the following formula:\n\nBase Resources × (1 + Captain PWR Bonus) × (1 + Captain Title Bonus)\n\nWhere:\n    •    Base Resources: 100\n    •    Captain PWR Bonus: depends on the captain’s power and is expressed as a percentage\n    •    Captain Title Bonus: depends on the titles owned by the captain\n\nThere are three possible title bonuses:\n    •    20%\n    •    40%\n    •    60%\n\nCaptain Bonus\n\nThe captain receives double the materials obtained from the car",
+      "images": [
+        "energy-supply-station-1774940217353.png"
+      ]
     }
   }
 }
