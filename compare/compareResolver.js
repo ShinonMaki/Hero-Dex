@@ -4,6 +4,97 @@ const { getFighter, getOpponent, pushLog } = require("./compareState");
 const { applyEffect } = require("./compareEffects");
 
 /**
+ * Normalizza i trigger "umani" dei JSON
+ * verso i trigger runtime del motore.
+ */
+function normalizeTrigger(trigger) {
+  const map = {
+    // battle start
+    battleStart: "onBattleStart",
+    onBattleStart: "onBattleStart",
+
+    // attacks
+    onAttack: "onNormalAttack",
+    onActiveAttack: "onNormalAttack",
+    onBasicAttack: "onNormalAttack",
+    onNormalAttack: "onNormalAttack",
+    onAttackHit: "onNormalAttackHit",
+    onNormalAttackHit: "onNormalAttackHit",
+    onCritAttack: "onNormalAttackCrit",
+    onNormalAttackCrit: "onNormalAttackCrit",
+
+    // skill / technique
+    onSkill: "onTechnique",
+    onTechnique: "onTechnique",
+    onSkillHit: "onTechniqueHit",
+    onTechniqueHit: "onTechniqueHit",
+
+    // ultimate
+    onUlt: "onUltimate",
+    onUltimate: "onUltimate",
+    onUltimateHit: "onUltimateHit",
+    onUltimateCrit: "onUltimateCrit",
+
+    // heal / shield
+    onHeal: "onHeal",
+    onActiveHeal: "onActiveHeal",
+    onShieldApply: "onShieldApply",
+
+    // misc
+    onBlock: "onBlock",
+    onHit: "onHit",
+    onCondition: "onCondition",
+    onApplyDebuff: "onApplyDebuff",
+    onDebuffApplied: "onApplyDebuff",
+    onDebuffExpire: "onDebuffExpire",
+    onEnemyDeath: "onEnemyDeath",
+    onTargetDeath: "onTargetDeath",
+    onDeath: "onDeath",
+    onFatalDamage: "onFatalDamage",
+    onHpBelowThreshold: "onHpBelowThreshold",
+    onRageReduced: "onRageReduced",
+
+    // passive style
+    passive: "passive",
+    always: "always"
+  };
+
+  return map[trigger] ?? trigger;
+}
+
+/**
+ * Traduce le category delle skill eroe nel trigger runtime corretto.
+ */
+function normalizeSkillCategory(category) {
+  const map = {
+    ultimate: "onUltimate",
+    technique: "onTechnique",
+    passive: "passive"
+  };
+
+  return map[category] ?? category;
+}
+
+/**
+ * Alcuni effect type del JSON eroe sono in realtà wrapper evento.
+ * Qui li traduciamo in trigger runtime.
+ */
+function inferTriggerFromEffectType(effectType) {
+  const map = {
+    combatStartResourceGain: "onBattleStart",
+    combatStartSoulArmorGain: "onBattleStart",
+    onRageReduced: "onRageReduced",
+    onUltimateCast: "onUltimate",
+    onFatalDamage: "onFatalDamage",
+    onEnemyDeath: "onEnemyDeath",
+    onDebuffApplied: "onApplyDebuff",
+    onUltimateCrit: "onUltimateCrit"
+  };
+
+  return map[effectType] ?? null;
+}
+
+/**
  * Evaluator minimo.
  * Più avanti potrai spostarlo in compareConditions.js
  */
@@ -44,6 +135,11 @@ function evaluateCondition(condition, ctx) {
     if (!hasDebuff) return false;
   }
 
+  if (condition.targetDebuff) {
+    const hasDebuff = target.debuffs.some(d => d.id === condition.targetDebuff);
+    if (!hasDebuff) return false;
+  }
+
   if (condition.highestInitialAtk === true) {
     if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
       return false;
@@ -67,10 +163,15 @@ function collectActiveEffects(source) {
   const skills = source.heroData.skills ?? {};
   for (const [skillKey, skillData] of Object.entries(skills)) {
     for (const effect of skillData.effects ?? []) {
+      const inferredTrigger =
+        normalizeTrigger(effect.trigger) ||
+        inferTriggerFromEffectType(effect.type) ||
+        normalizeSkillCategory(skillData.category);
+
       collected.push({
         ownerType: "skill",
         ownerId: skillKey,
-        trigger: effect.trigger ?? skillData.category,
+        trigger: inferredTrigger,
         condition: effect.condition,
         effect
       });
@@ -84,10 +185,15 @@ function collectActiveEffects(source) {
    */
   const weaponEffects = source.heroData.exclusiveWeapon?.effects ?? [];
   for (const effect of weaponEffects) {
+    const inferredTrigger =
+      normalizeTrigger(effect.trigger) ||
+      inferTriggerFromEffectType(effect.type) ||
+      "passive";
+
     collected.push({
       ownerType: "exclusiveWeapon",
       ownerId: source.heroData.exclusiveWeapon?.id ?? "exclusive_weapon",
-      trigger: effect.trigger ?? "passive",
+      trigger: inferredTrigger,
       condition: effect.condition,
       effect
     });
@@ -101,10 +207,15 @@ function collectActiveEffects(source) {
   const talents = source.heroData.talents ?? {};
   for (const [talentKey, talentData] of Object.entries(talents)) {
     for (const effect of talentData.effects ?? []) {
+      const inferredTrigger =
+        normalizeTrigger(effect.trigger) ||
+        inferTriggerFromEffectType(effect.type) ||
+        "passive";
+
       collected.push({
         ownerType: "talent",
         ownerId: talentKey,
-        trigger: effect.trigger ?? "passive",
+        trigger: inferredTrigger,
         condition: effect.condition,
         effect
       });
@@ -118,10 +229,15 @@ function collectActiveEffects(source) {
    */
   const noblePhantasmEffects = source.noblePhantasm?.effects ?? [];
   for (const effect of noblePhantasmEffects) {
+    const inferredTrigger =
+      normalizeTrigger(effect.trigger) ||
+      inferTriggerFromEffectType(effect.type) ||
+      "passive";
+
     collected.push({
       ownerType: "noblePhantasm",
       ownerId: source.noblePhantasm?.id ?? "noble_phantasm",
-      trigger: effect.trigger ?? "passive",
+      trigger: inferredTrigger,
       condition: effect.condition,
       effect
     });
@@ -136,10 +252,15 @@ function collectActiveEffects(source) {
     if (!Array.isArray(buff.effects)) continue;
 
     for (const effect of buff.effects) {
+      const inferredTrigger =
+        normalizeTrigger(effect.trigger) ||
+        inferTriggerFromEffectType(effect.type) ||
+        "passive";
+
       collected.push({
         ownerType: "buff",
         ownerId: buff.id ?? "runtime_buff",
-        trigger: effect.trigger ?? "passive",
+        trigger: inferredTrigger,
         condition: effect.condition,
         effect
       });
@@ -155,10 +276,15 @@ function collectActiveEffects(source) {
     if (!Array.isArray(debuff.effects)) continue;
 
     for (const effect of debuff.effects) {
+      const inferredTrigger =
+        normalizeTrigger(effect.trigger) ||
+        inferTriggerFromEffectType(effect.type) ||
+        "passive";
+
       collected.push({
         ownerType: "debuff",
         ownerId: debuff.id ?? "runtime_debuff",
-        trigger: effect.trigger ?? "passive",
+        trigger: inferredTrigger,
         condition: effect.condition,
         effect
       });
@@ -192,6 +318,7 @@ function resolveEvent(battleState, event) {
   const activeEffects = collectActiveEffects(source);
 
   for (const entry of activeEffects) {
+    if (entry.trigger === "passive" || entry.trigger === "always") continue;
     if (entry.trigger !== event.type) continue;
     if (!evaluateCondition(entry.condition, ctx)) continue;
 
@@ -218,5 +345,8 @@ function resolveEvent(battleState, event) {
 module.exports = {
   resolveEvent,
   collectActiveEffects,
-  evaluateCondition
+  evaluateCondition,
+  normalizeTrigger,
+  normalizeSkillCategory,
+  inferTriggerFromEffectType
 };
