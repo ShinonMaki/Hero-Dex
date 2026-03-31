@@ -715,6 +715,13 @@
       "images": [
         "set-out-to-explore-1774938790771.png"
       ]
+    },
+    "Tower Of Babel": {
+      "file": "tower-of-babel.pdf",
+      "text": "**Tower of Babel**\n__Special Titles → Authority__\n\nEach time a player obtains a special title (for example from events, rankings, dungeons, etc.), they will accumulate Authority.\n\nDifferent qualities of titles grant different amounts of Authority:\n    •    Common titles → small amount of Authority\n    •    Rare titles → higher amount of Authority\n    •    Event / ranking titles → large amount of Authority\n\nThe more titles a player collects, the more Authority they accumulate.\n\n__Authority → Authority Cards__\n\nAs players progress through the Tower of Babel, they can obtain Authority Cards as floor rewards.\n\nThe rewards are distributed as follows:\n    •    Floor 1 – Floor 20 → 10 Authority Cards per floor\n    •    Floor 21 – Floor 260 → 20 Authority Cards per floor\n\nThese Authority Cards can be exchanged for rare items in the Authority Card Shop.",
+      "images": [
+        "tower-of-babel-1774940143093.png"
+      ]
     }
   }
 }
