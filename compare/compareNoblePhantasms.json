@@ -61,6 +61,57 @@
           "type": "ultimateFixedDamageBonus",
           "value": 0.2
         }
+      ]
+    },
+   "primeval_flame": {
+    "id": "primeval_flame",
+    "name": "Primeval Flame",
+
+    "stats": {
+      "atkFlat": 20406,
+      "hpFlat": 252133
+    },
+
+    "bonus": {
+      "atkBonus": 0.23,
+      "hpBonus": 0.17,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "destruction_vi",
+        "trigger": "onAttack",
+        "chance": 0.5,
+        "effect": {
+          "type": "debuff",
+          "stat": "def",
+          "value": 0.21,
+          "duration": 5
+        }
+      },
+      {
+        "name": "wail_ii",
+        "trigger": "onAttack",
+        "chance": 0.25,
+        "effect": {
+          "type": "status",
+          "status": "silence",
+          "duration": 3
+        }
+      },
+      {
+        "name": "mutual_gaze_ii",
+        "trigger": "onAttack",
+        "condition": "targetHasSilence",
+        "cooldown": 4,
+        "effect": {
+          "type": "heal",
+          "target": "lowestHpAlly",
+          "scaling": "atk",
+          "value": 0.8
+        }
       }
     ]
   }
