@@ -1,0 +1,36 @@
+{
+  "crimson_lotus_saintress": {
+    "id": "crimson_lotus_saintress",
+    "name": "Crimson Lotus Saintress",
+
+    "stats": {
+      "atkFlat": 28035,
+      "hpFlat": 315625,
+      "atkBonus": 29,
+      "hpBonus": 17
+    },
+
+    "bonus": {
+      "atkBonus": 50,
+      "hpBonus": 50
+    },
+
+    "effects": [
+      {
+        "type": "damageBonus",
+        "subtype": "allDamage",
+        "value": 20
+      },
+      {
+        "type": "onBattleStart",
+        "effects": [
+          {
+            "type": "atkBonus",
+            "value": 20,
+            "durationSec": 10
+          }
+        ]
+      }
+    ]
+  }
+}
