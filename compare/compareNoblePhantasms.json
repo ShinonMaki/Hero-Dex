@@ -164,5 +164,57 @@
         }
       }
     ]
+  },
+  "avalon": {
+    "id": "avalon",
+    "name": "Avalon",
+
+    "stats": {
+      "atkFlat": 14644,
+      "hpFlat": 361300
+    },
+
+    "bonus": {
+      "atkBonus": 0.17,
+      "hpBonus": 0.17,
+      "healEffect": 0.12,
+      "noblePhantasmAtk": 0.5,
+      "noblePhantasmHp": 0.5
+    },
+
+    "effects": [
+      {
+        "name": "blessing_vi",
+        "trigger": "onActiveHeal",
+        "effect": {
+          "type": "heal",
+          "target": "lowestHpAlly",
+          "value": 1.12,
+          "valueType": "selfAtkPercent"
+        }
+      },
+      {
+        "name": "support_ii",
+        "trigger": "onActiveHeal",
+        "effect": {
+          "type": "shield",
+          "target": "highestAtkAlly",
+          "value": 1.5,
+          "valueType": "selfAtkPercent"
+        }
+      },
+      {
+        "name": "inspiration_ii",
+        "trigger": "onShieldApply",
+        "effect": {
+          "type": "buff",
+          "target": "shieldedAlly",
+          "stats": {
+            "critRate": 0.20,
+            "critDmg": 0.40
+          }
+        }
+      }
+    ]
   }
 }
