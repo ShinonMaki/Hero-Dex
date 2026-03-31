@@ -678,6 +678,13 @@
         "exclusive-weapon-1774938147063.png",
         "exclusive-weapon-1774938147990.png"
       ]
+    },
+    "Unit Star-Up": {
+      "file": "unit-star-up.pdf",
+      "text": "**Unit Star-up**\nYou can check unit Star-up by going to the promote tab and click on the icon next to the name. It will show you the list of materials needed to promote a unit from 5star all the way to demi god(DG). As for True God promotion, you will materials to complete Tree of Life.\n\nStar-up from 5 ⭐:\nMythic 1: 1 dupe + 1 corresponding element food\n\nMythic 2: 2 corresponding element food\n\nMythic 3: 3 corresponding element food\n\nMythic 4: 1 dupe + 1 mythic 1 corresponding element food + 2 corresponding element food\n\nMythic 5: 4 corresponding element food\n\nMythic 6: 6 corresponding element food\n\nMythic 7: 2 dupe + 1 mythic 4 corresponding element food\n\nMythic 8: 6 corresponding element food\n\nMythic 9: 6 corresponding element food\n\nEternal: 3 dupe + 1 mythic 4 corresponding element food + 1 mythic 4 food\n\nEternal 1: 1 mythic 4 food\n\nEternal 2: 1 mythic 4 dupe + 1 mythic 7 food\n\nEternal 3: 1 mythic 4 dupe + 1 mythic 7 food + 1 mythic 4 food\n\nEternal 4: 1 mythic 7 dupe + 1 mythic 7 food + 1 mythic 4 food\n\nDemi God: 1 mythic 7 dupe + 1 mythic 7 food + 10 fruit of life\n\nTrue God: 2 mythic 4 dupe + 120 water of creation + 120 divine light + 120 breath of formation + 120 earth matter + 21 mark of gods\n\nTotal of 30 dupe required from 5 star to True God star up.",
+      "images": [
+        "unit-star-up-1774938243297.png"
+      ]
     }
   }
 }
