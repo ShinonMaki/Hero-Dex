@@ -699,6 +699,13 @@
       "images": [
         "bloodline-1774938484547.png"
       ]
+    },
+    "Ninja Weapon": {
+      "file": "ninja-weapon.pdf",
+      "text": "**Ninja Weapon**\n## Ninja Technique\nUchiha Fan - Ult User\nSamehada - Technique User\nTotsuka Blade - Normal Attack User\n\n## Physical Technique\nGolden Rope - Ult User\nFlying Thunder God Kunai - Normal Attack\nRuyi Staff - Technique User\n\n## Illusion Technique\nRed Gourd - Team Buffer\nSeven-Star Sword - Team Debuffer\n\n## Secret Technique\nYuta Mirror - Buffer, works in Assist\nAmber Purifying Bottle - Buffer",
+      "images": [
+        "ninja-weapon-1774938585942.png"
+      ]
     }
   }
 }
