@@ -736,6 +736,13 @@
       "images": [
         "wonderland-shop-1774940330760.png"
       ]
+    },
+    "Wonderland Pass": {
+      "file": "wonderland-pass.pdf",
+      "text": "**Wonderland Pass**\n\nThe Wonderland Pass works with a daily login system and provides rewards based on the number of days you log in.\n\nRules\n    1.    Standard Pass\nLog in to the game every day to claim the standard rewards based on your cumulative login days.\n    2.    Premium Pass (9.99$)\nBy activating the Premium Wonderland Exploration Battle Pass, you unlock all premium rewards in addition to the standard ones.\n    3.    Manual Reset System\nThe Wonderland Pass does not reset automatically.\nPlayers can choose to reset it manually after reaching 30 cumulative login days.\n    4.    Reset After 30 Days\n    •    If a player activates the pass and resets it on the 30th cumulative login day, the pass will reset at 00:00 the following day.\n    •    If the player logs in for more than 30 days without resetting, the pass will reset immediately when manually reset.\n\nImportant Resource\n\nThe main useful resource obtained from the Wonderland Pass is the Energy Stone.\nThis resource can be used in the Energy Supply Station.",
+      "images": [
+        "wonderland-pass-1774940432702.png"
+      ]
     }
   }
 }
