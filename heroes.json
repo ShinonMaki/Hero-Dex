@@ -29,5 +29,12 @@
       "LTD Blazing (NA/EU)",
       "LTD Transcendent (TW/Rumble)"
     ]
+  },
+  "mai": {
+    "roles": [
+      "DPS Damage Dealer"
+    ],
+    "type": "LTD Blazing (NA/EU); LTD Transcendent (TW/Rumble)",
+    "category": "Light"
   }
 }
