@@ -44,6 +44,7 @@ function normalizeTrigger(trigger) {
     onBlock: "onBlock",
     onHit: "onHit",
     onCondition: "onCondition",
+    onAttackSequence: "onAttackSequence",
     onApplyDebuff: "onApplyDebuff",
     onDebuffApplied: "onApplyDebuff",
     onDebuffExpire: "onDebuffExpire",
@@ -110,6 +111,93 @@ function hasDebuff(target, debuffId) {
 }
 
 /**
+ * Inizializza il contenitore cooldown runtime.
+ */
+function ensureResolverState(fighter) {
+  if (!fighter.runtimeResolver) {
+    fighter.runtimeResolver = {
+      cooldowns: {}
+    };
+  }
+
+  if (!fighter.runtimeResolver.cooldowns) {
+    fighter.runtimeResolver.cooldowns = {};
+  }
+}
+
+function getCooldownKey(entry, event, target) {
+  const ownerType = entry.ownerType ?? "unknown_owner";
+  const ownerId = entry.ownerId ?? "unknown_owner_id";
+  const effectName = entry.effect?.name ?? "effect";
+
+  return `${ownerType}:${ownerId}:${effectName}`;
+}
+
+function getPerTargetCooldownKey(entry, event, target) {
+  const baseKey = getCooldownKey(entry, event, target);
+  const targetKey = target?.id ?? event?.target ?? "unknown_target";
+  return `${baseKey}:target:${targetKey}`;
+}
+
+function getCooldownDuration(entry) {
+  if (entry.effect?.cooldownPerTargetSec != null) return entry.effect.cooldownPerTargetSec;
+  if (entry.effect?.cooldownSec != null) return entry.effect.cooldownSec;
+  if (entry.effect?.cooldown != null) return entry.effect.cooldown;
+  return 0;
+}
+
+function isPerTargetCooldown(entry) {
+  return entry.effect?.cooldownPerTargetSec != null;
+}
+
+function isOnCooldown(source, entry, event, target, battleState) {
+  ensureResolverState(source);
+
+  const key = isPerTargetCooldown(entry)
+    ? getPerTargetCooldownKey(entry, event, target)
+    : getCooldownKey(entry, event, target);
+
+  const readyAt = source.runtimeResolver.cooldowns[key];
+  if (readyAt == null) return false;
+
+  return battleState.time < readyAt;
+}
+
+function setCooldown(source, entry, event, target, battleState) {
+  ensureResolverState(source);
+
+  const duration = getCooldownDuration(entry);
+  if (!duration || duration <= 0) return;
+
+  const key = isPerTargetCooldown(entry)
+    ? getPerTargetCooldownKey(entry, event, target)
+    : getCooldownKey(entry, event, target);
+
+  source.runtimeResolver.cooldowns[key] = battleState.time + duration;
+}
+
+function passesChance(entry, source, target, battleState) {
+  const chance = entry.effect?.chance;
+  if (chance == null) return true;
+
+  const roll = Math.random();
+
+  pushLog(battleState, {
+    kind: "effect_chance_roll",
+    ownerType: entry.ownerType,
+    ownerId: entry.ownerId,
+    effectName: entry.effect?.name ?? null,
+    chance,
+    roll,
+    passed: roll <= chance,
+    source: source?.id ?? null,
+    target: target?.id ?? null
+  });
+
+  return roll <= chance;
+}
+
+/**
  * Gestisce condizioni stringa.
  */
 function evaluateStringCondition(condition, ctx) {
@@ -166,6 +254,11 @@ function evaluateCondition(condition, ctx) {
     if (count !== condition.targetCountExact) return false;
   }
 
+  if (condition.hitCount !== undefined) {
+    const hitCount = event.payload?.hitCount ?? 1;
+    if (hitCount !== condition.hitCount) return false;
+  }
+
   if (condition.hpBelow !== undefined) {
     const hpRatio = source.current.hp / Math.max(source.computedStats.hp, 1);
     if (hpRatio >= condition.hpBelow) return false;
@@ -193,7 +286,10 @@ function evaluateCondition(condition, ctx) {
     const debuff = (target.debuffs ?? []).find(
       d => d.id === condition.targetDebuff || d.status === condition.targetDebuff
     );
-    if (!debuff || (debuff.stacks ?? 1) < condition.stacks) return false;
+
+    if (!debuff || (debuff.stacks ?? 1) < condition.stacks) {
+      return false;
+    }
   }
 
   return true;
@@ -376,7 +472,42 @@ function resolveEvent(battleState, event) {
   for (const entry of activeEffects) {
     if (entry.trigger === "passive" || entry.trigger === "always") continue;
     if (entry.trigger !== event.type) continue;
-    if (!evaluateCondition(entry.condition, ctx)) continue;
+
+    if (!evaluateCondition(entry.condition, ctx)) {
+      pushLog(battleState, {
+        kind: "effect_skipped_condition",
+        ownerType: entry.ownerType,
+        ownerId: entry.ownerId,
+        effectName: entry.effect?.name ?? null,
+        source: event.source ?? null,
+        target: event.target ?? null
+      });
+      continue;
+    }
+
+    if (isOnCooldown(source, entry, event, target, battleState)) {
+      pushLog(battleState, {
+        kind: "effect_skipped_cooldown",
+        ownerType: entry.ownerType,
+        ownerId: entry.ownerId,
+        effectName: entry.effect?.name ?? null,
+        source: event.source ?? null,
+        target: event.target ?? null
+      });
+      continue;
+    }
+
+    if (!passesChance(entry, source, target, battleState)) {
+      pushLog(battleState, {
+        kind: "effect_skipped_chance",
+        ownerType: entry.ownerType,
+        ownerId: entry.ownerId,
+        effectName: entry.effect?.name ?? null,
+        source: event.source ?? null,
+        target: event.target ?? null
+      });
+      continue;
+    }
 
     const resolvedEffect = unwrapEffect(entry.effect);
 
@@ -385,6 +516,7 @@ function resolveEvent(battleState, event) {
       ownerType: entry.ownerType,
       ownerId: entry.ownerId,
       effectType: resolvedEffect?.type ?? "unknown",
+      effectName: entry.effect?.name ?? null,
       source: event.source ?? null,
       target: event.target ?? null
     });
@@ -397,6 +529,8 @@ function resolveEvent(battleState, event) {
       opponent: target,
       entry
     });
+
+    setCooldown(source, entry, event, target, battleState);
   }
 }
 
