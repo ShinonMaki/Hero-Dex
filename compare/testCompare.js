@@ -48,7 +48,7 @@ const result = runBattle(
     sideA,
     sideB,
     verboseLog: true,
-    maxTime: 15,
+    maxTime: 30,
     tickSize: 0.5
   }
 );
