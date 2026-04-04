@@ -104,8 +104,49 @@ function unwrapEffect(effect) {
   return effect.effect ?? effect;
 }
 
-function hasDebuff(target, debuffId) {
-  return (target.debuffs ?? []).some(
+function createConditionSnapshot(source, target) {
+  return {
+    source: {
+      current: {
+        hp: source.current?.hp ?? 0,
+        rage: source.current?.rage ?? 0,
+        soulArmor: source.current?.soulArmor ?? 0
+      },
+      computedStats: {
+        ...source.computedStats
+      },
+      debuffs: Array.isArray(source.debuffs) ? source.debuffs.map(d => ({ ...d })) : [],
+      buffs: Array.isArray(source.buffs) ? source.buffs.map(b => ({ ...b })) : [],
+      snapshots: {
+        ...(source.snapshots ?? {})
+      },
+      flags: {
+        ...(source.flags ?? {})
+      }
+    },
+    target: {
+      current: {
+        hp: target.current?.hp ?? 0,
+        rage: target.current?.rage ?? 0,
+        soulArmor: target.current?.soulArmor ?? 0
+      },
+      computedStats: {
+        ...target.computedStats
+      },
+      debuffs: Array.isArray(target.debuffs) ? target.debuffs.map(d => ({ ...d })) : [],
+      buffs: Array.isArray(target.buffs) ? target.buffs.map(b => ({ ...b })) : [],
+      snapshots: {
+        ...(target.snapshots ?? {})
+      },
+      flags: {
+        ...(target.flags ?? {})
+      }
+    }
+  };
+}
+
+function hasDebuff(entity, debuffId) {
+  return (entity.debuffs ?? []).some(
     d => d.id === debuffId || d.status === debuffId || d.type === debuffId
   );
 }
@@ -125,7 +166,7 @@ function ensureResolverState(fighter) {
   }
 }
 
-function getCooldownKey(entry, event, target) {
+function getCooldownKey(entry) {
   const ownerType = entry.ownerType ?? "unknown_owner";
   const ownerId = entry.ownerId ?? "unknown_owner_id";
   const effectName = entry.effect?.name ?? "effect";
@@ -134,7 +175,7 @@ function getCooldownKey(entry, event, target) {
 }
 
 function getPerTargetCooldownKey(entry, event, target) {
-  const baseKey = getCooldownKey(entry, event, target);
+  const baseKey = getCooldownKey(entry);
   const targetKey = target?.id ?? event?.target ?? "unknown_target";
   return `${baseKey}:target:${targetKey}`;
 }
@@ -155,7 +196,7 @@ function isOnCooldown(source, entry, event, target, battleState) {
 
   const key = isPerTargetCooldown(entry)
     ? getPerTargetCooldownKey(entry, event, target)
-    : getCooldownKey(entry, event, target);
+    : getCooldownKey(entry);
 
   const readyAt = source.runtimeResolver.cooldowns[key];
   if (readyAt == null) return false;
@@ -171,7 +212,7 @@ function setCooldown(source, entry, event, target, battleState) {
 
   const key = isPerTargetCooldown(entry)
     ? getPerTargetCooldownKey(entry, event, target)
-    : getCooldownKey(entry, event, target);
+    : getCooldownKey(entry);
 
   source.runtimeResolver.cooldowns[key] = battleState.time + duration;
 }
@@ -199,24 +240,27 @@ function passesChance(entry, source, target, battleState) {
 
 /**
  * Gestisce condizioni stringa.
+ * Usa SEMPRE lo snapshot pre-evento, non lo stato modificato durante lo stesso evento.
  */
 function evaluateStringCondition(condition, ctx) {
-  const { source, target, opponent } = ctx;
+  const sourceForCondition = ctx.conditionSource ?? ctx.source;
+  const targetForCondition = ctx.conditionTarget ?? ctx.target;
+  const opponentForCondition = ctx.conditionOpponent ?? ctx.opponent;
 
   switch (condition) {
     case "targetHasSilence":
-      return hasDebuff(target, "silence");
+      return hasDebuff(targetForCondition, "silence");
 
     case "critRateCompetitionWin":
-      return (source.computedStats.critRate ?? 0) > (opponent.computedStats.critRate ?? 0);
+      return (sourceForCondition.computedStats?.critRate ?? 0) > (opponentForCondition.computedStats?.critRate ?? 0);
 
     case "manaPerceptionStacksGte3":
-      return (source.flags?.manaPerceptionStacks ?? 0) >= 3;
+      return (sourceForCondition.flags?.manaPerceptionStacks ?? 0) >= 3;
 
     case "manaPerceptionStacksGte3AndTargetHasShield":
       return (
-        (source.flags?.manaPerceptionStacks ?? 0) >= 3 &&
-        (target.current?.soulArmor ?? 0) > 0
+        (sourceForCondition.flags?.manaPerceptionStacks ?? 0) >= 3 &&
+        (targetForCondition.current?.soulArmor ?? 0) > 0
       );
 
     default:
@@ -226,12 +270,15 @@ function evaluateStringCondition(condition, ctx) {
 
 /**
  * Evaluator minimo.
- * Più avanti potrai spostarlo in compareConditions.js
+ * Le condition leggono lo snapshot pre-evento.
  */
 function evaluateCondition(condition, ctx) {
   if (!condition) return true;
 
-  const { source, target, event, opponent } = ctx;
+  const sourceForCondition = ctx.conditionSource ?? ctx.source;
+  const targetForCondition = ctx.conditionTarget ?? ctx.target;
+  const opponentForCondition = ctx.conditionOpponent ?? ctx.opponent;
+  const event = ctx.event;
 
   if (typeof condition === "string") {
     return evaluateStringCondition(condition, ctx);
@@ -260,30 +307,30 @@ function evaluateCondition(condition, ctx) {
   }
 
   if (condition.hpBelow !== undefined) {
-    const hpRatio = source.current.hp / Math.max(source.computedStats.hp, 1);
+    const hpRatio = (sourceForCondition.current?.hp ?? 0) / Math.max(sourceForCondition.computedStats?.hp ?? 1, 1);
     if (hpRatio >= condition.hpBelow) return false;
   }
 
   if (condition.targetHasDebuff) {
-    if (!hasDebuff(target, condition.targetHasDebuff)) return false;
+    if (!hasDebuff(targetForCondition, condition.targetHasDebuff)) return false;
   }
 
   if (condition.debuff) {
-    if (!hasDebuff(target, condition.debuff)) return false;
+    if (!hasDebuff(targetForCondition, condition.debuff)) return false;
   }
 
   if (condition.targetDebuff) {
-    if (!hasDebuff(target, condition.targetDebuff)) return false;
+    if (!hasDebuff(targetForCondition, condition.targetDebuff)) return false;
   }
 
   if (condition.highestInitialAtk === true) {
-    if ((source.snapshots.initialAtk ?? 0) < (opponent.snapshots.initialAtk ?? 0)) {
+    if ((sourceForCondition.snapshots?.initialAtk ?? 0) < (opponentForCondition.snapshots?.initialAtk ?? 0)) {
       return false;
     }
   }
 
   if (condition.stacks !== undefined && condition.targetDebuff) {
-    const debuff = (target.debuffs ?? []).find(
+    const debuff = (targetForCondition.debuffs ?? []).find(
       d => d.id === condition.targetDebuff || d.status === condition.targetDebuff
     );
 
@@ -384,13 +431,13 @@ function collectActiveEffects(source) {
       inferTriggerFromEffectType(unwrappedEffect?.type) ||
       "passive";
 
-    collected.push({
-      ownerType: "noblePhantasm",
-      ownerId: source.noblePhantasm?.id ?? "noble_phantasm",
-      trigger: inferredTrigger,
-      condition: effect.condition,
-      effect
-    });
+      collected.push({
+        ownerType: "noblePhantasm",
+        ownerId: source.noblePhantasm?.id ?? "noble_phantasm",
+        trigger: inferredTrigger,
+        condition: effect.condition,
+        effect
+      });
   }
 
   /**
@@ -459,12 +506,19 @@ function resolveEvent(battleState, event) {
     return;
   }
 
+  const snapshot = createConditionSnapshot(source, target);
+
   const ctx = {
     battleState,
     event,
     source,
     target,
-    opponent: target
+    opponent: target,
+
+    // snapshot pre-evento usato SOLO per condition
+    conditionSource: snapshot.source,
+    conditionTarget: snapshot.target,
+    conditionOpponent: snapshot.target
   };
 
   const activeEffects = collectActiveEffects(source);
