@@ -3,7 +3,6 @@
 const {
   createBattleState,
   getFighter,
-  getOpponent,
   pushLog
 } = require("./compareState");
 
@@ -50,6 +49,12 @@ function getBaseAttackCycleIntervalSec(fighter) {
     case "support":
       return 1.0;
 
+    case "assassin":
+      return 1.0;
+
+    case "warrior":
+      return 1.0;
+
     default:
       return 1.0;
   }
@@ -73,6 +78,38 @@ function initializeCombatTimers(fighter) {
   fighter.timers = {
     nextAttackAt: fighter.attackProfile.cycleIntervalSec
   };
+}
+
+function initializeTechniqueState(fighter) {
+  fighter.techniqueState = {
+    normalAttackCyclesCompleted: 0,
+    firstTechniqueCastDone: false
+  };
+}
+
+function getFirstTechniqueThreshold(fighter) {
+  const role = fighter.heroData?.role?.toLowerCase?.() ?? "";
+
+  switch (role) {
+    case "assassin":
+    case "support":
+      return 2;
+
+    case "mage":
+    case "warrior":
+      return 4;
+
+    default:
+      return 4;
+  }
+}
+
+function getCurrentTechniqueThreshold(fighter) {
+  if (!fighter.techniqueState?.firstTechniqueCastDone) {
+    return getFirstTechniqueThreshold(fighter);
+  }
+
+  return 4;
 }
 
 function logFighterSnapshot(battleState, side, fighter) {
@@ -103,6 +140,11 @@ function logFighterSnapshot(battleState, side, fighter) {
     },
     timers: {
       nextAttackAt: fighter.timers?.nextAttackAt ?? null
+    },
+    techniqueState: {
+      normalAttackCyclesCompleted: fighter.techniqueState?.normalAttackCyclesCompleted ?? 0,
+      firstTechniqueCastDone: fighter.techniqueState?.firstTechniqueCastDone ?? false,
+      currentThreshold: getCurrentTechniqueThreshold(fighter)
     }
   });
 }
@@ -158,6 +200,132 @@ function emitTickEvents(battleState) {
   });
 }
 
+function dealTechniqueDamageFromHeroData(battleState, source, target) {
+  const techniqueData = source.heroData?.skills?.technique;
+  if (!techniqueData) return;
+
+  const scalingMultiplier = techniqueData.scalingMultiplier ?? 1;
+  let damage = source.computedStats.atk * scalingMultiplier;
+
+  damage *= 1 + (source.computedStats.techniqueDamage ?? 0);
+  damage *= 1 + (source.computedStats.dmgBonus ?? 0) + (source.computedStats.finalDamageBonus ?? 0);
+  damage *= 1 - (target.computedStats.dmgReduction ?? 0);
+
+  damage = Math.max(0, damage);
+
+  pushLog(battleState, {
+    kind: "damage",
+    source: source.id,
+    target: target.id,
+    amount: damage,
+    type: "technique"
+  });
+
+  let remaining = damage;
+
+  if (target.current.soulArmor > 0) {
+    const absorbed = Math.min(target.current.soulArmor, remaining);
+    target.current.soulArmor -= absorbed;
+    remaining -= absorbed;
+
+    pushLog(battleState, {
+      kind: "soul_armor_absorb",
+      target: target.id,
+      absorbed
+    });
+  }
+
+  if (remaining > 0) {
+    target.current.hp = Math.max(0, target.current.hp - remaining);
+
+    pushLog(battleState, {
+      kind: "hp_loss",
+      target: target.id,
+      damage: remaining,
+      hpLeft: target.current.hp
+    });
+
+    if (target.current.hp <= 0) {
+      target.alive = false;
+
+      pushLog(battleState, {
+        kind: "death",
+        target: target.id
+      });
+    }
+  }
+}
+
+function shouldCastTechniqueNow(fighter) {
+  if (!fighter?.alive) return false;
+  if (!fighter.techniqueState) return false;
+
+  const threshold = getCurrentTechniqueThreshold(fighter);
+
+  return fighter.techniqueState.normalAttackCyclesCompleted >= threshold;
+}
+
+function markTechniqueCast(fighter) {
+  if (!fighter.techniqueState) return;
+
+  fighter.techniqueState.normalAttackCyclesCompleted = 0;
+  fighter.techniqueState.firstTechniqueCastDone = true;
+}
+
+function performTechnique(battleState, sourceSide) {
+  const source = getFighter(battleState, sourceSide);
+  const targetSide = sourceSide === "a" ? "b" : "a";
+  const target = getFighter(battleState, targetSide);
+
+  if (!source?.alive || !target?.alive) return;
+  if (!source.heroData?.skills?.technique) return;
+
+  pushLog(battleState, {
+    kind: "technique_started",
+    source: sourceSide,
+    target: targetSide,
+    time: battleState.time,
+    cyclesCompleted: source.techniqueState?.normalAttackCyclesCompleted ?? 0,
+    threshold: getCurrentTechniqueThreshold(source)
+  });
+
+  emitEvent(battleState, {
+    type: "onTechnique",
+    source: sourceSide,
+    target: targetSide,
+    payload: { targetCount: 1 }
+  });
+
+  processQueue(battleState);
+
+  if (!source.alive || !target.alive) return;
+
+  dealTechniqueDamageFromHeroData(battleState, source, target);
+
+  checkWinner(battleState);
+  if (battleState.winner) return;
+
+  emitEvent(battleState, {
+    type: "onTechniqueHit",
+    source: sourceSide,
+    target: targetSide,
+    payload: { targetCount: 1 }
+  });
+
+  processQueue(battleState);
+  checkWinner(battleState);
+
+  markTechniqueCast(source);
+
+  pushLog(battleState, {
+    kind: "technique_finished",
+    source: sourceSide,
+    target: targetSide,
+    time: battleState.time,
+    nextThreshold: getCurrentTechniqueThreshold(source)
+  });
+}
+
 /**
  * Esegue un basic attack completo:
  * 1. emette onNormalAttack
@@ -209,6 +377,24 @@ function performBasicAttack(battleState, sourceSide) {
 
   processQueue(battleState);
   checkWinner(battleState);
+  if (battleState.winner) return;
+
+  if (source.techniqueState) {
+    source.techniqueState.normalAttackCyclesCompleted += 1;
+
+    pushLog(battleState, {
+      kind: "technique_cycle_count",
+      source: sourceSide,
+      time: battleState.time,
+      cyclesCompleted: source.techniqueState.normalAttackCyclesCompleted,
+      threshold: getCurrentTechniqueThreshold(source),
+      firstTechniqueCastDone: source.techniqueState.firstTechniqueCastDone
+    });
+  }
+
+  if (shouldCastTechniqueNow(source)) {
+    performTechnique(battleState, sourceSide);
+  }
 }
 
 function canAttackNow(fighter, battleState) {
@@ -374,6 +560,9 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
   initializeCombatTimers(fighterA);
   initializeCombatTimers(fighterB);
 
+  initializeTechniqueState(fighterA);
+  initializeTechniqueState(fighterB);
+
   const battleState = createBattleState(fighterA, fighterB, {
     tickSize: options.tickSize ?? 0.5,
     maxTime: options.maxTime ?? 30,
@@ -414,6 +603,16 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
     finalSoulArmor: {
       a: battleState.fighters.a.current.soulArmor,
       b: battleState.fighters.b.current.soulArmor
+    },
+    finalTechniqueState: {
+      a: {
+        normalAttackCyclesCompleted: battleState.fighters.a.techniqueState?.normalAttackCyclesCompleted ?? 0,
+        firstTechniqueCastDone: battleState.fighters.a.techniqueState?.firstTechniqueCastDone ?? false
+      },
+      b: {
+        normalAttackCyclesCompleted: battleState.fighters.b.techniqueState?.normalAttackCyclesCompleted ?? 0,
+        firstTechniqueCastDone: battleState.fighters.b.techniqueState?.firstTechniqueCastDone ?? false
+      }
     }
   });
 
@@ -434,9 +633,14 @@ module.exports = {
   advanceTick,
   simulateActionsPlaceholder,
   performBasicAttack,
+  performTechnique,
   updateDurations,
   initializeCombatTimers,
+  initializeTechniqueState,
   getBaseAttackCycleIntervalSec,
   getEffectiveAttackCycleIntervalSec,
-  tryPerformScheduledAttack
+  getFirstTechniqueThreshold,
+  getCurrentTechniqueThreshold,
+  tryPerformScheduledAttack,
+  shouldCastTechniqueNow
 };
