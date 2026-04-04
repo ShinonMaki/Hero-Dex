@@ -35,6 +35,46 @@ function buildBattleFighter(heroKey, heroData, sideOptions = {}) {
   );
 }
 
+/**
+ * Per ora profilo base per classi note.
+ * Mage e Support: 1 attack cycle ogni 1 secondo.
+ * Fallback prudente: 1 secondo.
+ */
+function getBaseAttackCycleIntervalSec(fighter) {
+  const role = fighter.heroData?.role?.toLowerCase?.() ?? "";
+
+  switch (role) {
+    case "mage":
+      return 1.0;
+
+    case "support":
+      return 1.0;
+
+    default:
+      return 1.0;
+  }
+}
+
+/**
+ * Per ora teniamo l'interval semplice.
+ * Più avanti potremo fare:
+ * base * (100 / attackSpeed)
+ * oppure integrare haste reale.
+ */
+function getEffectiveAttackCycleIntervalSec(fighter) {
+  return getBaseAttackCycleIntervalSec(fighter);
+}
+
+function initializeCombatTimers(fighter) {
+  fighter.attackProfile = {
+    cycleIntervalSec: getEffectiveAttackCycleIntervalSec(fighter)
+  };
+
+  fighter.timers = {
+    nextAttackAt: fighter.attackProfile.cycleIntervalSec
+  };
+}
+
 function logFighterSnapshot(battleState, side, fighter) {
   pushLog(battleState, {
     kind: "fighter_built",
@@ -57,6 +97,12 @@ function logFighterSnapshot(battleState, side, fighter) {
       rage: fighter.current.rage,
       soulArmor: fighter.current.soulArmor,
       maxSoulArmor: fighter.current.maxSoulArmor
+    },
+    attackProfile: {
+      cycleIntervalSec: fighter.attackProfile?.cycleIntervalSec ?? null
+    },
+    timers: {
+      nextAttackAt: fighter.timers?.nextAttackAt ?? null
     }
   });
 }
@@ -127,6 +173,13 @@ function performBasicAttack(battleState, sourceSide) {
 
   if (!source?.alive || !target?.alive) return;
 
+  pushLog(battleState, {
+    kind: "basic_attack_started",
+    source: sourceSide,
+    target: targetSide,
+    time: battleState.time
+  });
+
   emitEvent(battleState, {
     type: "onNormalAttack",
     source: sourceSide,
@@ -136,7 +189,6 @@ function performBasicAttack(battleState, sourceSide) {
 
   processQueue(battleState);
 
-  // se uno dei due è morto durante i trigger, stop
   if (!source.alive || !target.alive) return;
 
   dealBasicAttackDamage({
@@ -159,15 +211,54 @@ function performBasicAttack(battleState, sourceSide) {
   checkWinner(battleState);
 }
 
+function canAttackNow(fighter, battleState) {
+  if (!fighter?.alive) return false;
+  if (!fighter.timers) return false;
+  if (fighter.timers.nextAttackAt == null) return false;
+
+  return battleState.time >= fighter.timers.nextAttackAt;
+}
+
+function scheduleNextAttack(fighter) {
+  if (!fighter?.timers || !fighter?.attackProfile) return;
+
+  fighter.timers.nextAttackAt = Number(
+    (fighter.timers.nextAttackAt + fighter.attackProfile.cycleIntervalSec).toFixed(2)
+  );
+}
+
+function tryPerformScheduledAttack(battleState, sourceSide) {
+  const source = getFighter(battleState, sourceSide);
+  if (!source?.alive) return;
+
+  if (!canAttackNow(source, battleState)) return;
+
+  pushLog(battleState, {
+    kind: "attack_timer_ready",
+    source: sourceSide,
+    time: battleState.time,
+    nextAttackAt: source.timers.nextAttackAt
+  });
+
+  performBasicAttack(battleState, sourceSide);
+  scheduleNextAttack(source);
+
+  pushLog(battleState, {
+    kind: "attack_timer_rescheduled",
+    source: sourceSide,
+    time: battleState.time,
+    nextAttackAt: source.timers.nextAttackAt
+  });
+}
+
 /**
- * Placeholder temporaneo:
- * per ora facciamo solo basic attack reali.
- * Più avanti qui entreranno:
- * - rage logic
- * - technique
- * - ultimate
- * - velocità / haste
- * - target count dinamico
+ * Per ora:
+ * - ogni fighter ha un timer
+ * - se il timer è pronto, fa un attack cycle
+ *
+ * Nota:
+ * il motore resta sequenziale dentro lo stesso tick.
+ * Più avanti potremo fare finestre simultanee.
  */
 function simulateActionsPlaceholder(battleState) {
   const a = getFighter(battleState, "a");
@@ -175,10 +266,10 @@ function simulateActionsPlaceholder(battleState) {
 
   if (!a.alive || !b.alive) return;
 
-  performBasicAttack(battleState, "a");
+  tryPerformScheduledAttack(battleState, "a");
   if (battleState.winner) return;
 
-  performBasicAttack(battleState, "b");
+  tryPerformScheduledAttack(battleState, "b");
 }
 
 /**
@@ -200,6 +291,29 @@ function updateDurations(battleState) {
       debuff.remainingSec = Number((debuff.remainingSec - battleState.tickSize).toFixed(2));
       return debuff.remainingSec > 0;
     });
+
+    if (fighter.states) {
+      for (const [stateId, stateData] of Object.entries(fighter.states)) {
+        if (!stateData?.active) continue;
+        if (stateData.remainingSec == null) continue;
+
+        stateData.remainingSec = Number((stateData.remainingSec - battleState.tickSize).toFixed(2));
+
+        if (stateData.remainingSec <= 0) {
+          stateData.active = false;
+
+          if (stateId === "selfRegeneration" && fighter.flags?.damageImmunity) {
+            fighter.flags.damageImmunity = false;
+          }
+
+          pushLog(battleState, {
+            kind: "state_expired",
+            fighter: fighter.id,
+            stateId
+          });
+        }
+      }
+    }
   }
 }
 
@@ -256,6 +370,9 @@ function runBattle(heroAKey, heroAData, heroBKey, heroBData, options = {}) {
 
   const fighterA = buildBattleFighter(heroAKey, heroAData, sideA);
   const fighterB = buildBattleFighter(heroBKey, heroBData, sideB);
+
+  initializeCombatTimers(fighterA);
+  initializeCombatTimers(fighterB);
 
   const battleState = createBattleState(fighterA, fighterB, {
     tickSize: options.tickSize ?? 0.5,
@@ -317,5 +434,9 @@ module.exports = {
   advanceTick,
   simulateActionsPlaceholder,
   performBasicAttack,
-  updateDurations
+  updateDurations,
+  initializeCombatTimers,
+  getBaseAttackCycleIntervalSec,
+  getEffectiveAttackCycleIntervalSec,
+  tryPerformScheduledAttack
 };
