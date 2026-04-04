@@ -78,6 +78,26 @@ function triggerFatalRecovery(target, battleState) {
  * =========================
  */
 
+function applySoulArmorAbsorption(target, damage, battleState) {
+  if ((target.current.soulArmor ?? 0) <= 0) {
+    return damage;
+  }
+
+  const maxAbsorb = damage * 0.5;
+  const absorbed = Math.min(target.current.soulArmor, maxAbsorb);
+
+  target.current.soulArmor -= absorbed;
+
+  pushLog(battleState, {
+    kind: "soul_armor_absorb",
+    target: target.id,
+    absorbed,
+    absorbLimit: maxAbsorb
+  });
+
+  return damage - absorbed;
+}
+
 function applyHpLoss(target, damage, battleState) {
   if (hasDamageImmunity(target)) {
     pushLog(battleState, {
@@ -90,17 +110,7 @@ function applyHpLoss(target, damage, battleState) {
 
   let remaining = damage;
 
-  if (target.current.soulArmor > 0) {
-    const absorbed = Math.min(target.current.soulArmor, remaining);
-    target.current.soulArmor -= absorbed;
-    remaining -= absorbed;
-
-    pushLog(battleState, {
-      kind: "soul_armor_absorb",
-      target: target.id,
-      absorbed
-    });
-  }
+  remaining = applySoulArmorAbsorption(target, remaining, battleState);
 
   if (remaining > 0) {
     const hpBefore = target.current.hp;
