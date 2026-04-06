@@ -1,0 +1,597 @@
+{
+  "silence": {
+    "id": "silence",
+    "name": "Silence",
+    "rarity": 2,
+    "effects": [
+      {
+        "name": "silence_on_ultimate",
+        "trigger": "onUltimate",
+        "chance": 0.6,
+        "effect": {
+          "type": "status",
+          "status": "silence",
+          "durationSec": 4
+        }
+      },
+      {
+        "name": "silence_ultimate_penalty",
+        "trigger": "always",
+        "effect": {
+          "type": "modifyUltimateDamage",
+          "value": -0.1
+        }
+      }
+    ]
+  },
+
+  "lifesteal": {
+    "id": "lifesteal",
+    "name": "Lifesteal",
+    "rarity": 2,
+    "effects": [
+      {
+        "name": "lifesteal_on_ultimate",
+        "trigger": "onUltimate",
+        "effect": {
+          "type": "lifesteal",
+          "value": 0.2,
+          "appliesTo": ["ultimate"]
+        }
+      }
+    ]
+  },
+
+  "shield": {
+    "id": "shield",
+    "name": "Shield",
+    "rarity": 2,
+    "effects": [
+      {
+        "name": "shield_on_battle_start",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "shield",
+          "target": "allAllies",
+          "value": 0.12,
+          "valueType": "selfMaxHpPercent",
+          "maxTargets": 5,
+          "stackable": false,
+          "dispellable": false,
+          "shieldSource": "soulJade"
+        }
+      }
+    ]
+  },
+
+  "enrage": {
+    "id": "enrage",
+    "name": "Enrage",
+    "rarity": 2,
+    "effects": [
+      {
+        "name": "enrage_battle_start",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 15,
+          "dispellable": false,
+          "stats": {
+            "ultimateDamage": 0.4
+          }
+        }
+      }
+    ]
+  },
+
+  "strength": {
+    "id": "strength",
+    "name": "Strength",
+    "rarity": 2,
+    "stats": {
+      "dmgBonus": 0.16
+    }
+  },
+
+  "divine_body": {
+    "id": "divine_body",
+    "name": "Divine Body",
+    "rarity": 2,
+    "stats": {
+      "defBonus": 0.16
+    },
+    "effects": [
+      {
+        "name": "divine_body_vs_crit",
+        "trigger": "onHit",
+        "condition": {
+          "attackerHasSoulJade": "crit"
+        },
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 1,
+          "stats": {
+            "dmgReduction": 0.16
+          }
+        }
+      }
+    ]
+  },
+
+  "purification": {
+    "id": "purification",
+    "name": "Purification",
+    "rarity": 3,
+    "effects": [
+      {
+        "name": "purification_on_heal",
+        "trigger": "onActiveHeal",
+        "chance": 0.45,
+        "effect": {
+          "type": "dispelDebuff",
+          "target": "allyWithAbnormalState",
+          "count": 3
+        }
+      }
+    ]
+  },
+
+  "crit": {
+    "id": "crit",
+    "name": "CRIT",
+    "rarity": 3,
+    "stats": {
+      "critRate": 0.16
+    }
+  },
+
+  "cure": {
+    "id": "cure",
+    "name": "Cure",
+    "rarity": 3,
+    "stats": {
+      "healEffect": 0.16
+    }
+  },
+
+  "blade": {
+    "id": "blade",
+    "name": "Blade",
+    "rarity": 3,
+    "effects": [
+      {
+        "name": "blade_vs_support_mage",
+        "trigger": "always",
+        "effect": {
+          "type": "conditionalDamageBonus",
+          "value": 0.2,
+          "targetRoles": ["support", "mage"]
+        }
+      }
+    ]
+  },
+
+  "guardian": {
+    "id": "guardian",
+    "name": "Guardian",
+    "rarity": 3,
+    "effects": [
+      {
+        "name": "guardian_on_crit_taken",
+        "trigger": "onSufferCrit",
+        "chance": 0.8,
+        "cooldownSec": 2,
+        "effect": {
+          "type": "heal",
+          "target": "self",
+          "value": 0.02,
+          "valueType": "selfMaxHpPercent"
+        }
+      }
+    ]
+  },
+
+  "tenacity": {
+    "id": "tenacity",
+    "name": "Tenacity",
+    "rarity": 3,
+    "stats": {
+      "dmgReduction": 0.16
+    }
+  },
+
+  "shapeless": {
+    "id": "shapeless",
+    "name": "Shapeless",
+    "rarity": 3,
+    "effects": [
+      {
+        "name": "shapeless_phase_1",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 20,
+          "dispellable": false,
+          "stats": {
+            "dmgReduction": 0.16,
+            "dmgBonus": -0.2
+          }
+        }
+      },
+      {
+        "name": "shapeless_phase_2",
+        "trigger": "onTimedPhase",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "delaySec": 20,
+          "duration": "entireBattle",
+          "dispellable": false,
+          "stats": {
+            "dmgBonus": 0.25
+          }
+        }
+      }
+    ]
+  },
+
+  "restoration": {
+    "id": "restoration",
+    "name": "Restoration",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "restoration_battle_start",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "hot",
+          "target": "self",
+          "value": 0.024,
+          "valueType": "selfMaxHpPercent",
+          "tickIntervalSec": 1,
+          "durationSec": 7,
+          "dispellable": false
+        }
+      }
+    ]
+  },
+
+  "armor_breaker": {
+    "id": "armor_breaker",
+    "name": "Armor Breaker",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "armor_breaker_on_normal_attack",
+        "trigger": "onNormalAttack",
+        "chance": 0.35,
+        "effect": {
+          "type": "debuff",
+          "stat": "def",
+          "value": 0.16,
+          "durationSec": 5,
+          "stackable": false
+        }
+      }
+    ]
+  },
+
+  "slow": {
+    "id": "slow",
+    "name": "Slow",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "slow_on_normal_attack",
+        "trigger": "onNormalAttack",
+        "chance": 0.32,
+        "effect": {
+          "type": "debuff",
+          "stat": "haste",
+          "value": 10,
+          "durationSec": 5,
+          "stackable": false
+        }
+      }
+    ]
+  },
+
+  "swift": {
+    "id": "swift",
+    "name": "Swift",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "swift_on_ultimate",
+        "trigger": "onUltimate",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 10,
+          "stackable": false,
+          "stats": {
+            "haste": 24
+          }
+        }
+      }
+    ]
+  },
+
+  "divine_blessing": {
+    "id": "divine_blessing",
+    "name": "Divine Blessing",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "divine_blessing_on_death",
+        "trigger": "onDeath",
+        "effect": {
+          "type": "shield",
+          "target": "highestAtkAlly",
+          "maxTargets": 2,
+          "value": 0.06,
+          "valueType": "selfMaxHpPercent",
+          "durationSec": 8,
+          "stackable": false,
+          "dispellable": false,
+          "shieldSource": "soulJade"
+        }
+      }
+    ]
+  },
+
+  "first_aid": {
+    "id": "first_aid",
+    "name": "First Aid",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "first_aid_on_fatal_damage",
+        "trigger": "onFatalDamage",
+        "chance": 0.4,
+        "cooldownSec": 40,
+        "effect": {
+          "type": "heal",
+          "target": "self",
+          "value": 0.3,
+          "valueType": "selfMaxHpPercent"
+        }
+      }
+    ]
+  },
+
+  "dmg_reduction": {
+    "id": "dmg_reduction",
+    "name": "DMG Reduction",
+    "rarity": 4,
+    "effects": [
+      {
+        "name": "dmg_reduction_battle_start",
+        "trigger": "onBattleStart",
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 10,
+          "stats": {
+            "dmgReduction": 0.2
+          }
+        }
+      }
+    ]
+  },
+
+  "dodge": {
+    "id": "dodge",
+    "name": "Dodge",
+    "rarity": 5,
+    "stats": {
+      "dodge": 0.08
+    },
+    "effects": [
+      {
+        "name": "dodge_vs_strength",
+        "trigger": "onHit",
+        "condition": {
+          "attackerHasSoulJade": "strength"
+        },
+        "effect": {
+          "type": "buff",
+          "target": "self",
+          "durationSec": 1,
+          "stats": {
+            "dmgReduction": 0.16
+          }
+        }
+      }
+    ]
+  },
+
+  "precision": {
+    "id": "precision",
+    "name": "Precision",
+    "rarity": 5,
+    "stats": {
+      "hitRate": 0.08
+    },
+    "effects": [
+      {
+        "name": "precision_vs_dodge",
+        "trigger": "always",
+        "effect": {
+          "type": "conditionalDamageBonus",
+          "value": 0.16,
+          "targetHasSoulJade": "dodge"
+        }
+      }
+    ]
+  },
+
+  "penetration": {
+    "id": "penetration",
+    "name": "Penetration",
+    "rarity": 5,
+    "effects": [
+      {
+        "name": "penetration_ignore_def",
+        "trigger": "always",
+        "effect": {
+          "type": "ignoreDefense",
+          "value": 0.16
+        }
+      },
+      {
+        "name": "penetration_vs_divine_body",
+        "trigger": "always",
+        "effect": {
+          "type": "conditionalDamageBonus",
+          "value": 0.16,
+          "targetHasSoulJade": "divine_body"
+        }
+      }
+    ]
+  },
+
+  "dmg_reflection": {
+    "id": "dmg_reflection",
+    "name": "DMG Reflection",
+    "rarity": 5,
+    "effects": [
+      {
+        "name": "dmg_reflection_on_damage_taken",
+        "trigger": "onDamaged",
+        "chance": 0.2,
+        "effect": {
+          "type": "damageReflection",
+          "value": 0.16
+        }
+      }
+    ]
+  },
+
+  "regeneration": {
+    "id": "regeneration",
+    "name": "Regeneration",
+    "rarity": 5,
+    "effects": [
+      {
+        "name": "regeneration_periodic",
+        "trigger": "onTick",
+        "effect": {
+          "type": "periodicHeal",
+          "target": "self",
+          "value": 0.02,
+          "valueType": "selfMaxHpPercent",
+          "intervalSec": 6
+        }
+      }
+    ]
+  },
+
+  "cruelty": {
+    "id": "cruelty",
+    "name": "Cruelty",
+    "rarity": 5,
+    "effects": [
+      {
+        "name": "cruelty_vs_regeneration_guardian",
+        "trigger": "always",
+        "effect": {
+          "type": "conditionalDamageBonus",
+          "value": 0.2,
+          "targetHasAnySoulJade": ["regeneration", "guardian"]
+        }
+      }
+    ]
+  },
+
+  "resilience": {
+    "id": "resilience",
+    "name": "Resilience",
+    "rarity": 6,
+    "stats": {
+      "critRes": 0.16
+    }
+  },
+
+  "dispel": {
+    "id": "dispel",
+    "name": "Dispel",
+    "rarity": 6,
+    "effects": [
+      {
+        "name": "dispel_on_normal_attack",
+        "trigger": "onNormalAttack",
+        "chance": 0.08,
+        "effect": {
+          "type": "dispelBuff",
+          "target": "enemy",
+          "count": 1,
+          "selection": "random"
+        }
+      }
+    ]
+  },
+
+  "devotion": {
+    "id": "devotion",
+    "name": "Devotion",
+    "rarity": 6,
+    "effects": [
+      {
+        "name": "devotion_on_death",
+        "trigger": "onDeath",
+        "effect": {
+          "type": "heal",
+          "target": "allAllies",
+          "value": 0.04,
+          "valueType": "selfMaxHpPercent"
+        }
+      }
+    ]
+  },
+
+  "inspiration": {
+    "id": "inspiration",
+    "name": "Inspiration",
+    "rarity": 6,
+    "effects": [
+      {
+        "name": "inspiration_on_death",
+        "trigger": "onDeath",
+        "effect": {
+          "type": "buff",
+          "target": "allAllies",
+          "durationSec": 10,
+          "stackable": false,
+          "stats": {
+            "atkBonus": 0.16
+          }
+        }
+      }
+    ]
+  },
+
+  "healing_reduction": {
+    "id": "healing_reduction",
+    "name": "Healing Reduction",
+    "rarity": 6,
+    "effects": [
+      {
+        "name": "healing_reduction_on_normal_attack",
+        "trigger": "onNormalAttack",
+        "chance": 0.25,
+        "cooldownSec": 6,
+        "effect": {
+          "type": "debuff",
+          "stat": "healingReceived",
+          "value": 0.4,
+          "durationSec": 6,
+          "stackable": false
+        }
+      }
+    ]
+  }
+}
