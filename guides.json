@@ -672,7 +672,21 @@
     "Sea Area Exploration": {
       "file": "sea-area-exploration.pdf",
       "text": "## __**Sea Area Explore Guide **__\n\n__Overview__\n\nSea Area Explore is a team-based exploration event where players progress through multiple layers, fight enemies, collect treasures, and compete against other players. Strategy, coordination, and resource management are key to progressing efficiently.\n\n__**Team Rules**__\n\n__Team Formation__\n\nPlayers must form a team to participate.\n\n• Each team can have up to 4 members\n• The Event is based of your 3 team comp, remember to update your team\n\n__Team Lock__\n\nBefore the event starts:\n\n• you can join, leave, or modify your team\n\nAfter the event starts:\n\n• you cannot leave, kick, or disband the team\n\n__**Map & Progression**__\n\n__Layers__\n\nThe map is divided into 3 layers.\n\n• each layer has increasing difficulty\n• higher layers = stronger enemies and players\n\n__Progression__\n\nTo move to the next layer:\n\n• defeat character events\nor\n• use a permanent pointer\n\n__Daily Reset__\n\nEvery day at 00:00, the map resets back to Layer 1.\n\n__**Stamina System**__\n\n__Stamina Cost__\n\nEach exploration consumes:\n\n• 1–3 stamina\n\nHigher layers consume more stamina.\n\n__Recovery__\n\nStamina recovers over time.\n\nIt can also be restored using:\n\n• Roasted Meat Leg\n\n__**Combat Rules**__\n\n__Enemy Types__\n\n• Layer 1–2 → only PvE (character events)\n• Layer 3 → PvP encounters with other players\n\n__Dock Durability__\n\nEach player has dock durability.\n\n• taking damage reduces durability\n• if it reaches 0 → you fall back to Layer 2\n\n__Battle Formula__\n\nCombat follows standard rules:\n\nFinal Stats = Base Stats + Treasure Bonus\n\nEach attack deals minimum guaranteed damage.\n\n__**Treasure System**__\n\n__Effects__\n\nTreasures increase your attributes during exploration.\n\n__Risk__\n\nIf defeated by another player:\n\n• you drop your treasures\n\n__**Seastone**__\n\n__How to Get__\n\n• entering Layer 3 → gain 1 Seastone\n• defeating strong enemies or players → drop Seastone\n\n__Risk__\n\nIf defeated:\n\n• you lose your Seastone\n\n__**Mark & Assist System**__\n\n__Marking Targets__\n\nYou can mark:\n\n• strong enemies\n• other players\n\n__Assist__\n\nTeammates can assist marked targets.\n\n• each assist has a cooldown\n• assists consume uses\n• uses are restored by exploring and spending stamina\n\n__Rewards__\n\nAfter assisted kills:\n\n• rewards can be claimed from the log interface\n\n__Assist Points__\n\n• points gained from assists are fixed\n\n__Rewards__\n\nPlayers earn Sea Exploration Points by completing events.\n\n• points determine personal ranking\n• rewards are sent via mail after the event\n\n__Item Retention__\n\nThese items are not reset and can be used in future events:\n\n• Roasted Meat Leg\n• Silver Keys\n• Gold Keys\n• CostEternal Pose",
-      "images": []
+      "images": [
+        "sea-area-exploration-1776082794047-6205.png",
+        "sea-area-exploration-1776082797922-9442.png",
+        "sea-area-exploration-1776082803104-7972.png",
+        "sea-area-exploration-1776082808169-273.png",
+        "sea-area-exploration-1776082814175-9076.png",
+        "sea-area-exploration-1776082818283-1490.png",
+        "sea-area-exploration-1776082829219-8996.png",
+        "sea-area-exploration-1776082835223-8468.png",
+        "sea-area-exploration-1776082838317-9889.png",
+        "sea-area-exploration-1776082842724-2552.png",
+        "sea-area-exploration-1776082846839-1329.png",
+        "sea-area-exploration-1776082850792-2765.png",
+        "sea-area-exploration-1776082856290-5964.png"
+      ]
     }
   },
   "help unit": {
