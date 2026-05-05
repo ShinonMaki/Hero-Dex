@@ -16,6 +16,7 @@ const {
 const { PREFIX, typeColors } = require("./config/constants");
 const { heroesData, findPdf, findImage } = require("./utils/fileUtils");
 
+// COMMANDS
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
 const { handleManageHero } = require("./commands/managehero");
@@ -27,10 +28,12 @@ const { handleUnregister } = require("./commands/unregister");
 const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
 
+// HERO FLOW
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
 const { startEditHero, handleEditHeroFlow } = require("./commands/edithero");
 
+// GUIDE FLOW
 const {
   handleAddGuideFlow,
   handleAddGuideCategorySelect,
@@ -44,10 +47,12 @@ const {
   handleEditGuideModeSelection
 } = require("./commands/editguide");
 
+// INTERACTIONS
 const { handleGuideButton } = require("./interactions/guideButton");
 const { handleGuideBack } = require("./interactions/guideBack");
 const { handleAndroidGuideButton } = require("./interactions/androidGuideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
+const { handleStartButtons } = require("./interactions/startButtons"); // ⭐ AGGIUNTO
 
 const {
   handleManageGuideButtons,
@@ -90,6 +95,7 @@ client.on("messageCreate", async (message) => {
   if (await handleAddGuideFlow(message)) return;
   if (await handleEditGuideFlow(message)) return;
   if (await handleRenameCategoryFlow(message)) return;
+
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(1).trim().split(/\s+/);
@@ -109,8 +115,9 @@ client.on("messageCreate", async (message) => {
   if (command === "register") return handleRegister(message);
   if (command === "unregister") return handleUnregister(message);
   if (command === "compare") return handleCompare(message);
-  if (command === "start") return handleStart(message);
-  
+  if (command === "start") return handleStart(message); // ⭐
+
+  // HERO COMMAND (.rimuru ecc)
   const hero = command;
   const data = heroesData[hero];
 
@@ -164,7 +171,15 @@ client.on("messageCreate", async (message) => {
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
+
+  // ===== BUTTONS =====
   if (interaction.isButton()) {
+
+    // ⭐ START BUTTONS (PRIORITÀ MASSIMA)
+    if (interaction.customId.startsWith("start_")) {
+      return handleStartButtons(interaction);
+    }
+
     if (
       interaction.customId === "guide_delivery_ios" ||
       interaction.customId === "guide_delivery_chat"
@@ -184,7 +199,6 @@ client.on("interactionCreate", async (interaction) => {
       return handleEditGuideModeSelection(interaction);
     }
 
-    // IMPORTANT: this must stay BEFORE startsWith("guide_")
     if (interaction.customId === "guide_back") {
       return handleGuideBack(interaction);
     }
@@ -212,53 +226,36 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "tierlist_menu"
-  ) {
-    return handleTierlistMenu(interaction);
-  }
+  // ===== SELECT MENUS =====
+  if (interaction.isStringSelectMenu()) {
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "guide_add_select_category"
-  ) {
-    return handleAddGuideCategorySelect(interaction);
-  }
+    if (interaction.customId === "tierlist_menu") {
+      return handleTierlistMenu(interaction);
+    }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "guide_category_select"
-  ) {
-    return handleGuideCategoryButtons(interaction);
-  }
+    if (interaction.customId === "guide_add_select_category") {
+      return handleAddGuideCategorySelect(interaction);
+    }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "guide_edit_category_select"
-  ) {
-    return handleEditGuideCategorySelection(interaction);
-  }
+    if (interaction.customId === "guide_category_select") {
+      return handleGuideCategoryButtons(interaction);
+    }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId.startsWith("guide_menu_")
-  ) {
-    return handleGuideMenu(interaction);
-  }
+    if (interaction.customId === "guide_edit_category_select") {
+      return handleEditGuideCategorySelection(interaction);
+    }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "guide_edit_select_guide"
-  ) {
-    return handleEditGuideSelection(interaction);
-  }
+    if (interaction.customId.startsWith("guide_menu_")) {
+      return handleGuideMenu(interaction);
+    }
 
-  if (
-    interaction.isStringSelectMenu() &&
-    interaction.customId === "guide_rename_category_select"
-  ) {
-    return handleRenameCategorySelect(interaction);
+    if (interaction.customId === "guide_edit_select_guide") {
+      return handleEditGuideSelection(interaction);
+    }
+
+    if (interaction.customId === "guide_rename_category_select") {
+      return handleRenameCategorySelect(interaction);
+    }
   }
 });
 
@@ -267,20 +264,7 @@ client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 });
 
-client.on("error", (err) => {
-  console.error("Client error:", err);
-});
+client.on("error", console.error);
+client.on("shardError", console.error);
 
-client.on("shardError", (err) => {
-  console.error("Shard error:", err);
-});
-
-console.log("TOKEN exists:", !!process.env.TOKEN);
-
-client.login(process.env.TOKEN)
-  .then(() => {
-    console.log("Login request sent");
-  })
-  .catch((err) => {
-    console.error("Login error:", err);
-  });
+client.login(process.env.TOKEN);
