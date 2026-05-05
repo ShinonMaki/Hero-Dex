@@ -1,7 +1,12 @@
-const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
+const {
+  EmbedBuilder,
+  AttachmentBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
+} = require("discord.js");
 
 async function handleHelp(message) {
-
   const banner = new AttachmentBuilder("./images/help.PNG", { name: "help.png" });
   const logo = new AttachmentBuilder("./images/logo.PNG", { name: "logo.png" });
 
@@ -22,8 +27,29 @@ async function handleHelp(message) {
     .setImage("attachment://help.png")
     .setFooter({ text: "Hero-Dex Help Menu" });
 
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("help_guide")
+      .setLabel("Guide")
+      .setEmoji("📚")
+      .setStyle(ButtonStyle.Primary),
+
+    new ButtonBuilder()
+      .setCustomId("help_tierlist")
+      .setLabel("Tierlist")
+      .setEmoji("🧾")
+      .setStyle(ButtonStyle.Secondary),
+
+    new ButtonBuilder()
+      .setCustomId("help_heroes")
+      .setLabel("Heroes")
+      .setEmoji("🧍")
+      .setStyle(ButtonStyle.Success)
+  );
+
   return message.reply({
     embeds: [embed],
+    components: [row],
     files: [banner, logo]
   });
 }
