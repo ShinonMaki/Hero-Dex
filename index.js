@@ -44,6 +44,7 @@ const {
 } = require("./commands/editguide");
 
 const { handleGuideButton } = require("./interactions/guideButton");
+const { handleGuideBack } = require("./interactions/guideBack");
 const { handleAndroidGuideButton } = require("./interactions/androidGuideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
 
@@ -106,7 +107,6 @@ client.on("messageCreate", async (message) => {
   if (command === "syncguides") return handleSyncGuides(message);
   if (command === "register") return handleRegister(message);
   if (command === "unregister") return handleUnregister(message);
-  
   if (command === "compare") return handleCompare(message);
 
   const hero = command;
@@ -180,6 +180,11 @@ client.on("interactionCreate", async (interaction) => {
 
     if (interaction.customId.startsWith("guide_edit_mode_")) {
       return handleEditGuideModeSelection(interaction);
+    }
+
+    // IMPORTANT: this must stay BEFORE startsWith("guide_")
+    if (interaction.customId === "guide_back") {
+      return handleGuideBack(interaction);
     }
 
     if (interaction.customId.startsWith("guide_")) {
