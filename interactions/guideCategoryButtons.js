@@ -1,49 +1,60 @@
-const {
-  getGuides
-} = require("../utils/guideUtils");
+const { getGuides } = require("../utils/guideUtils");
+const { formatFileLabel } = require("../utils/formatUtils");
 
 const {
-  formatFileLabel
-} = require("../utils/formatUtils");
-
-const {
+  EmbedBuilder,
   StringSelectMenuBuilder,
-  ActionRowBuilder
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle
 } = require("discord.js");
 
 async function handleGuideCategoryButtons(interaction) {
-  if (interaction.customId === "guide_category_select") {
-    const category = interaction.values[0];
-    const guides = getGuides();
-    const categoryData = guides[category];
+  if (!interaction.isStringSelectMenu()) return;
+  if (interaction.customId !== "guide_category_select") return;
 
-    if (!categoryData || Object.keys(categoryData).length === 0) {
-      return interaction.reply({
-        content: "No guides found in this category.",
-        ephemeral: true
-      });
-    }
+  const category = interaction.values[0];
+  const guides = getGuides();
+  const categoryData = guides[category];
 
-    const groupedGuides = groupGuideParts(Object.keys(categoryData));
-
-    const options = Object.keys(groupedGuides).map((baseGuideName) => ({
-      label: baseGuideName.slice(0, 100),
-      value: baseGuideName
-    }));
-
-    const menu = new StringSelectMenuBuilder()
-      .setCustomId(`guide_menu_${category}`)
-      .setPlaceholder("Select a guide")
-      .addOptions(options.slice(0, 25));
-
-    const row = new ActionRowBuilder().addComponents(menu);
-
+  if (!categoryData || Object.keys(categoryData).length === 0) {
     return interaction.reply({
-      content: `Category: ${formatFileLabel(category)}`,
-      components: [row],
+      content: "No guides found in this category.",
       ephemeral: true
     });
   }
+
+  const groupedGuides = groupGuideParts(Object.keys(categoryData));
+
+  const options = Object.keys(groupedGuides).map((baseGuideName) => ({
+    label: baseGuideName.slice(0, 100),
+    value: baseGuideName
+  }));
+
+  const menu = new StringSelectMenuBuilder()
+    .setCustomId(`guide_menu_${category}`)
+    .setPlaceholder("Select a guide")
+    .addOptions(options.slice(0, 25));
+
+  const guideRow = new ActionRowBuilder().addComponents(menu);
+
+  const backRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("guide_back")
+      .setLabel("Back")
+      .setEmoji("🔙")
+      .setStyle(ButtonStyle.Secondary)
+  );
+
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle("📚 Guide Hub")
+    .setDescription(`Category: **${formatFileLabel(category)}**\nSelect a guide.`);
+
+  return interaction.update({
+    embeds: [embed],
+    components: [guideRow, backRow]
+  });
 }
 
 function groupGuideParts(guideNames) {
