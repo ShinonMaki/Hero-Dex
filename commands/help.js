@@ -2,7 +2,7 @@ const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
 
 async function handleHelp(message) {
 
-  const file = new AttachmentBuilder("./images/help.png", { name: "help.png" });
+  const file = new AttachmentBuilder("./images/help.PNG", { name: "help.png" });
 
   const embed = new EmbedBuilder()
     .setColor(0xFF2D95)
