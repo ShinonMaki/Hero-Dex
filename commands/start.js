@@ -15,12 +15,12 @@ async function handleStart(message) {
     .setTitle("📘 Command List")
     .setDescription("Here are the available user commands:")
     .addFields(
-      { name: ".guide", value: "Open the Guide Hub and browse guides by category." },
-      { name: ".tierlist", value: "Open the Tier List menu." },
-      { name: ".heroes", value: "Show the list of available heroes." },
+      { name: "guide", value: "Open the Guide Hub and browse guides by category." },
+      { name: "tierlist", value: "Open the Tier List menu." },
+      { name: "heroes", value: "Show the list of available heroes." },
       {
-        name: ".name",
-        value: "Use a hero name as a command to open a specific hero guide.\nExample: `.rimuru`"
+        name: "select hero",
+        value: "Use a hero name as a command to open a specific hero guide.\nExample: `rimuru`"
       }
     )
     .setThumbnail("attachment://logo.png")
