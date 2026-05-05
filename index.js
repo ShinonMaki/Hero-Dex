@@ -25,6 +25,7 @@ const { handleSyncGuides } = require("./commands/syncguides");
 const { handleRegister } = require("./commands/register");
 const { handleUnregister } = require("./commands/unregister");
 const { handleCompare } = require("./commands/compare");
+const { handleHelp } = require("./commands/help");
 
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
 const { startDeleteHero, handleDeleteHeroFlow } = require("./commands/deletehero");
@@ -108,7 +109,8 @@ client.on("messageCreate", async (message) => {
   if (command === "register") return handleRegister(message);
   if (command === "unregister") return handleUnregister(message);
   if (command === "compare") return handleCompare(message);
-
+  if (command === "help") return handleHelp(message);
+  
   const hero = command;
   const data = heroesData[hero];
 
