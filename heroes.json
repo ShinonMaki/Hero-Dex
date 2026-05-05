@@ -36,12 +36,5 @@
     ],
     "type": "Light",
     "category": "LTD Blazing (NA/EU); LTD Transcendent (TW/Rumble)"
-  },
-  ".stop": {
-    "roles": [
-      ".deletehero"
-    ],
-    "type": "D",
-    "category": "D"
   }
 }
