@@ -268,6 +268,28 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+function isInitialRealmWeek() {
+  const now = new Date();
+
+  const romeDate = new Date(
+    now.toLocaleString("en-US", { timeZone: "Europe/Rome" })
+  );
+
+  const year = romeDate.getFullYear();
+  const month = romeDate.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const firstDayOfWeek = firstDay.getDay();
+
+  const daysUntilTuesday = (2 - firstDayOfWeek + 7) % 7;
+  const firstTuesday = new Date(year, month, 1 + daysUntilTuesday);
+
+  const day = romeDate.getDate();
+  const firstTuesdayDate = firstTuesday.getDate();
+
+  return day >= firstTuesdayDate && day <= firstTuesdayDate + 2;
+}
+
 // ===== DEBUG LOGIN =====
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
@@ -333,6 +355,44 @@ client.once("clientReady", () => {
 
       await channel.send({
         content: "<@&1470141312308216080> Hall of Heroes"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
+
+  // Initial Realm - first Tuesday/Wednesday/Thursday of the month at 11:00
+  cron.schedule(
+    "0 11 * * 2,3,4",
+    async () => {
+      if (!isInitialRealmWeek()) return;
+
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Initial Realm start"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
+
+  // Ancient Battlefield - first Tuesday/Wednesday/Thursday of the month at 20:00
+  cron.schedule(
+    "0 20 * * 2,3,4",
+    async () => {
+      if (!isInitialRealmWeek()) return;
+
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Ancient Battlefield start"
       });
     },
     {
