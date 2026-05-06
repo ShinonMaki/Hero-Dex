@@ -52,7 +52,7 @@ const { handleGuideButton } = require("./interactions/guideButton");
 const { handleGuideBack } = require("./interactions/guideBack");
 const { handleAndroidGuideButton } = require("./interactions/androidGuideButton");
 const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
-const { handleStartButtons } = require("./interactions/startButtons"); // ⭐ AGGIUNTO
+const { handleStartButtons } = require("./interactions/startButtons");
 
 const {
   handleManageGuideButtons,
@@ -115,7 +115,7 @@ client.on("messageCreate", async (message) => {
   if (command === "register") return handleRegister(message);
   if (command === "unregister") return handleUnregister(message);
   if (command === "compare") return handleCompare(message);
-  if (command === "start") return handleStart(message); // ⭐
+  if (command === "start") return handleStart(message);
 
   // HERO COMMAND (.rimuru ecc)
   const hero = command;
@@ -131,7 +131,9 @@ client.on("messageCreate", async (message) => {
 
   const embed = new EmbedBuilder()
     .setColor(color)
+    .setThumbnail("attachment://logo.png")
     .setImage(imageFile ? `attachment://${hero}.png` : null)
+    .setFooter({ text: "Hero-Dex • YoRHa Guild" })
     .addFields(
       { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
       { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
@@ -146,16 +148,22 @@ client.on("messageCreate", async (message) => {
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
+      .setCustomId(`android_${hero}`)
+      .setLabel("PREMIUM")
+      .setEmoji("💎")
+      .setStyle(ButtonStyle.Success),
+
+    new ButtonBuilder()
       .setCustomId(`guide_${hero}`)
       .setLabel("GUIDE")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId(`android_${hero}`)
-      .setLabel("ANDROID/PC")
-      .setStyle(ButtonStyle.Success)
+      .setEmoji("📖")
+      .setStyle(ButtonStyle.Primary)
   );
 
-  const files = [];
+  const files = [
+    new AttachmentBuilder("./images/logo.PNG", { name: "logo.png" })
+  ];
+
   if (imageFile) {
     files.push(
       new AttachmentBuilder(`./images/${imageFile}`, { name: `${hero}.png` })
@@ -175,7 +183,6 @@ client.on("interactionCreate", async (interaction) => {
   // ===== BUTTONS =====
   if (interaction.isButton()) {
 
-    // ⭐ START BUTTONS (PRIORITÀ MASSIMA)
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
     }
