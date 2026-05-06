@@ -271,6 +271,22 @@ client.on("interactionCreate", async (interaction) => {
 // ===== DEBUG LOGIN =====
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
+
+  cron.schedule(
+    "0 22 */2 * *",
+    async () => {
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Arena tournament start"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
 });
 
 client.on("error", console.error);
