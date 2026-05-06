@@ -106,7 +106,7 @@ async function applyWatermark(inputPath, outputPath) {
 
   const resizedWatermarkBuffer = await sharp(WATERMARK_PATH)
     .resize({
-      width: Math.floor(metadata.width * 0.9),
+      width: Math.floor(metadata.width * 1.35),
       fit: "inside",
       withoutEnlargement: true
     })
@@ -117,7 +117,6 @@ async function applyWatermark(inputPath, outputPath) {
     .composite([
       {
         input: resizedWatermarkBuffer,
-        width: Math.floor(metadata.width * 1.35),
         gravity: "center",
         blend: "multiply",
         opacity: 0.22
