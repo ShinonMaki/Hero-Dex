@@ -5,6 +5,8 @@ const cron = require("node-cron");
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 const {
   Client,
   GatewayIntentBits,
@@ -74,6 +76,53 @@ app.get("/", (req, res) => {
   res.send("Bot is alive");
 });
 
+// ===== GITHUB WEBHOOK =====
+app.post("/github-webhook", async (req, res) => {
+  try {
+    const commits = req.body.commits ?? [];
+
+    if (commits.length === 0) {
+      return res.sendStatus(200);
+    }
+
+    const channel = await client.channels.fetch("1501589076019511476");
+
+    if (!channel) {
+      return res.sendStatus(200);
+    }
+
+    const description = commits
+      .map(commit => `• ${commit.message}`)
+      .slice(0, 10)
+      .join("\n");
+
+    const embed = new EmbedBuilder()
+      .setColor(0xFF2D95)
+      .setTitle("📢 Hero-Dex Update")
+      .setThumbnail("attachment://logo.png")
+      .setDescription(description)
+      .setFooter({
+        text: "Hero-Dex • YoRHa Guild"
+      })
+      .setTimestamp();
+
+    await channel.send({
+      embeds: [embed],
+      files: [
+        new AttachmentBuilder("./images/logo.PNG", {
+          name: "logo.png"
+        })
+      ]
+    });
+
+    return res.sendStatus(200);
+
+  } catch (err) {
+    console.error("GitHub webhook error:", err);
+    return res.sendStatus(500);
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
 });
@@ -119,7 +168,7 @@ client.on("messageCreate", async (message) => {
   if (command === "compare") return handleCompare(message);
   if (command === "start") return handleStart(message);
 
-  // HERO COMMAND (.rimuru ecc)
+  // HERO COMMAND
   const hero = command;
   const data = heroesData[hero];
 
@@ -135,11 +184,22 @@ client.on("messageCreate", async (message) => {
     .setColor(color)
     .setThumbnail("attachment://logo.png")
     .setImage(imageFile ? `attachment://${hero}.png` : null)
-    .setFooter({ text: "Hero-Dex • YoRHa Guild" })
+    .setFooter({
+      text: "Hero-Dex • YoRHa Guild"
+    })
     .addFields(
-      { name: "Name", value: hero.charAt(0).toUpperCase() + hero.slice(1) },
-      { name: "Role", value: data?.roles?.join(", ") || "Unknown" },
-      { name: "Type", value: data?.type || "Unknown" },
+      {
+        name: "Name",
+        value: hero.charAt(0).toUpperCase() + hero.slice(1)
+      },
+      {
+        name: "Role",
+        value: data?.roles?.join(", ") || "Unknown"
+      },
+      {
+        name: "Type",
+        value: data?.type || "Unknown"
+      },
       {
         name: "Category",
         value: Array.isArray(data?.category)
@@ -149,26 +209,30 @@ client.on("messageCreate", async (message) => {
     );
 
   const row = new ActionRowBuilder().addComponents(
-  new ButtonBuilder()
-    .setCustomId(`guide_${hero}`)
-    .setLabel("PREMIUM")
-    .setEmoji("💎")
-    .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId(`guide_${hero}`)
+      .setLabel("PREMIUM")
+      .setEmoji("💎")
+      .setStyle(ButtonStyle.Success),
 
-  new ButtonBuilder()
-    .setCustomId(`android_${hero}`)
-    .setLabel("GUIDE")
-    .setEmoji("📖")
-    .setStyle(ButtonStyle.Primary)
-);
+    new ButtonBuilder()
+      .setCustomId(`android_${hero}`)
+      .setLabel("GUIDE")
+      .setEmoji("📖")
+      .setStyle(ButtonStyle.Primary)
+  );
 
   const files = [
-    new AttachmentBuilder("./images/logo.PNG", { name: "logo.png" })
+    new AttachmentBuilder("./images/logo.PNG", {
+      name: "logo.png"
+    })
   ];
 
   if (imageFile) {
     files.push(
-      new AttachmentBuilder(`./images/${imageFile}`, { name: `${hero}.png` })
+      new AttachmentBuilder(`./images/${imageFile}`, {
+        name: `${hero}.png`
+      })
     );
   }
 
@@ -182,7 +246,6 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
 
-  // ===== BUTTONS =====
   if (interaction.isButton()) {
 
     if (interaction.customId.startsWith("start_")) {
@@ -235,7 +298,6 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
-  // ===== SELECT MENUS =====
   if (interaction.isStringSelectMenu()) {
 
     if (interaction.customId === "tierlist_menu") {
@@ -294,12 +356,11 @@ function isInitialRealmWeek() {
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 
-  // Arena Tournament - every 2 days at 22:00
+  // Arena Tournament
   cron.schedule(
     "0 22 */2 * *",
     async () => {
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
@@ -311,12 +372,11 @@ client.once("clientReady", () => {
     }
   );
 
-  // Guild War - Monday, Wednesday, Friday at 13:00
+  // Guild War
   cron.schedule(
     "0 13 * * 1,3,5",
     async () => {
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
@@ -328,12 +388,11 @@ client.once("clientReady", () => {
     }
   );
 
-  // Holy Domain Duel - every Sunday at 13:00
+  // Holy Domain Duel
   cron.schedule(
     "0 13 * * 0",
     async () => {
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
@@ -345,12 +404,11 @@ client.once("clientReady", () => {
     }
   );
 
-  // Hall of Heroes - every Monday at 13:00
+  // Hall of Heroes
   cron.schedule(
     "0 13 * * 1",
     async () => {
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
@@ -362,14 +420,13 @@ client.once("clientReady", () => {
     }
   );
 
-  // Initial Realm - first Tuesday/Wednesday/Thursday of the month at 11:00
+  // Initial Realm
   cron.schedule(
     "0 11 * * 2,3,4",
     async () => {
       if (!isInitialRealmWeek()) return;
 
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
@@ -381,14 +438,13 @@ client.once("clientReady", () => {
     }
   );
 
-  // Ancient Battlefield - first Tuesday/Wednesday/Thursday of the month at 20:00
+  // Ancient Battlefield
   cron.schedule(
     "0 20 * * 2,3,4",
     async () => {
       if (!isInitialRealmWeek()) return;
 
       const channel = await client.channels.fetch("1434858215245484103");
-
       if (!channel) return;
 
       await channel.send({
