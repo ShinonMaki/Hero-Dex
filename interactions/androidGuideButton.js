@@ -8,7 +8,6 @@ const TEMP_DIR = path.join("./temp");
 
 async function handleAndroidGuideButton(interaction) {
   const hero = interaction.customId.replace("android_", "");
-
   const folder = path.join("./hero-guide-images", hero);
 
   if (!fs.existsSync(folder)) {
@@ -61,8 +60,10 @@ async function handleAndroidGuideButton(interaction) {
 
     for (const file of files) {
       const inputPath = path.join(folder, file);
-      const safeFileName = file.replace(/\s+/g, "_");
-      const outputName = `${hero}_${Date.now()}_${safeFileName}`;
+
+      const parsed = path.parse(file);
+      const safeName = parsed.name.replace(/\s+/g, "_").replace(/[^\w.-]/g, "");
+      const outputName = `${hero}_${Date.now()}_${safeName}.png`;
       const outputPath = path.join(TEMP_DIR, outputName);
 
       await applyWatermark(inputPath, outputPath);
@@ -83,9 +84,8 @@ async function handleAndroidGuideButton(interaction) {
     setTimeout(() => {
       cleanupFiles(watermarkedPaths);
     }, 60_000);
-
   } catch (err) {
-    console.error("Android/PC guide send error:", err);
+    console.error("Android/PC guide send error FULL:", err);
 
     if (interaction.replied || interaction.deferred) {
       return interaction.followUp({
@@ -108,39 +108,21 @@ async function applyWatermark(inputPath, outputPath) {
     throw new Error(`Invalid image metadata for: ${inputPath}`);
   }
 
-  const watermarkWidth = Math.floor(metadata.width * 1.3);
+  const watermarkWidth = Math.floor(metadata.width * 1.2);
 
-  const resizedWatermark = await sharp(WATERMARK_PATH)
-    .resize({
-      width: watermarkWidth
-    })
+  const watermarkBuffer = await sharp(WATERMARK_PATH)
+    .resize({ width: watermarkWidth })
     .grayscale()
-    .png()
-    .toBuffer({ resolveWithObject: true });
-
-  const opacityMask = Buffer.from(`
-    <svg width="${resizedWatermark.info.width}" height="${resizedWatermark.info.height}">
-      <rect width="100%" height="100%" fill="rgba(0,0,0,0.22)" />
-    </svg>
-  `);
-
-  const transparentWatermark = await sharp(resizedWatermark.data)
     .ensureAlpha()
-    .composite([
-      {
-        input: opacityMask,
-        blend: "dest-in"
-      }
-    ])
     .png()
     .toBuffer();
 
   await sharp(inputPath)
     .composite([
       {
-        input: transparentWatermark,
+        input: watermarkBuffer,
         gravity: "center",
-        blend: "over"
+        blend: "multiply"
       }
     ])
     .png()
