@@ -70,9 +70,13 @@ const { handleGuideMenu } = require("./interactions/guideMenu");
 const { handleGuideDeliveryButtons } = require("./interactions/guideDeliveryButtons");
 
 const PORT = process.env.PORT || 3000;
+
 const UPDATE_CHANNEL_ID = "1501589076019511476";
 const EVENT_CHANNEL_ID = "1434858215245484103";
 const EVENT_ROLE_ID = "1470141312308216080";
+
+const RESTRICTED_GUILD_ID = "1434845553815982104";
+const ALLOWED_COMMAND_CHANNEL_ID = "1501588339776815144";
 
 // ===== BOT =====
 const client = new Client({
@@ -136,9 +140,18 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
 });
 
+function isWrongCommandChannel(context) {
+  return (
+    context.guild?.id === RESTRICTED_GUILD_ID &&
+    context.channel?.id !== ALLOWED_COMMAND_CHANNEL_ID
+  );
+}
+
 // ===== MESSAGE HANDLER =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+
+  if (isWrongCommandChannel(message)) return;
 
   if (await handleAddHeroFlow(message)) return;
   if (await handleDeleteHeroFlow(message)) return;
@@ -243,6 +256,17 @@ client.on("messageCreate", async (message) => {
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
+  if (isWrongCommandChannel(interaction)) {
+    if (interaction.isRepliable()) {
+      return interaction.reply({
+        content: `<#${ALLOWED_COMMAND_CHANNEL_ID}> Use the bot commands in this channel.`,
+        ephemeral: true
+      }).catch(() => {});
+    }
+
+    return;
+  }
+
   if (interaction.isButton()) {
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
