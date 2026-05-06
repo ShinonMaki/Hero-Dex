@@ -104,20 +104,43 @@ async function handleAndroidGuideButton(interaction) {
 async function applyWatermark(inputPath, outputPath) {
   const metadata = await sharp(inputPath).metadata();
 
-  const resizedWatermarkBuffer = await sharp(WATERMARK_PATH)
+  if (!metadata.width || !metadata.height) {
+    throw new Error(`Invalid image metadata for: ${inputPath}`);
+  }
+
+  const watermarkWidth = Math.floor(metadata.width * 1.3);
+
+  const resizedWatermark = await sharp(WATERMARK_PATH)
     .resize({
-      width: Math.floor(metadata.width * 1.3),
+      width: watermarkWidth
     })
+    .grayscale()
+    .png()
+    .toBuffer({ resolveWithObject: true });
+
+  const opacityMask = Buffer.from(`
+    <svg width="${resizedWatermark.info.width}" height="${resizedWatermark.info.height}">
+      <rect width="100%" height="100%" fill="rgba(0,0,0,0.22)" />
+    </svg>
+  `);
+
+  const transparentWatermark = await sharp(resizedWatermark.data)
+    .ensureAlpha()
+    .composite([
+      {
+        input: opacityMask,
+        blend: "dest-in"
+      }
+    ])
     .png()
     .toBuffer();
 
   await sharp(inputPath)
     .composite([
       {
-        input: resizedWatermarkBuffer,
+        input: transparentWatermark,
         gravity: "center",
-        blend: "multiply",
-        opacity: 0.22
+        blend: "over"
       }
     ])
     .png()
