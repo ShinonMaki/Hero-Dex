@@ -70,6 +70,18 @@ const { handleGuideMenu } = require("./interactions/guideMenu");
 const { handleGuideDeliveryButtons } = require("./interactions/guideDeliveryButtons");
 
 const PORT = process.env.PORT || 3000;
+const UPDATE_CHANNEL_ID = "1501589076019511476";
+const EVENT_CHANNEL_ID = "1434858215245484103";
+const EVENT_ROLE_ID = "1470141312308216080";
+
+// ===== BOT =====
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
+});
 
 // ===== SERVER =====
 app.get("/", (req, res) => {
@@ -85,7 +97,7 @@ app.post("/github-webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    const channel = await client.channels.fetch("1501589076019511476");
+    const channel = await client.channels.fetch(UPDATE_CHANNEL_ID).catch(() => null);
 
     if (!channel) {
       return res.sendStatus(200);
@@ -101,9 +113,7 @@ app.post("/github-webhook", async (req, res) => {
       .setTitle("📢 Hero-Dex Update")
       .setThumbnail("attachment://logo.png")
       .setDescription(description)
-      .setFooter({
-        text: "Hero-Dex • YoRHa Guild"
-      })
+      .setFooter({ text: "Hero-Dex • YoRHa Guild" })
       .setTimestamp();
 
     await channel.send({
@@ -116,7 +126,6 @@ app.post("/github-webhook", async (req, res) => {
     });
 
     return res.sendStatus(200);
-
   } catch (err) {
     console.error("GitHub webhook error:", err);
     return res.sendStatus(500);
@@ -125,15 +134,6 @@ app.post("/github-webhook", async (req, res) => {
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
-});
-
-// ===== BOT =====
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
 });
 
 // ===== MESSAGE HANDLER =====
@@ -184,9 +184,7 @@ client.on("messageCreate", async (message) => {
     .setColor(color)
     .setThumbnail("attachment://logo.png")
     .setImage(imageFile ? `attachment://${hero}.png` : null)
-    .setFooter({
-      text: "Hero-Dex • YoRHa Guild"
-    })
+    .setFooter({ text: "Hero-Dex • YoRHa Guild" })
     .addFields(
       {
         name: "Name",
@@ -245,9 +243,7 @@ client.on("messageCreate", async (message) => {
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
-
   if (interaction.isButton()) {
-
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
     }
@@ -299,7 +295,6 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isStringSelectMenu()) {
-
     if (interaction.customId === "tierlist_menu") {
       return handleTierlistMenu(interaction);
     }
@@ -360,64 +355,56 @@ client.once("clientReady", () => {
   cron.schedule(
     "0 22 */2 * *",
     async () => {
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Arena tournament start"
+        content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 
   // Guild War
   cron.schedule(
     "0 13 * * 1,3,5",
     async () => {
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Guild War start"
+        content: `<@&${EVENT_ROLE_ID}> Guild War start`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 
   // Holy Domain Duel
   cron.schedule(
     "0 13 * * 0",
     async () => {
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Holy Domain Duel"
+        content: `<@&${EVENT_ROLE_ID}> Holy Domain Duel`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 
   // Hall of Heroes
   cron.schedule(
     "0 13 * * 1",
     async () => {
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Hall of Heroes"
+        content: `<@&${EVENT_ROLE_ID}> Hall of Heroes`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 
   // Initial Realm
@@ -426,16 +413,14 @@ client.once("clientReady", () => {
     async () => {
       if (!isInitialRealmWeek()) return;
 
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Initial Realm start"
+        content: `<@&${EVENT_ROLE_ID}> Initial Realm start`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 
   // Ancient Battlefield
@@ -444,16 +429,14 @@ client.once("clientReady", () => {
     async () => {
       if (!isInitialRealmWeek()) return;
 
-      const channel = await client.channels.fetch("1434858215245484103");
+      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
 
       await channel.send({
-        content: "<@&1470141312308216080> Ancient Battlefield start"
+        content: `<@&${EVENT_ROLE_ID}> Ancient Battlefield start`
       });
     },
-    {
-      timezone: "Europe/Rome"
-    }
+    { timezone: "Europe/Rome" }
   );
 });
 
