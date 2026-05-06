@@ -375,19 +375,40 @@ function isInitialRealmWeek() {
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 
-  // Arena Tournament
-  cron.schedule(
-    "0 22 */2 * *",
-    async () => {
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
+  // Arena Tournament - every 2 days starting from 2026-05-06
+cron.schedule(
+  "0 22 * * *",
+  async () => {
 
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
+    const startDate = new Date("2026-05-06T00:00:00");
+
+    const now = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "Europe/Rome"
+      })
+    );
+
+    const diffTime = now.getTime() - startDate.getTime();
+
+    const diffDays = Math.floor(
+      diffTime / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffDays % 2 !== 0) return;
+
+    const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
+
+    if (!channel) return;
+
+    await channel.send({
+      content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
+    });
+
+  },
+  {
+    timezone: "Europe/Rome"
+  }
+);
 
   // Guild War
   cron.schedule(
