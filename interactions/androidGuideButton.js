@@ -106,7 +106,7 @@ async function applyWatermark(inputPath, outputPath) {
 
   const resizedWatermarkBuffer = await sharp(WATERMARK_PATH)
     .resize({
-      width: Math.floor(metadata.width * 1.35),
+      width: Math.floor(metadata.width * 1.3),
     })
     .png()
     .toBuffer();
