@@ -117,7 +117,7 @@ async function applyWatermark(inputPath, outputPath) {
     .composite([
       {
         input: resizedWatermarkBuffer,
-        gravity: "center"
+        gravity: "center",
         blend: "overlay",
         opacity: 0.18
       }
