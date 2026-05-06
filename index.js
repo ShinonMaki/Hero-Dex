@@ -322,6 +322,23 @@ client.once("clientReady", () => {
       timezone: "Europe/Rome"
     }
   );
+
+  // Hall of Heroes - every Monday at 13:00
+  cron.schedule(
+    "0 13 * * 1",
+    async () => {
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Hall of Heroes"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
 });
 
 client.on("error", console.error);
