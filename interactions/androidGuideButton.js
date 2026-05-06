@@ -108,7 +108,7 @@ async function applyWatermark(inputPath, outputPath) {
     throw new Error(`Invalid image metadata for: ${inputPath}`);
   }
 
-  const watermarkWidth = Math.floor(metadata.width * 1.2);
+  const watermarkWidth = Math.floor(metadata.width * 0.85);
 
   const watermarkBuffer = await sharp(WATERMARK_PATH)
     .resize({ width: watermarkWidth })
