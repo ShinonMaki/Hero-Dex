@@ -147,18 +147,18 @@ client.on("messageCreate", async (message) => {
     );
 
   const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`android_${hero}`)
-      .setLabel("PREMIUM")
-      .setEmoji("💎")
-      .setStyle(ButtonStyle.Success),
+  new ButtonBuilder()
+    .setCustomId(`guide_${hero}`)
+    .setLabel("PREMIUM")
+    .setEmoji("💎")
+    .setStyle(ButtonStyle.Success),
 
-    new ButtonBuilder()
-      .setCustomId(`guide_${hero}`)
-      .setLabel("GUIDE")
-      .setEmoji("📖")
-      .setStyle(ButtonStyle.Primary)
-  );
+  new ButtonBuilder()
+    .setCustomId(`android_${hero}`)
+    .setLabel("GUIDE")
+    .setEmoji("📖")
+    .setStyle(ButtonStyle.Primary)
+);
 
   const files = [
     new AttachmentBuilder("./images/logo.PNG", { name: "logo.png" })
