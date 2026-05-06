@@ -118,6 +118,8 @@ async function applyWatermark(inputPath, outputPath) {
       {
         input: resizedWatermarkBuffer,
         gravity: "center"
+        blend: "overlay",
+        opacity: 0.18
       }
     ])
     .png()
