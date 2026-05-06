@@ -3,7 +3,7 @@ const fs = require("fs");
 const sharp = require("sharp");
 
 const MAX_FILES_PER_MESSAGE = 10;
-const WATERMARK_PATH = path.join("./watermark", "watermark.PNG"); // cambia in watermark.png se il file è lowercase
+const WATERMARK_PATH = path.join("./watermark", "watermark.PNG");
 const TEMP_DIR = path.join("./temp");
 
 async function handleAndroidGuideButton(interaction) {
@@ -62,7 +62,10 @@ async function handleAndroidGuideButton(interaction) {
       const inputPath = path.join(folder, file);
 
       const parsed = path.parse(file);
-      const safeName = parsed.name.replace(/\s+/g, "_").replace(/[^\w.-]/g, "");
+      const safeName = parsed.name
+        .replace(/\s+/g, "_")
+        .replace(/[^\w.-]/g, "");
+
       const outputName = `${hero}_${Date.now()}_${safeName}.png`;
       const outputPath = path.join(TEMP_DIR, outputName);
 
@@ -108,10 +111,18 @@ async function applyWatermark(inputPath, outputPath) {
     throw new Error(`Invalid image metadata for: ${inputPath}`);
   }
 
-  const watermarkWidth = Math.floor(metadata.width * 0.85);
+  const bigWatermarkWidth = Math.floor(metadata.width * 0.85);
+  const smallWatermarkWidth = Math.floor(metadata.width * 0.28);
 
-  const watermarkBuffer = await sharp(WATERMARK_PATH)
-    .resize({ width: watermarkWidth })
+  const bigWatermarkBuffer = await sharp(WATERMARK_PATH)
+    .resize({ width: bigWatermarkWidth })
+    .grayscale()
+    .ensureAlpha()
+    .png()
+    .toBuffer();
+
+  const smallWatermarkBuffer = await sharp(WATERMARK_PATH)
+    .resize({ width: smallWatermarkWidth })
     .grayscale()
     .ensureAlpha()
     .png()
@@ -120,8 +131,23 @@ async function applyWatermark(inputPath, outputPath) {
   await sharp(inputPath)
     .composite([
       {
-        input: watermarkBuffer,
+        input: bigWatermarkBuffer,
         gravity: "center",
+        blend: "multiply"
+      },
+      {
+        input: smallWatermarkBuffer,
+        gravity: "northwest",
+        blend: "multiply"
+      },
+      {
+        input: smallWatermarkBuffer,
+        gravity: "northeast",
+        blend: "multiply"
+      },
+      {
+        input: smallWatermarkBuffer,
+        gravity: "southeast",
         blend: "multiply"
       }
     ])
