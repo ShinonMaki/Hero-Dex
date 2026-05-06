@@ -1,20 +1,13 @@
 const path = require("path");
 const fs = require("fs");
-
-const { isPremium } = require("../utils/premiumUtils");
+const sharp = require("sharp");
 
 const MAX_FILES_PER_MESSAGE = 10;
+const WATERMARK_PATH = path.join("./watermark", "watermark.PNG"); // cambia in watermark.png se il file è lowercase
+const TEMP_DIR = path.join("./temp");
 
 async function handleAndroidGuideButton(interaction) {
   const hero = interaction.customId.replace("android_", "");
-
-  // 🔒 CONTROLLO PREMIUM
-  if (!isPremium(interaction.user.id)) {
-    return interaction.reply({
-      content: "🔒 This guide is premium only.",
-      ephemeral: true
-    });
-  }
 
   const folder = path.join("./hero-guide-images", hero);
 
@@ -23,6 +16,17 @@ async function handleAndroidGuideButton(interaction) {
       content: "No Android/PC images found for this hero.",
       ephemeral: true
     });
+  }
+
+  if (!fs.existsSync(WATERMARK_PATH)) {
+    return interaction.reply({
+      content: "Watermark file not found.",
+      ephemeral: true
+    });
+  }
+
+  if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR, { recursive: true });
   }
 
   const files = fs
@@ -47,14 +51,26 @@ async function handleAndroidGuideButton(interaction) {
     });
   }
 
-  const imagePaths = files.map(file => path.join(folder, file));
-  const chunks = chunkArray(imagePaths, MAX_FILES_PER_MESSAGE);
-
   try {
     await interaction.reply({
-      content: `Sending ${files.length} image(s) in ${chunks.length} message(s)...`,
+      content: `Preparing ${files.length} protected image(s)...`,
       ephemeral: true
     });
+
+    const watermarkedPaths = [];
+
+    for (const file of files) {
+      const inputPath = path.join(folder, file);
+      const safeFileName = file.replace(/\s+/g, "_");
+      const outputName = `${hero}_${Date.now()}_${safeFileName}`;
+      const outputPath = path.join(TEMP_DIR, outputName);
+
+      await applyWatermark(inputPath, outputPath);
+
+      watermarkedPaths.push(outputPath);
+    }
+
+    const chunks = chunkArray(watermarkedPaths, MAX_FILES_PER_MESSAGE);
 
     for (let i = 0; i < chunks.length; i++) {
       await interaction.followUp({
@@ -63,20 +79,54 @@ async function handleAndroidGuideButton(interaction) {
         ephemeral: true
       });
     }
+
+    setTimeout(() => {
+      cleanupFiles(watermarkedPaths);
+    }, 60_000);
+
   } catch (err) {
     console.error("Android/PC guide send error:", err);
 
     if (interaction.replied || interaction.deferred) {
       return interaction.followUp({
-        content: "Error sending images.",
+        content: "Error sending protected images.",
         ephemeral: true
       });
     }
 
     return interaction.reply({
-      content: "Error sending images.",
+      content: "Error sending protected images.",
       ephemeral: true
     });
+  }
+}
+
+async function applyWatermark(inputPath, outputPath) {
+  const metadata = await sharp(inputPath).metadata();
+
+  const resizedWatermarkBuffer = await sharp(WATERMARK_PATH)
+    .resize({
+      width: Math.floor(metadata.width * 0.9),
+      fit: "inside",
+      withoutEnlargement: true
+    })
+    .png()
+    .toBuffer();
+
+  await sharp(inputPath)
+    .composite([
+      {
+        input: resizedWatermarkBuffer,
+        gravity: "center"
+      }
+    ])
+    .png()
+    .toFile(outputPath);
+}
+
+function cleanupFiles(files) {
+  for (const file of files) {
+    fs.unlink(file, () => {});
   }
 }
 
