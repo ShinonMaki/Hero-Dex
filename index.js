@@ -305,6 +305,23 @@ client.once("clientReady", () => {
       timezone: "Europe/Rome"
     }
   );
+
+  // Holy Domain Duel - every Sunday at 13:00
+  cron.schedule(
+    "0 13 * * 0",
+    async () => {
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Holy Domain Duel"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
 });
 
 client.on("error", console.error);
