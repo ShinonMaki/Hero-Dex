@@ -272,6 +272,7 @@ client.on("interactionCreate", async (interaction) => {
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 
+  // Arena Tournament - every 2 days at 22:00
   cron.schedule(
     "0 22 */2 * *",
     async () => {
@@ -281,6 +282,23 @@ client.once("clientReady", () => {
 
       await channel.send({
         content: "<@&1470141312308216080> Arena tournament start"
+      });
+    },
+    {
+      timezone: "Europe/Rome"
+    }
+  );
+
+  // Guild War - Monday, Wednesday, Friday at 13:00
+  cron.schedule(
+    "0 13 * * 1,3,5",
+    async () => {
+      const channel = await client.channels.fetch("1434858215245484103");
+
+      if (!channel) return;
+
+      await channel.send({
+        content: "<@&1470141312308216080> Guild War start"
       });
     },
     {
