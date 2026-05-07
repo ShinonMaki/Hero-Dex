@@ -36,5 +36,12 @@
     ],
     "type": "Light",
     "category": "LTD Blazing (NA/EU); LTD Transcendent (TW/Rumble)"
+  },
+  "rimuru": {
+    "roles": [
+      "Burst Crit Fix DMG"
+    ],
+    "type": "Chaos",
+    "category": "LTD Immortal Leggendary"
   }
 }
