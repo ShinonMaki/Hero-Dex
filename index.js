@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const cron = require("node-cron");
+const fs = require("fs");
 
 const express = require("express");
 const app = express();
@@ -190,12 +191,26 @@ client.on("messageCreate", async (message) => {
 
   const imageFile = findImage(hero);
 
+  // ===== HERO LOGO SYSTEM =====
+  const heroLogoPath = `./logos/${hero}_logo.png`;
+  const fallbackLogoPath = "./images/logo.PNG";
+
+  const hasHeroLogo = fs.existsSync(heroLogoPath);
+
+  const logoAttachmentName = hasHeroLogo
+    ? `${hero}_logo.png`
+    : "logo.png";
+
+  const logoAttachmentPath = hasHeroLogo
+    ? heroLogoPath
+    : fallbackLogoPath;
+
   const type = data?.type?.toLowerCase() || "default";
   const color = typeColors[type] || typeColors.default;
 
   const embed = new EmbedBuilder()
     .setColor(color)
-    .setThumbnail("attachment://logo.png")
+    .setThumbnail(`attachment://${logoAttachmentName}`)
     .setImage(imageFile ? `attachment://${hero}.png` : null)
     .setFooter({ text: "Hero-Dex • YoRHa Guild" })
     .addFields(
@@ -234,8 +249,8 @@ client.on("messageCreate", async (message) => {
   );
 
   const files = [
-    new AttachmentBuilder("./images/logo.PNG", {
-      name: "logo.png"
+    new AttachmentBuilder(logoAttachmentPath, {
+      name: logoAttachmentName
     })
   ];
 
@@ -374,115 +389,6 @@ function isInitialRealmWeek() {
 // ===== DEBUG LOGIN =====
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
-
-  // Arena Tournament - every 2 days starting from 2026-05-06
-cron.schedule(
-  "0 22 * * *",
-  async () => {
-
-    const startDate = new Date("2026-05-06T00:00:00");
-
-    const now = new Date(
-      new Date().toLocaleString("en-US", {
-        timeZone: "Europe/Rome"
-      })
-    );
-
-    const diffTime = now.getTime() - startDate.getTime();
-
-    const diffDays = Math.floor(
-      diffTime / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays % 2 !== 0) return;
-
-    const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-
-    if (!channel) return;
-
-    await channel.send({
-      content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
-    });
-
-  },
-  {
-    timezone: "Europe/Rome"
-  }
-);
-
-  // Guild War
-  cron.schedule(
-    "0 13 * * 1,3,5",
-    async () => {
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
-
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Guild War start`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
-
-  // Holy Domain Duel
-  cron.schedule(
-    "0 13 * * 0",
-    async () => {
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
-
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Holy Domain Duel`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
-
-  // Hall of Heroes
-  cron.schedule(
-    "0 13 * * 1",
-    async () => {
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
-
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Hall of Heroes`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
-
-  // Initial Realm
-  cron.schedule(
-    "0 11 * * 2,3,4",
-    async () => {
-      if (!isInitialRealmWeek()) return;
-
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
-
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Initial Realm start`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
-
-  // Ancient Battlefield
-  cron.schedule(
-    "0 20 * * 2,3,4",
-    async () => {
-      if (!isInitialRealmWeek()) return;
-
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
-
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Ancient Battlefield start`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
 });
 
 client.on("error", console.error);
