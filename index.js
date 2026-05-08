@@ -266,20 +266,21 @@ client.on("messageCreate", async (message) => {
     );
   }
 
-  if (hasVoice) {
-    files.push(
+  await message.reply({
+  embeds: [embed],
+  components: [row],
+  files
+});
+
+if (hasVoice) {
+  await message.channel.send({
+    files: [
       new AttachmentBuilder(voicePath, {
         name: `${hero}.mp3`
       })
-    );
-  }
-
-  await message.reply({
-    embeds: [embed],
-    components: [row],
-    files
+    ]
   });
-});
+}
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
