@@ -205,6 +205,10 @@ client.on("messageCreate", async (message) => {
     ? heroLogoPath
     : fallbackLogoPath;
 
+  // ===== HERO VOICE SYSTEM =====
+  const voicePath = `./voices/${hero}.mp3`;
+  const hasVoice = fs.existsSync(voicePath);
+
   const type = data?.type?.toLowerCase() || "default";
   const color = typeColors[type] || typeColors.default;
 
@@ -258,6 +262,14 @@ client.on("messageCreate", async (message) => {
     files.push(
       new AttachmentBuilder(`./images/${imageFile}`, {
         name: `${hero}.png`
+      })
+    );
+  }
+
+  if (hasVoice) {
+    files.push(
+      new AttachmentBuilder(voicePath, {
+        name: `${hero}.mp3`
       })
     );
   }
