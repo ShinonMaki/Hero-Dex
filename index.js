@@ -281,6 +281,7 @@ if (hasVoice) {
     ]
   });
 }
+});
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
