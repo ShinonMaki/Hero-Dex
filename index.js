@@ -420,7 +420,7 @@ client.once("clientReady", () => {
         (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      if (diffDays % 2 !== 0) return;
+      if (diffDays % 3 !== 0) return;
 
       const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
       if (!channel) return;
