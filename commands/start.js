@@ -7,27 +7,46 @@ const {
 } = require("discord.js");
 
 async function handleStart(message) {
-  const banner = new AttachmentBuilder("./images/help.PNG", { name: "help.png" });
-  const logo = new AttachmentBuilder("./images/logo.PNG", { name: "logo.png" });
+  const banner = new AttachmentBuilder("./images/help.PNG", {
+    name: "help.png"
+  });
+
+  const logo = new AttachmentBuilder("./images/logo.PNG", {
+    name: "logo.png"
+  });
 
   const embed = new EmbedBuilder()
     .setColor(0xFF2D95)
     .setTitle("📘 Command List")
     .setDescription("Here are the available user commands:")
     .addFields(
-      { name: "guide", value: "Open the Guide Hub and browse guides by category." },
-      { name: "tierlist", value: "Open the Tier List menu." },
-      { name: "heroes", value: "Show the list of available heroes." },
+      {
+        name: "guide",
+        value: "Open the Guide Hub and browse guides by category."
+      },
+      {
+        name: "tierlist",
+        value: "Open the Tier List menu."
+      },
+      {
+        name: "heroes",
+        value: "Show the list of available heroes."
+      },
+      {
+        name: "suggestion",
+        value: "Send a suggestion to improve Hero-Dex."
+      },
       {
         name: "select hero",
-        value: "Use a hero name as a command to open a specific hero guide.\nExample: `rimuru`"
+        value:
+          "Use a hero name as a command to open a specific hero guide.\nExample: `rimuru`"
       }
     )
     .setThumbnail("attachment://logo.png")
     .setImage("attachment://help.png")
     .setFooter({ text: "Hero-Dex Start Menu" });
 
-  const row = new ActionRowBuilder().addComponents(
+  const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("start_guide")
       .setLabel("Guide")
@@ -53,9 +72,17 @@ async function handleStart(message) {
       .setStyle(ButtonStyle.Danger)
   );
 
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("start_suggestion")
+      .setLabel("Suggestion")
+      .setEmoji("💡")
+      .setStyle(ButtonStyle.Secondary)
+  );
+
   return message.reply({
     embeds: [embed],
-    components: [row],
+    components: [row1, row2],
     files: [banner, logo]
   });
 }
