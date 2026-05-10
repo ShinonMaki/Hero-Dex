@@ -43,5 +43,12 @@
     ],
     "type": "Chaos",
     "category": "LTD Immortal Leggendary"
+  },
+  "shadow": {
+    "roles": [
+      "Taunt SpiritArmor"
+    ],
+    "type": "Dark",
+    "category": "Immortal Leggendary LTD"
   }
 }
