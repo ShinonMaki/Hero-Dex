@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "name": "Sea Area Exploration",
+    "id": "sea_area_exploration",
+    "message": "Sea Area Exploration Start",
+    "time": "11:00",
+    "cycleDays": 28,
+    "startDate": "2026-04-28",
+    "activeDays": [
+      0,
+      1,
+      2
+    ],
+    "channelId": "1434858215245484103",
+    "roleId": "1470141312308216080",
+    "timezone": "Europe/Rome",
+    "enabled": true,
+    "lastSentKey": null
+  },
+  {
+    "name": "Final Battle Island",
+    "id": "final_battle_island",
+    "message": "Final Battle Island Start",
+    "time": "11:00",
+    "cycleDays": 28,
+    "startDate": "2026-05-12",
+    "activeDays": [
+      0,
+      1,
+      2
+    ],
+    "channelId": "1434858215245484103",
+    "roleId": "1470141312308216080",
+    "timezone": "Europe/Rome",
+    "enabled": true,
+    "lastSentKey": null
+  },
+  {
+    "name": "Ninja War",
+    "id": "ninja_war",
+    "message": "Ninja war Start",
+    "time": "11:00",
+    "cycleDays": 28,
+    "startDate": "2026-05-19",
+    "activeDays": [
+      0,
+      1,
+      2
+    ],
+    "channelId": "1434858215245484103",
+    "roleId": "1470141312308216080",
+    "timezone": "Europe/Rome",
+    "enabled": true,
+    "lastSentKey": null
+  },
+  {
+    "name": "Shield Drop",
+    "id": "shield_drop",
+    "message": "Shield Drop",
+    "time": "20:00",
+    "cycleDays": 28,
+    "startDate": "2026-05-19",
+    "activeDays": [
+      0,
+      1,
+      2
+    ],
+    "channelId": "1434858215245484103",
+    "roleId": "1470141312308216080",
+    "timezone": "Europe/Rome",
+    "enabled": true,
+    "lastSentKey": null
+  }
+]
