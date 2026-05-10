@@ -50,5 +50,12 @@
     ],
     "type": "Dark",
     "category": "Immortal Leggendary LTD"
+  },
+  "makise": {
+    "roles": [
+      "Shield Fix DMG & Res Rage\nReduction DEBUFF"
+    ],
+    "type": "Light",
+    "category": "Blazing LTD"
   }
 }
