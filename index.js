@@ -32,6 +32,7 @@ const { handleRegister } = require("./commands/register");
 const { handleUnregister } = require("./commands/unregister");
 const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
+const { startAddNotify,handleAddNotifyFlow } = require("./commands/addnotify");
 
 // HERO FLOW
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
@@ -168,6 +169,7 @@ client.on("messageCreate", async (message) => {
   if (await handleAddGuideFlow(message)) return;
   if (await handleEditGuideFlow(message)) return;
   if (await handleRenameCategoryFlow(message)) return;
+  if (await handleAddNotifyFlow(message)) return;
 
   if (!message.content.startsWith(PREFIX)) return;
 
@@ -189,6 +191,7 @@ client.on("messageCreate", async (message) => {
   if (command === "unregister") return handleUnregister(message);
   if (command === "compare") return handleCompare(message);
   if (command === "start") return handleStart(message);
+  if (command === "addnotify") return startAddNotify(message);
 
   // HERO COMMAND
   const hero = command;
