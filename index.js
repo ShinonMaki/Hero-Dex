@@ -60,6 +60,12 @@ const { handleManageHeroButtons } = require("./interactions/manageHeroButtons");
 const { handleStartButtons } = require("./interactions/startButtons");
 
 const {
+  handleSuggestionButton,
+  handleSuggestionMessage,
+  handleSuggestionDone
+} = require("./interactions/suggestionButton");
+
+const {
   handleManageGuideButtons,
   handleRenameCategorySelect,
   handleRenameCategoryFlow
@@ -153,6 +159,8 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   if (isWrongCommandChannel(message)) return;
+
+  if (await handleSuggestionMessage(message)) return;
 
   if (await handleAddHeroFlow(message)) return;
   if (await handleDeleteHeroFlow(message)) return;
@@ -267,24 +275,30 @@ client.on("messageCreate", async (message) => {
   }
 
   await message.reply({
-  embeds: [embed],
-  components: [row],
-  files
-});
-
-if (hasVoice) {
-  await message.channel.send({
-    files: [
-      new AttachmentBuilder(voicePath, {
-        name: `${hero}.mp3`
-      })
-    ]
+    embeds: [embed],
+    components: [row],
+    files
   });
-}
+
+  if (hasVoice) {
+    await message.channel.send({
+      files: [
+        new AttachmentBuilder(voicePath, {
+          name: `${hero}.mp3`
+        })
+      ]
+    });
+  }
 });
 
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
+  if (interaction.isButton()) {
+    if (interaction.customId.startsWith("suggestion_done_")) {
+      return handleSuggestionDone(interaction);
+    }
+  }
+
   if (isWrongCommandChannel(interaction)) {
     if (interaction.isRepliable()) {
       return interaction.reply({
@@ -297,6 +311,10 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isButton()) {
+    if (interaction.customId === "start_suggestion") {
+      return handleSuggestionButton(interaction);
+    }
+
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
     }
@@ -404,7 +422,7 @@ function isInitialRealmWeek() {
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 
-  // Arena Tournament - every 2 days starting from 2026-05-06
+  // Arena Tournament - every 3 days starting from 2026-05-06
   cron.schedule(
     "0 22 * * *",
     async () => {
