@@ -64,5 +64,12 @@
     ],
     "type": "Dark",
     "category": "Blazing LTD"
+  },
+  "vergil": {
+    "roles": [
+      "Execute Dodge Burst"
+    ],
+    "type": "Chaos",
+    "category": "Blazing LTD"
   }
 }
