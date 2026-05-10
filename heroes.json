@@ -57,5 +57,12 @@
     ],
     "type": "Light",
     "category": "Blazing LTD"
+  },
+  "makima": {
+    "roles": [
+      "AOE CC Debuff"
+    ],
+    "type": "Dark",
+    "category": "Blazing LTD"
   }
 }
