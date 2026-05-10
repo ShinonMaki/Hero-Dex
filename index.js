@@ -396,26 +396,24 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-function isInitialRealmWeek() {
-  const now = new Date();
+function isInitialRealmPeriod() {
+  const startDate = new Date("2026-05-05T00:00:00");
 
-  const romeDate = new Date(
-    now.toLocaleString("en-US", { timeZone: "Europe/Rome" })
+  const now = new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: "Europe/Rome"
+    })
   );
 
-  const year = romeDate.getFullYear();
-  const month = romeDate.getMonth();
+  const diffDays = Math.floor(
+    (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
-  const firstDay = new Date(year, month, 1);
-  const firstDayOfWeek = firstDay.getDay();
+  if (diffDays < 0) return false;
 
-  const daysUntilTuesday = (2 - firstDayOfWeek + 7) % 7;
-  const firstTuesday = new Date(year, month, 1 + daysUntilTuesday);
+  const cycleDay = diffDays % 28;
 
-  const day = romeDate.getDate();
-  const firstTuesdayDate = firstTuesday.getDate();
-
-  return day >= firstTuesdayDate && day <= firstTuesdayDate + 2;
+  return cycleDay >= 0 && cycleDay <= 2;
 }
 
 // ===== DEBUG LOGIN =====
@@ -423,32 +421,28 @@ client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
 
   // Arena Tournament - every 3 days starting from 2026-05-06
-  cron.schedule(
-    "0 22 * * *",
-    async () => {
-      const startDate = new Date("2026-05-06T00:00:00");
+  cron.schedule("0 22 * * *", async () => {
+    const startDate = new Date("2026-05-06T00:00:00");
 
-      const now = new Date(
-        new Date().toLocaleString("en-US", {
-          timeZone: "Europe/Rome"
-        })
-      );
+    const now = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "Europe/Rome"
+      })
+    );
 
-      const diffDays = Math.floor(
-        (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
+    const diffDays = Math.floor(
+      (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
-      if (diffDays % 3 !== 0) return;
+    if (diffDays % 3 !== 0) return;
 
-      const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
-      if (!channel) return;
+    const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
+    if (!channel) return;
 
-      await channel.send({
-        content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
-      });
-    },
-    { timezone: "Europe/Rome" }
-  );
+    await channel.send({
+      content: `<@&${EVENT_ROLE_ID}> Arena tournament start`
+    });
+  }, { timezone: "Europe/Rome" });
 
   // Guild War
   cron.schedule("0 13 * * 1,3,5", async () => {
@@ -480,9 +474,9 @@ client.once("clientReady", () => {
     });
   }, { timezone: "Europe/Rome" });
 
-  // Initial Realm
+  // Initial Realm - every 28 days, active for 3 days at 11:00
   cron.schedule("0 11 * * 2,3,4", async () => {
-    if (!isInitialRealmWeek()) return;
+    if (!isInitialRealmPeriod()) return;
 
     const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
     if (!channel) return;
@@ -492,9 +486,9 @@ client.once("clientReady", () => {
     });
   }, { timezone: "Europe/Rome" });
 
-  // Ancient Battlefield
+  // Ancient Battlefield - every 28 days, active for 3 days at 20:00
   cron.schedule("0 20 * * 2,3,4", async () => {
-    if (!isInitialRealmWeek()) return;
+    if (!isInitialRealmPeriod()) return;
 
     const channel = await client.channels.fetch(EVENT_CHANNEL_ID);
     if (!channel) return;
