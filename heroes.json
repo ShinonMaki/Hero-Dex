@@ -71,5 +71,12 @@
     ],
     "type": "Chaos",
     "category": "Blazing LTD"
+  },
+  "frieren": {
+    "roles": [
+      "Rage Reduction\nDebuff"
+    ],
+    "type": "Light",
+    "category": "LTD Immortal Leggendary"
   }
 }
