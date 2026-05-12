@@ -34,6 +34,7 @@ const { handleUnregister } = require("./commands/unregister");
 const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
 const { startAddNotify,handleAddNotifyFlow } = require("./commands/addnotify");
+const { startNotificationRunner } = require("./utils/notificationRunner");
 
 // HERO FLOW
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
@@ -439,6 +440,8 @@ function isInitialRealmPeriod() {
 // ===== DEBUG LOGIN =====
 client.once("clientReady", () => {
   console.log(`Hero-Dex is online as ${client.user.tag}`);
+
+  startNotificationRunner(client);
 
   // Arena Tournament - every 3 days starting from 2026-05-06
   cron.schedule("0 22 * * *", async () => {
