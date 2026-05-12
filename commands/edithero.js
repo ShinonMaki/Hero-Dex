@@ -65,7 +65,10 @@ async function handleEditHeroFlow(message) {
 5 - Hero Image
 6 - PDF
 7 - Add Android Images
-8 - Replace Android Images`
+8 - Replace Android Images
+9 - From
+10 - Logo
+11 - Voice`
       );
       return true;
     }
@@ -74,12 +77,16 @@ async function handleEditHeroFlow(message) {
     if (session.step === 2) {
       session.data.mode = content;
 
+      if (!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"].includes(content)) {
+        return message.reply("Invalid option.");
+      }
+
       if (["7", "8"].includes(content)) {
         session.step = 10;
         return message.reply("Send images now. Write `done` when finished.");
       }
 
-      if (["5", "6"].includes(content)) {
+      if (["5", "6", "10", "11"].includes(content)) {
         session.step = 3;
         return message.reply("Send the new file.");
       }
@@ -88,9 +95,10 @@ async function handleEditHeroFlow(message) {
       return message.reply("Send new value.");
     }
 
-    // ===== IMAGE / PDF =====
-    if (session.step === 3 && ["5", "6"].includes(session.data.mode)) {
+    // ===== FILE EDIT: IMAGE / PDF / LOGO / VOICE =====
+    if (session.step === 3 && ["5", "6", "10", "11"].includes(session.data.mode)) {
       const hero = session.data.hero;
+      const mode = session.data.mode;
 
       if (message.attachments.size === 0) {
         await message.reply("Send file.");
@@ -100,7 +108,7 @@ async function handleEditHeroFlow(message) {
       const attachment = message.attachments.first();
       const ext = path.extname(attachment.name || "").toLowerCase();
 
-      if (session.data.mode === "5") {
+      if (mode === "5") {
         if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
           await message.reply("Please send a valid image file.");
           return true;
@@ -108,9 +116,10 @@ async function handleEditHeroFlow(message) {
 
         ensureDir("./images");
         await downloadAttachment(attachment.url, `./images/${hero}${ext}`);
+        gitCommitAndPush(`Update image for ${hero}`);
       }
 
-      if (session.data.mode === "6") {
+      if (mode === "6") {
         if (ext !== ".pdf") {
           await message.reply("Please send a valid PDF file.");
           return true;
@@ -118,11 +127,32 @@ async function handleEditHeroFlow(message) {
 
         ensureDir("./pdf");
         await downloadAttachment(attachment.url, `./pdf/${hero}.pdf`);
+        gitCommitAndPush(`Update PDF for ${hero}`);
       }
 
-      gitCommitAndPush(`Update file for ${hero}`);
-      heroEditSessions.delete(message.author.id);
+      if (mode === "10") {
+        if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
+          await message.reply("Please send a valid logo image file.");
+          return true;
+        }
 
+        ensureDir("./logos");
+        await downloadAttachment(attachment.url, `./logos/${hero}_logo${ext}`);
+        gitCommitAndPush(`Update logo for ${hero}`);
+      }
+
+      if (mode === "11") {
+        if (ext !== ".mp3") {
+          await message.reply("Please send a valid MP3 file.");
+          return true;
+        }
+
+        ensureDir("./voices");
+        await downloadAttachment(attachment.url, `./voices/${hero}.mp3`);
+        gitCommitAndPush(`Update voice for ${hero}`);
+      }
+
+      heroEditSessions.delete(message.author.id);
       return message.reply("File updated.");
     }
 
@@ -146,6 +176,13 @@ async function handleEditHeroFlow(message) {
 
         renameHeroFiles(hero, newName);
 
+        // Extra rename for logo and voice
+        renameFileIfExists(`./logos/${hero}_logo.png`, `./logos/${newName}_logo.png`);
+        renameFileIfExists(`./logos/${hero}_logo.jpg`, `./logos/${newName}_logo.jpg`);
+        renameFileIfExists(`./logos/${hero}_logo.jpeg`, `./logos/${newName}_logo.jpeg`);
+        renameFileIfExists(`./logos/${hero}_logo.webp`, `./logos/${newName}_logo.webp`);
+        renameFileIfExists(`./voices/${hero}.mp3`, `./voices/${newName}.mp3`);
+
         heroesData[newName] = heroesData[hero];
         delete heroesData[hero];
 
@@ -168,7 +205,16 @@ async function handleEditHeroFlow(message) {
       }
 
       if (mode === "4") {
-        heroesData[hero].category = rawContent;
+        const categories = rawContent
+          .split(";")
+          .map(c => c.trim())
+          .filter(Boolean);
+
+        heroesData[hero].category = categories.length === 1 ? categories[0] : categories;
+      }
+
+      if (mode === "9") {
+        heroesData[hero].from = rawContent;
       }
 
       saveHeroesJson();
@@ -231,6 +277,13 @@ async function handleEditHeroFlow(message) {
   }
 
   return false;
+}
+
+function renameFileIfExists(oldPath, newPath) {
+  if (!fs.existsSync(oldPath)) return;
+
+  ensureDir(path.dirname(newPath));
+  fs.renameSync(oldPath, newPath);
 }
 
 module.exports = {
