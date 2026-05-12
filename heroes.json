@@ -53,7 +53,8 @@
       "Taunt SpiritArmor"
     ],
     "type": "Dark",
-    "category": "Immortal Leggendary LTD"
+    "category": "Immortal Leggendary LTD",
+    "from": "The Eminence in Shadow"
   },
   "makise": {
     "roles": [
