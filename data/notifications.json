@@ -86,5 +86,21 @@
     "timezone": "Europe/Rome",
     "enabled": true,
     "lastSentKey": null
+  },
+  {
+    "name": "Auctions",
+    "id": "auctions",
+    "message": "Auctions Start",
+    "time": "13:00",
+    "cycleDays": 1,
+    "startDate": "2026-05-12",
+    "activeDays": [
+      0
+    ],
+    "channelId": "1434858215245484103",
+    "roleId": "1470141312308216080",
+    "timezone": "Europe/Rome",
+    "enabled": true,
+    "lastSentKey": null
   }
 ]
