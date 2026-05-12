@@ -194,104 +194,120 @@ client.on("messageCreate", async (message) => {
   if (command === "addnotify") return startAddNotify(message);
 
   // HERO COMMAND
-  const hero = command;
-  const data = heroesData[hero];
+const hero = command;
+const data = heroesData[hero];
 
-  const pdf = findPdf(hero);
-  if (!pdf) return;
+const pdf = findPdf(hero);
+if (!pdf) return;
 
-  const imageFile = findImage(hero);
+const imageFile = findImage(hero);
 
-  // ===== HERO LOGO SYSTEM =====
-  const heroLogoPath = `./logos/${hero}_logo.png`;
-  const fallbackLogoPath = "./images/logo.PNG";
+// ===== HERO LOGO SYSTEM =====
+const logoExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
-  const hasHeroLogo = fs.existsSync(heroLogoPath);
+let heroLogoPath = null;
 
-  const logoAttachmentName = hasHeroLogo
-    ? `${hero}_logo.png`
-    : "logo.png";
+for (const ext of logoExtensions) {
+  const possiblePath = `./logos/${hero}_logo${ext}`;
 
-  const logoAttachmentPath = hasHeroLogo
-    ? heroLogoPath
-    : fallbackLogoPath;
+  if (fs.existsSync(possiblePath)) {
+    heroLogoPath = possiblePath;
+    break;
+  }
+}
 
-  // ===== HERO VOICE SYSTEM =====
-  const voicePath = `./voices/${hero}.mp3`;
-  const hasVoice = fs.existsSync(voicePath);
+const fallbackLogoPath = "./images/logo.PNG";
 
-  const type = data?.type?.toLowerCase() || "default";
-  const color = typeColors[type] || typeColors.default;
+const hasHeroLogo = !!heroLogoPath;
 
-  const embed = new EmbedBuilder()
-    .setColor(color)
-    .setThumbnail(`attachment://${logoAttachmentName}`)
-    .setImage(imageFile ? `attachment://${hero}.png` : null)
-    .setFooter({ text: "Hero-Dex • YoRHa Guild" })
-    .addFields(
-      {
-        name: "Name",
-        value: hero.charAt(0).toUpperCase() + hero.slice(1)
-      },
-      {
-        name: "Role",
-        value: data?.roles?.join(", ") || "Unknown"
-      },
-      {
-        name: "Type",
-        value: data?.type || "Unknown"
-      },
-      {
-        name: "Category",
-        value: Array.isArray(data?.category)
-          ? data.category.join(", ")
-          : data?.category || "Unknown"
-      }
-    );
+const logoAttachmentName = hasHeroLogo
+  ? path.basename(heroLogoPath)
+  : "logo.png";
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`guide_${hero}`)
-      .setLabel("PREMIUM")
-      .setEmoji("💎")
-      .setStyle(ButtonStyle.Success),
+const logoAttachmentPath = hasHeroLogo
+  ? heroLogoPath
+  : fallbackLogoPath;
 
-    new ButtonBuilder()
-      .setCustomId(`android_${hero}`)
-      .setLabel("GUIDE")
-      .setEmoji("📖")
-      .setStyle(ButtonStyle.Primary)
+// ===== HERO VOICE SYSTEM =====
+const voicePath = `./voices/${hero}.mp3`;
+const hasVoice = fs.existsSync(voicePath);
+
+const type = data?.type?.toLowerCase() || "default";
+const color = typeColors[type] || typeColors.default;
+
+const embed = new EmbedBuilder()
+  .setColor(color)
+  .setThumbnail(`attachment://${logoAttachmentName}`)
+  .setImage(imageFile ? `attachment://${hero}.png` : null)
+  .setFooter({ text: "Hero-Dex • YoRHa Guild" })
+  .addFields(
+    {
+      name: "Name",
+      value: hero.charAt(0).toUpperCase() + hero.slice(1)
+    },
+    {
+      name: "From",
+      value: data?.from || "Unknown"
+    },
+    {
+      name: "Role",
+      value: data?.roles?.join(", ") || "Unknown"
+    },
+    {
+      name: "Type",
+      value: data?.type || "Unknown"
+    },
+    {
+      name: "Category",
+      value: Array.isArray(data?.category)
+        ? data.category.join(", ")
+        : data?.category || "Unknown"
+    }
   );
 
-  const files = [
-    new AttachmentBuilder(logoAttachmentPath, {
-      name: logoAttachmentName
+const row = new ActionRowBuilder().addComponents(
+  new ButtonBuilder()
+    .setCustomId(`guide_${hero}`)
+    .setLabel("PREMIUM")
+    .setEmoji("💎")
+    .setStyle(ButtonStyle.Success),
+
+  new ButtonBuilder()
+    .setCustomId(`android_${hero}`)
+    .setLabel("GUIDE")
+    .setEmoji("📖")
+    .setStyle(ButtonStyle.Primary)
+);
+
+const files = [
+  new AttachmentBuilder(logoAttachmentPath, {
+    name: logoAttachmentName
+  })
+];
+
+if (imageFile) {
+  files.push(
+    new AttachmentBuilder(`./images/${imageFile}`, {
+      name: `${hero}.png`
     })
-  ];
+  );
+}
 
-  if (imageFile) {
-    files.push(
-      new AttachmentBuilder(`./images/${imageFile}`, {
-        name: `${hero}.png`
+await message.reply({
+  embeds: [embed],
+  components: [row],
+  files
+});
+
+if (hasVoice) {
+  await message.channel.send({
+    files: [
+      new AttachmentBuilder(voicePath, {
+        name: `${hero}.mp3`
       })
-    );
-  }
-
-  await message.reply({
-    embeds: [embed],
-    components: [row],
-    files
+    ]
   });
-
-  if (hasVoice) {
-    await message.channel.send({
-      files: [
-        new AttachmentBuilder(voicePath, {
-          name: `${hero}.mp3`
-        })
-      ]
-    });
-  }
+}
 });
 
 // ===== INTERACTIONS =====
