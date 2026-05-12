@@ -62,7 +62,8 @@
       "Shield Fix DMG & Res Rage\nReduction DEBUFF"
     ],
     "type": "Light",
-    "category": "Blazing LTD"
+    "category": "Blazing LTD",
+    "from": "Steins;Gate"
   },
   "makima": {
     "roles": [
