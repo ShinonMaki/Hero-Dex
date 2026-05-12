@@ -24,6 +24,7 @@ async function startAddHero(message) {
     step: 1,
     data: {
       name: null,
+      from: null,
       roles: [],
       type: null,
       category: null
@@ -64,11 +65,23 @@ async function handleAddHeroFlow(message) {
       session.data.name = heroName;
       session.step = 2;
 
+      return message.reply("From? Example: `Frieren: Beyond Journey's End`");
+    }
+
+    // STEP 2 - FROM
+    if (session.step === 2) {
+      if (!rawContent) {
+        return message.reply("From?");
+      }
+
+      session.data.from = rawContent;
+      session.step = 3;
+
       return message.reply("Hero role?");
     }
 
-    // STEP 2 - ROLE
-    if (session.step === 2) {
+    // STEP 3 - ROLE
+    if (session.step === 3) {
       const roles = rawContent
         .split(",")
         .map(r => r.trim())
@@ -79,25 +92,25 @@ async function handleAddHeroFlow(message) {
       }
 
       session.data.roles = roles;
-      session.step = 3;
+      session.step = 4;
 
       return message.reply("Hero type?");
     }
 
-    // STEP 3 - TYPE
-    if (session.step === 3) {
+    // STEP 4 - TYPE
+    if (session.step === 4) {
       if (!rawContent) {
         return message.reply("Hero type?");
       }
 
       session.data.type = rawContent;
-      session.step = 4;
+      session.step = 5;
 
       return message.reply("Hero category?");
     }
 
-    // STEP 4 - CATEGORY
-    if (session.step === 4) {
+    // STEP 5 - CATEGORY
+    if (session.step === 5) {
       if (!rawContent) {
         return message.reply("Hero category?");
       }
@@ -108,13 +121,13 @@ async function handleAddHeroFlow(message) {
         .filter(Boolean);
 
       session.data.category = categories.length === 1 ? categories[0] : categories;
-      session.step = 5;
+      session.step = 6;
 
       return message.reply("Hero image? Send the file.");
     }
 
-    // STEP 5 - HERO IMAGE
-    if (session.step === 5) {
+    // STEP 6 - HERO IMAGE
+    if (session.step === 6) {
       if (message.attachments.size === 0) {
         return message.reply("Send the hero image.");
       }
@@ -129,12 +142,12 @@ async function handleAddHeroFlow(message) {
       ensureDir("./images");
       await downloadAttachment(attachment.url, `./images/${session.data.name}${ext}`);
 
-      session.step = 6;
+      session.step = 7;
       return message.reply("Hero PDF?");
     }
 
-    // STEP 6 - PDF
-    if (session.step === 6) {
+    // STEP 7 - PDF
+    if (session.step === 7) {
       if (message.attachments.size === 0) {
         return message.reply("Send the PDF.");
       }
@@ -149,24 +162,21 @@ async function handleAddHeroFlow(message) {
       ensureDir("./pdf");
       await downloadAttachment(attachment.url, `./pdf/${session.data.name}.pdf`);
 
-      session.step = 7;
+      session.step = 8;
       return message.reply("Add Android images? (yes/no)");
     }
 
-    // STEP 7 - YES/NO
-    if (session.step === 7) {
+    // STEP 8 - ANDROID YES/NO
+    if (session.step === 8) {
       if (content !== "yes" && content !== "no") {
         return message.reply("Reply with yes or no.");
       }
 
       if (content === "no") {
-        finalizeHero(session.data);
-        heroCreationSessions.delete(message.author.id);
-
-        return message.reply(`Hero added: ${formatFileLabel(session.data.name)}`);
+        session.step = 10;
+        return message.reply("Hero logo? Send the file or write `no`.");
       }
 
-      // CLEAN FOLDER (IMPORTANT)
       const folder = path.join("./hero-guide-images", session.data.name);
 
       if (fs.existsSync(folder)) {
@@ -175,17 +185,15 @@ async function handleAddHeroFlow(message) {
 
       ensureDir(folder);
 
-      session.step = 8;
+      session.step = 9;
       return message.reply("Send Android images. Write `done` when finished.");
     }
 
-    // STEP 8 - ANDROID IMAGES
-    if (session.step === 8) {
+    // STEP 9 - ANDROID IMAGES
+    if (session.step === 9) {
       if (content === "done") {
-        finalizeHero(session.data);
-        heroCreationSessions.delete(message.author.id);
-
-        return message.reply(`Hero added: ${formatFileLabel(session.data.name)}`);
+        session.step = 10;
+        return message.reply("Hero logo? Send the file or write `no`.");
       }
 
       if (message.attachments.size === 0) {
@@ -193,7 +201,7 @@ async function handleAddHeroFlow(message) {
       }
 
       const folder = path.join("./hero-guide-images", session.data.name);
-      const files = fs.readdirSync(folder);
+      const files = fs.existsSync(folder) ? fs.readdirSync(folder) : [];
 
       let index = files.length + 1;
 
@@ -210,6 +218,66 @@ async function handleAddHeroFlow(message) {
       return message.reply("Images added. Continue or write `done`.");
     }
 
+    // STEP 10 - LOGO
+    if (session.step === 10) {
+      if (content === "no") {
+        session.step = 11;
+        return message.reply("Hero voice? Send an MP3 file or write `no`.");
+      }
+
+      if (message.attachments.size === 0) {
+        return message.reply("Send the hero logo or write `no`.");
+      }
+
+      const attachment = message.attachments.first();
+      const ext = path.extname(attachment.name || "").toLowerCase();
+
+      if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) {
+        return message.reply("Invalid logo format. Send PNG/JPG/WEBP or write `no`.");
+      }
+
+      ensureDir("./logos");
+      await downloadAttachment(
+        attachment.url,
+        `./logos/${session.data.name}_logo${ext}`
+      );
+
+      session.step = 11;
+      return message.reply("Hero voice? Send an MP3 file or write `no`.");
+    }
+
+    // STEP 11 - VOICE
+    if (session.step === 11) {
+      if (content === "no") {
+        finalizeHero(session.data);
+        heroCreationSessions.delete(message.author.id);
+
+        return message.reply(`Hero added: ${formatFileLabel(session.data.name)}`);
+      }
+
+      if (message.attachments.size === 0) {
+        return message.reply("Send the hero voice MP3 or write `no`.");
+      }
+
+      const attachment = message.attachments.first();
+      const ext = path.extname(attachment.name || "").toLowerCase();
+
+      if (ext !== ".mp3") {
+        return message.reply("Invalid voice format. Send MP3 or write `no`.");
+      }
+
+      ensureDir("./voices");
+      await downloadAttachment(
+        attachment.url,
+        `./voices/${session.data.name}.mp3`
+      );
+
+      finalizeHero(session.data);
+      heroCreationSessions.delete(message.author.id);
+
+      return message.reply(`Hero added: ${formatFileLabel(session.data.name)}`);
+    }
+
   } catch (err) {
     console.error("Add hero error:", err);
     heroCreationSessions.delete(message.author.id);
@@ -222,6 +290,7 @@ async function handleAddHeroFlow(message) {
 
 function finalizeHero(data) {
   heroesData[data.name] = {
+    from: data.from,
     roles: data.roles,
     type: data.type,
     category: data.category
