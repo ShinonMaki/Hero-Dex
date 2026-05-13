@@ -107,9 +107,18 @@ app.post("/github-webhook", async (req, res) => {
   try {
     const commits = req.body.commits ?? [];
 
-    if (commits.length === 0) {
-      return res.sendStatus(200);
-    }
+const visibleCommits = commits.filter(commit => {
+  const message = commit.message?.toLowerCase() || "";
+
+  return (
+    !message.includes("update notifications") &&
+    !message.includes("[skip notify]")
+  );
+});
+
+if (visibleCommits.length === 0) {
+  return res.sendStatus(200);
+}
 
     const channel = await client.channels.fetch(UPDATE_CHANNEL_ID).catch(() => null);
 
@@ -117,7 +126,7 @@ app.post("/github-webhook", async (req, res) => {
       return res.sendStatus(200);
     }
 
-    const description = commits
+    const description = visibleCommits
       .map(commit => `• ${commit.message}`)
       .slice(0, 10)
       .join("\n");
