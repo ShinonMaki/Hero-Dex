@@ -88,5 +88,13 @@
     "type": "Light",
     "category": "LTD Immortal Leggendary",
     "from": "Frieren: Beyond Journey’s End"
+  },
+  "gilgamesh": {
+    "from": "Fate/Zero, Fate/stay night: Unlimited Blade Works, Fate/stay night: Heaven’s Feel, Fate/Grand Order: Absolute Demonic Front-Babylonia",
+    "roles": [
+      "RNG Buff DPS"
+    ],
+    "type": "Light",
+    "category": "Immortal Leggendary"
   }
 }
