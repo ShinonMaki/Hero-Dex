@@ -96,5 +96,13 @@
     ],
     "type": "Light",
     "category": "LTD Immortal Leggendary"
+  },
+  "homura": {
+    "from": "Puella Magi Madoka Magica",
+    "roles": [
+      "Buff Debuff Curse"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
