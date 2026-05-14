@@ -35,6 +35,8 @@ const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
 const { startAddNotify,handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
+const { bonusSessions } = require("./sessions/bonusSessions");
+const heroBonusScores = require("./data/heroBonusScores.json");
 
 // HERO FLOW
 const { startAddHero, handleAddHeroFlow } = require("./commands/addhero");
@@ -342,13 +344,18 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isButton()) {
     if (interaction.customId === "start_bonus") {
-    await interaction.reply({
-      content:
-        "Which hero do you want to check bonuses for?\nExample: `lux`",
-      ephemeral: true
-    });
-    return;
-  }
+  bonusSessions.set(interaction.user.id, {
+    step: "hero"
+  });
+
+  await interaction.reply({
+    content:
+      "Which hero do you want to check bonuses for?\nExample: `lux`",
+    ephemeral: true
+  });
+
+  return;
+}
 
   if (interaction.customId === "start_suggestion") {
     return handleSuggestionButton(interaction);
