@@ -146,54 +146,246 @@
   },
 
   "madara": {
-    "taurus": {
-      "label": "Long Fight DPS",
+  "taurus": {
+    "label": "Long Fight Hyper Carry",
 
-      "weapon": {
-        "atk": 10,
-        "hp": 9,
-        "hpRegen": 4,
-        "hitRate": 3,
-        "dodge": 5,
-        "hpBonus": 7,
-        "critReduction": 6,
-        "dmgReduction": 8
-      },
+    "weapon": {
+      "atk": 10,
+      "hp": 9,
+      "hpRegen": 4,
+      "hitRate": 5,
+      "dodge": 5,
+      "hpBonus": 8,
+      "critReduction": 6,
+      "dmgReduction": 9
+    },
 
-      "armor": {
-        "atk": 10,
-        "hp": 9,
-        "hpRegen": 4,
-        "hitRate": 3,
-        "dodge": 5,
-        "hpBonus": 7,
-        "critReduction": 6,
-        "dmgReduction": 8
-      },
+    "armor": {
+      "atk": 10,
+      "hp": 9,
+      "hpRegen": 4,
+      "hitRate": 5,
+      "dodge": 5,
+      "hpBonus": 8,
+      "critReduction": 6,
+      "dmgReduction": 9
+    },
 
-      "helm": {
-        "atk": 9,
-        "hp": 7,
-        "hpRegen": 1,
-        "hitRate": 5,
-        "dodge": 2,
-        "atkBonus": 10,
-        "critDmg": 9,
-        "dmgBonus": 10
-      },
+    "helm": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 1,
+      "hitRate": 6,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    },
 
-      "accessory": {
-        "atk": 9,
-        "hp": 7,
-        "hpRegen": 1,
-        "hitRate": 5,
-        "dodge": 2,
-        "atkBonus": 10,
-        "critDmg": 9,
-        "dmgBonus": 10
-      }
+    "accessory": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 1,
+      "hitRate": 6,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
     }
   },
+
+  "sagittarius": {
+    "label": "Burst Whale",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 7,
+      "dodge": 3,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 7,
+      "dodge": 3,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    }
+  },
+
+  "cancer": {
+    "label": "Lotus Crit Build",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 3,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 3,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    }
+  },
+
+  "gemini": {
+    "label": "Utility Rage Control",
+
+    "weapon": {
+      "atk": 7,
+      "hp": 8,
+      "hpRegen": 4,
+      "hitRate": 10,
+      "dodge": 6,
+      "hpBonus": 7,
+      "critReduction": 6,
+      "dmgReduction": 8
+    },
+
+    "armor": {
+      "atk": 7,
+      "hp": 8,
+      "hpRegen": 4,
+      "hitRate": 10,
+      "dodge": 6,
+      "hpBonus": 7,
+      "critReduction": 6,
+      "dmgReduction": 8
+    },
+
+    "helm": {
+      "atk": 7,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 10,
+      "dodge": 4,
+      "atkBonus": 8,
+      "critDmg": 6,
+      "dmgBonus": 7
+    },
+
+    "accessory": {
+      "atk": 7,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 10,
+      "dodge": 4,
+      "atkBonus": 8,
+      "critDmg": 6,
+      "dmgBonus": 7
+    }
+  },
+
+  "leo": {
+    "label": "Anti Tank DPS",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 4,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 4,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 7,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 8,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 7,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 8,
+      "dmgBonus": 10
+    }
+  }
+},
 "rimuru": {
   "sagittarius": {
     "label": "Burst DPS",
