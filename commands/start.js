@@ -33,6 +33,10 @@ async function handleStart(message) {
         value: "Show the list of available heroes."
       },
       {
+        name: "bonus build",
+        value: "Check the recommended clothes bonus scores for a hero."
+      },
+      {
         name: "suggestion",
         value: "Send a suggestion to improve Hero-Dex."
       },
@@ -73,6 +77,12 @@ async function handleStart(message) {
   );
 
   const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("start_bonus")
+      .setLabel("Bonus Build")
+      .setEmoji("⚙️")
+      .setStyle(ButtonStyle.Primary),
+
     new ButtonBuilder()
       .setCustomId("start_suggestion")
       .setLabel("Suggestion")
