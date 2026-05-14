@@ -143,5 +143,200 @@
         "dmgBonus": 4
       }
     }
+  },
+
+  "madara": {
+    "taurus": {
+      "label": "Long Fight DPS",
+
+      "weapon": {
+        "atk": 10,
+        "hp": 9,
+        "hpRegen": 4,
+        "hitRate": 3,
+        "dodge": 5,
+        "hpBonus": 7,
+        "critReduction": 6,
+        "dmgReduction": 8
+      },
+
+      "armor": {
+        "atk": 10,
+        "hp": 9,
+        "hpRegen": 4,
+        "hitRate": 3,
+        "dodge": 5,
+        "hpBonus": 7,
+        "critReduction": 6,
+        "dmgReduction": 8
+      },
+
+      "helm": {
+        "atk": 9,
+        "hp": 7,
+        "hpRegen": 1,
+        "hitRate": 5,
+        "dodge": 2,
+        "atkBonus": 10,
+        "critDmg": 9,
+        "dmgBonus": 10
+      },
+
+      "accessory": {
+        "atk": 9,
+        "hp": 7,
+        "hpRegen": 1,
+        "hitRate": 5,
+        "dodge": 2,
+        "atkBonus": 10,
+        "critDmg": 9,
+        "dmgBonus": 10
+      }
+    }
+  },
+"rimuru": {
+  "sagittarius": {
+    "label": "Burst DPS",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 4,
+      "dodge": 5,
+      "hpBonus": 7,
+      "critReduction": 5,
+      "dmgReduction": 7.5
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 4,
+      "dodge": 5,
+      "hpBonus": 7,
+      "critReduction": 5,
+      "dmgReduction": 7.5
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 5,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9.5
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 5,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9.5
+    }
+  },
+
+  "taurus": {
+    "label": "Sustain DPS",
+
+    "weapon": {
+      "atk": 7,
+      "hp": 10,
+      "hpRegen": 5,
+      "hitRate": 3,
+      "dodge": 6,
+      "hpBonus": 9,
+      "critReduction": 7,
+      "dmgReduction": 9
+    },
+
+    "armor": {
+      "atk": 7,
+      "hp": 10,
+      "hpRegen": 5,
+      "hitRate": 3,
+      "dodge": 6,
+      "hpBonus": 9,
+      "critReduction": 7,
+      "dmgReduction": 9
+    },
+
+    "helm": {
+      "atk": 7,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 4,
+      "dodge": 5,
+      "atkBonus": 9,
+      "critDmg": 8,
+      "dmgBonus": 8
+    },
+
+    "accessory": {
+      "atk": 7,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 4,
+      "dodge": 5,
+      "atkBonus": 9,
+      "critDmg": 8,
+      "dmgBonus": 8
+    }
+  },
+
+  "cancer": {
+    "label": "Niche Crit Build",
+
+    "weapon": {
+      "atk": 8,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 4,
+      "dodge": 4,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 8,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 4,
+      "dodge": 4,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 5,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 5,
+      "dodge": 2,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    }
   }
+}
 }
