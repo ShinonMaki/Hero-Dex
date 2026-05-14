@@ -16,7 +16,8 @@ const {
   AttachmentBuilder,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle
+  ButtonStyle,
+  StringSelectMenuBuilder
 } = require("discord.js");
 
 const { PREFIX, typeColors } = require("./config/constants");
@@ -33,8 +34,9 @@ const { handleRegister } = require("./commands/register");
 const { handleUnregister } = require("./commands/unregister");
 const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
-const { startAddNotify,handleAddNotifyFlow } = require("./commands/addnotify");
+const { startAddNotify, handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
+
 const { bonusSessions } = require("./sessions/bonusSessions");
 const heroBonusScores = require("./data/heroBonusScores.json");
 
@@ -90,6 +92,96 @@ const EVENT_ROLE_ID = "1470141312308216080";
 const RESTRICTED_GUILD_ID = "1434845553815982104";
 const ALLOWED_COMMAND_CHANNEL_ID = "1501588339776815144";
 
+// ===== BONUS HELPERS =====
+const bonusNames = {
+  atk: "ATK",
+  hp: "HP",
+  hpRegen: "HP Regen per Second",
+  hitRate: "Hit Rate",
+  dodge: "Dodge",
+  hpBonus: "HP Bonus %",
+  atkBonus: "ATK Bonus %",
+  critReduction: "CRIT Reduction",
+  critDmg: "CRIT DMG",
+  dmgReduction: "DMG Reduction",
+  dmgBonus: "DMG Bonus"
+};
+
+const clothesEmojis = {
+  aries: "♈",
+  taurus: "♉",
+  gemini: "♊",
+  cancer: "♋",
+  leo: "♌",
+  virgo: "♍",
+  libra: "♎",
+  scorpio: "♏",
+  sagittarius: "♐",
+  capricorn: "♑",
+  aquarius: "♒",
+  aqua: "♒",
+  pisces: "♓"
+};
+
+function formatHeroName(hero) {
+  return hero.charAt(0).toUpperCase() + hero.slice(1);
+}
+
+function formatBuildName(build) {
+  return build.charAt(0).toUpperCase() + build.slice(1);
+}
+
+function formatBonusList(pieceData) {
+  return Object.entries(pieceData)
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, value]) => `• **${bonusNames[key] || key}**: ${value}/10`)
+    .join("\n");
+}
+
+function buildBonusEmbed(hero, build) {
+  const heroData = heroBonusScores[hero];
+  const buildData = heroData?.[build];
+
+  if (!buildData) return null;
+
+  const emoji = clothesEmojis[build] || "⚙️";
+
+  return new EmbedBuilder()
+    .setColor(0xFF2D95)
+    .setTitle(`${emoji} ${formatHeroName(hero)} • ${formatBuildName(build)}`)
+    .setDescription(`**Build Type:** ${buildData.label}`)
+    .addFields(
+      {
+        name: "⚔ Weapon",
+        value: formatBonusList(buildData.weapon),
+        inline: false
+      },
+      {
+        name: "🛡 Armor",
+        value: formatBonusList(buildData.armor),
+        inline: false
+      },
+      {
+        name: "👑 Helm",
+        value: formatBonusList(buildData.helm),
+        inline: false
+      },
+      {
+        name: "📿 Accessory",
+        value: formatBonusList(buildData.accessory),
+        inline: false
+      },
+      {
+        name: "Legend",
+        value:
+          "10 = Must Have\n8-9 = Very Strong\n6-7 = Good\n4-5 = Situational\n1-3 = Low Value",
+        inline: false
+      }
+    )
+    .setFooter({ text: "Hero-Dex • Bonus Build System" })
+    .setTimestamp();
+}
+
 // ===== BOT =====
 const client = new Client({
   intents: [
@@ -109,18 +201,18 @@ app.post("/github-webhook", async (req, res) => {
   try {
     const commits = req.body.commits ?? [];
 
-const visibleCommits = commits.filter(commit => {
-  const message = commit.message?.toLowerCase() || "";
+    const visibleCommits = commits.filter(commit => {
+      const message = commit.message?.toLowerCase() || "";
 
-  return (
-    !message.includes("update notifications") &&
-    !message.includes("[skip notify]")
-  );
-});
+      return (
+        !message.includes("update notifications") &&
+        !message.includes("[skip notify]")
+      );
+    });
 
-if (visibleCommits.length === 0) {
-  return res.sendStatus(200);
-}
+    if (visibleCommits.length === 0) {
+      return res.sendStatus(200);
+    }
 
     const channel = await client.channels.fetch(UPDATE_CHANNEL_ID).catch(() => null);
 
@@ -174,6 +266,43 @@ client.on("messageCreate", async (message) => {
 
   if (isWrongCommandChannel(message)) return;
 
+  // ===== BONUS BUILD FLOW =====
+  const bonusSession = bonusSessions.get(message.author.id);
+
+  if (bonusSession?.step === "hero") {
+    const hero = message.content.trim().toLowerCase();
+
+    if (!heroBonusScores[hero]) {
+      return message.reply("Hero not found. Please try again.\nExample: `lux`");
+    }
+
+    const heroData = heroBonusScores[hero];
+
+    const options = Object.entries(heroData).map(([build, data]) => {
+      const emoji = clothesEmojis[build];
+
+      return {
+        label: `${formatBuildName(build)} • ${data.label}`,
+        value: `${hero}__${build}`,
+        emoji: emoji || undefined
+      };
+    });
+
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`bonus_build_select_${message.author.id}`)
+        .setPlaceholder("Select a build")
+        .addOptions(options)
+    );
+
+    bonusSessions.delete(message.author.id);
+
+    return message.reply({
+      content: `Available builds for **${formatHeroName(hero)}**:`,
+      components: [row]
+    });
+  }
+
   if (await handleSuggestionMessage(message)) return;
 
   if (await handleAddHeroFlow(message)) return;
@@ -207,120 +336,119 @@ client.on("messageCreate", async (message) => {
   if (command === "addnotify") return startAddNotify(message);
 
   // HERO COMMAND
-const hero = command;
-const data = heroesData[hero];
+  const hero = command;
+  const data = heroesData[hero];
 
-const pdf = findPdf(hero);
-if (!pdf) return;
+  const pdf = findPdf(hero);
+  if (!pdf) return;
 
-const imageFile = findImage(hero);
+  const imageFile = findImage(hero);
 
-// ===== HERO LOGO SYSTEM =====
-const logoExtensions = [".png", ".jpg", ".jpeg", ".webp"];
+  // ===== HERO LOGO SYSTEM =====
+  const logoExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
-let heroLogoPath = null;
+  let heroLogoPath = null;
 
-for (const ext of logoExtensions) {
-  const possiblePath = `./logos/${hero}_logo${ext}`;
+  for (const ext of logoExtensions) {
+    const possiblePath = `./logos/${hero}_logo${ext}`;
 
-  if (fs.existsSync(possiblePath)) {
-    heroLogoPath = possiblePath;
-    break;
-  }
-}
-
-const fallbackLogoPath = "./images/logo.PNG";
-
-const hasHeroLogo = !!heroLogoPath;
-
-const logoAttachmentName = hasHeroLogo
-  ? path.basename(heroLogoPath)
-  : "logo.png";
-
-const logoAttachmentPath = hasHeroLogo
-  ? heroLogoPath
-  : fallbackLogoPath;
-
-// ===== HERO VOICE SYSTEM =====
-const voicePath = `./voices/${hero}.mp3`;
-const hasVoice = fs.existsSync(voicePath);
-
-const type = data?.type?.toLowerCase() || "default";
-const color = typeColors[type] || typeColors.default;
-
-const embed = new EmbedBuilder()
-  .setColor(color)
-  .setThumbnail(`attachment://${logoAttachmentName}`)
-  .setImage(imageFile ? `attachment://${hero}.png` : null)
-  .setFooter({ text: "Hero-Dex • YoRHa Guild" })
-  .addFields(
-    {
-      name: "Name",
-      value: hero.charAt(0).toUpperCase() + hero.slice(1)
-    },
-    {
-      name: "From",
-      value: data?.from || "Unknown"
-    },
-    {
-      name: "Role",
-      value: data?.roles?.join(", ") || "Unknown"
-    },
-    {
-      name: "Type",
-      value: data?.type || "Unknown"
-    },
-    {
-      name: "Category",
-      value: Array.isArray(data?.category)
-        ? data.category.join(", ")
-        : data?.category || "Unknown"
+    if (fs.existsSync(possiblePath)) {
+      heroLogoPath = possiblePath;
+      break;
     }
+  }
+
+  const fallbackLogoPath = "./images/logo.PNG";
+  const hasHeroLogo = !!heroLogoPath;
+
+  const logoAttachmentName = hasHeroLogo
+    ? path.basename(heroLogoPath)
+    : "logo.png";
+
+  const logoAttachmentPath = hasHeroLogo
+    ? heroLogoPath
+    : fallbackLogoPath;
+
+  // ===== HERO VOICE SYSTEM =====
+  const voicePath = `./voices/${hero}.mp3`;
+  const hasVoice = fs.existsSync(voicePath);
+
+  const type = data?.type?.toLowerCase() || "default";
+  const color = typeColors[type] || typeColors.default;
+
+  const embed = new EmbedBuilder()
+    .setColor(color)
+    .setThumbnail(`attachment://${logoAttachmentName}`)
+    .setImage(imageFile ? `attachment://${hero}.png` : null)
+    .setFooter({ text: "Hero-Dex • YoRHa Guild" })
+    .addFields(
+      {
+        name: "Name",
+        value: hero.charAt(0).toUpperCase() + hero.slice(1)
+      },
+      {
+        name: "From",
+        value: data?.from || "Unknown"
+      },
+      {
+        name: "Role",
+        value: data?.roles?.join(", ") || "Unknown"
+      },
+      {
+        name: "Type",
+        value: data?.type || "Unknown"
+      },
+      {
+        name: "Category",
+        value: Array.isArray(data?.category)
+          ? data.category.join(", ")
+          : data?.category || "Unknown"
+      }
+    );
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`guide_${hero}`)
+      .setLabel("PREMIUM")
+      .setEmoji("💎")
+      .setStyle(ButtonStyle.Success),
+
+    new ButtonBuilder()
+      .setCustomId(`android_${hero}`)
+      .setLabel("GUIDE")
+      .setEmoji("📖")
+      .setStyle(ButtonStyle.Primary)
   );
 
-const row = new ActionRowBuilder().addComponents(
-  new ButtonBuilder()
-    .setCustomId(`guide_${hero}`)
-    .setLabel("PREMIUM")
-    .setEmoji("💎")
-    .setStyle(ButtonStyle.Success),
-
-  new ButtonBuilder()
-    .setCustomId(`android_${hero}`)
-    .setLabel("GUIDE")
-    .setEmoji("📖")
-    .setStyle(ButtonStyle.Primary)
-);
-
-const files = [
-  new AttachmentBuilder(logoAttachmentPath, {
-    name: logoAttachmentName
-  })
-];
-
-if (imageFile) {
-  files.push(
-    new AttachmentBuilder(`./images/${imageFile}`, {
-      name: `${hero}.png`
+  const files = [
+    new AttachmentBuilder(logoAttachmentPath, {
+      name: logoAttachmentName
     })
-  );
-}
+  ];
 
-await message.reply({
-  embeds: [embed],
-  components: [row],
-  files
-});
-
-if (hasVoice) {
-  await message.channel.send({
-    files: [
-      new AttachmentBuilder(voicePath, {
-        name: `${hero}.mp3`
+  if (imageFile) {
+    files.push(
+      new AttachmentBuilder(`./images/${imageFile}`, {
+        name: `${hero}.png`
       })
-    ]
+    );
+  }
+
+  await message.reply({
+    embeds: [embed],
+    components: [row],
+    files
   });
-}
+
+  if (hasVoice) {
+    await message.channel.send({
+      files: [
+        new AttachmentBuilder(voicePath, {
+          name: `${hero}.mp3`
+        })
+      ]
+    });
+  }
 });
 
 // ===== INTERACTIONS =====
@@ -344,22 +472,22 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isButton()) {
     if (interaction.customId === "start_bonus") {
-  bonusSessions.set(interaction.user.id, {
-    step: "hero"
-  });
+      bonusSessions.set(interaction.user.id, {
+        step: "hero"
+      });
 
-  await interaction.reply({
-    content:
-      "Which hero do you want to check bonuses for?\nExample: `lux`",
-    ephemeral: true
-  });
+      await interaction.reply({
+        content:
+          "Which hero do you want to check bonuses for?\nExample: `lux`",
+        ephemeral: true
+      });
 
-  return;
-}
+      return;
+    }
 
-  if (interaction.customId === "start_suggestion") {
-    return handleSuggestionButton(interaction);
-  }
+    if (interaction.customId === "start_suggestion") {
+      return handleSuggestionButton(interaction);
+    }
 
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
@@ -412,6 +540,32 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isStringSelectMenu()) {
+    if (interaction.customId.startsWith("bonus_build_select_")) {
+      const allowedUserId = interaction.customId.replace("bonus_build_select_", "");
+
+      if (interaction.user.id !== allowedUserId) {
+        return interaction.reply({
+          content: "This bonus menu is not for you.",
+          ephemeral: true
+        });
+      }
+
+      const [hero, build] = interaction.values[0].split("__");
+      const embed = buildBonusEmbed(hero, build);
+
+      if (!embed) {
+        return interaction.reply({
+          content: "Bonus build not found.",
+          ephemeral: true
+        });
+      }
+
+      return interaction.reply({
+        embeds: [embed],
+        ephemeral: false
+      });
+    }
+
     if (interaction.customId === "tierlist_menu") {
       return handleTierlistMenu(interaction);
     }
