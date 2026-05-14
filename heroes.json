@@ -104,5 +104,13 @@
     ],
     "type": "Dark",
     "category": "LTD Immortal Leggendary"
+  },
+  "kafka": {
+    "from": "Kaiju No. 8",
+    "roles": [
+      "Block Buff Stack\nBurst"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
