@@ -341,9 +341,18 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   if (interaction.isButton()) {
-    if (interaction.customId === "start_suggestion") {
-      return handleSuggestionButton(interaction);
-    }
+    if (interaction.customId === "start_bonus") {
+    await interaction.reply({
+      content:
+        "Which hero do you want to check bonuses for?\nExample: `lux`",
+      ephemeral: true
+    });
+    return;
+  }
+
+  if (interaction.customId === "start_suggestion") {
+    return handleSuggestionButton(interaction);
+  }
 
     if (interaction.customId.startsWith("start_")) {
       return handleStartButtons(interaction);
