@@ -112,5 +112,13 @@
     ],
     "type": "Dark",
     "category": "LTD Immortal Leggendary"
+  },
+  "lelouch": {
+    "from": "Code Geass: Lelouch of the Rebellion",
+    "roles": [
+      "Taunt SpiritArmor"
+    ],
+    "type": "Light",
+    "category": "LTD Immortal Leggendary"
   }
 }
