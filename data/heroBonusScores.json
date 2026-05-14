@@ -1,1 +1,147 @@
-{}
+{
+  "lux": {
+    "scorpio": {
+      "label": "Full Tank",
+
+      "weapon": {
+        "atk": 2,
+        "hp": 10,
+        "hpRegen": 7,
+        "hitRate": 1,
+        "dodge": 8,
+        "hpBonus": 10,
+        "critReduction": 9,
+        "dmgReduction": 10
+      },
+
+      "armor": {
+        "atk": 2,
+        "hp": 10,
+        "hpRegen": 7,
+        "hitRate": 1,
+        "dodge": 8,
+        "hpBonus": 10,
+        "critReduction": 9,
+        "dmgReduction": 10
+      },
+
+      "helm": {
+        "atk": 4,
+        "hp": 10,
+        "hpRegen": 5,
+        "hitRate": 2,
+        "dodge": 5,
+        "atkBonus": 6,
+        "critDmg": 1,
+        "dmgBonus": 4
+      },
+
+      "accessory": {
+        "atk": 4,
+        "hp": 10,
+        "hpRegen": 5,
+        "hitRate": 2,
+        "dodge": 5,
+        "atkBonus": 6,
+        "critDmg": 1,
+        "dmgBonus": 4
+      }
+    },
+
+    "libra": {
+      "label": "Safe Tank",
+
+      "weapon": {
+        "atk": 3,
+        "hp": 10,
+        "hpRegen": 6,
+        "hitRate": 1,
+        "dodge": 8,
+        "hpBonus": 9,
+        "critReduction": 9,
+        "dmgReduction": 10
+      },
+
+      "armor": {
+        "atk": 3,
+        "hp": 10,
+        "hpRegen": 6,
+        "hitRate": 1,
+        "dodge": 8,
+        "hpBonus": 9,
+        "critReduction": 9,
+        "dmgReduction": 10
+      },
+
+      "helm": {
+        "atk": 4,
+        "hp": 9,
+        "hpRegen": 5,
+        "hitRate": 2,
+        "dodge": 5,
+        "atkBonus": 6,
+        "critDmg": 1,
+        "dmgBonus": 4
+      },
+
+      "accessory": {
+        "atk": 4,
+        "hp": 9,
+        "hpRegen": 5,
+        "hitRate": 2,
+        "dodge": 5,
+        "atkBonus": 6,
+        "critDmg": 1,
+        "dmgBonus": 4
+      }
+    },
+
+    "virgo": {
+      "label": "Healer",
+
+      "weapon": {
+        "atk": 8,
+        "hp": 8,
+        "hpRegen": 7,
+        "hitRate": 2,
+        "dodge": 5,
+        "hpBonus": 8,
+        "critReduction": 7,
+        "dmgReduction": 8
+      },
+
+      "armor": {
+        "atk": 8,
+        "hp": 8,
+        "hpRegen": 7,
+        "hitRate": 2,
+        "dodge": 5,
+        "hpBonus": 8,
+        "critReduction": 7,
+        "dmgReduction": 8
+      },
+
+      "helm": {
+        "atk": 9,
+        "hp": 8,
+        "hpRegen": 5,
+        "hitRate": 4,
+        "dodge": 5,
+        "atkBonus": 10,
+        "critDmg": 1,
+        "dmgBonus": 4
+      },
+
+      "accessory": {
+        "atk": 9,
+        "hp": 8,
+        "hpRegen": 5,
+        "hitRate": 4,
+        "dodge": 5,
+        "atkBonus": 10,
+        "critDmg": 1,
+        "dmgBonus": 4
+      }
+    }
+  }
+}
