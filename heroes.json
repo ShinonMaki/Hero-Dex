@@ -120,5 +120,13 @@
     ],
     "type": "Light",
     "category": "LTD Immortal Leggendary"
+  },
+  "mina": {
+    "from": "Kaiju No. 8",
+    "roles": [
+      "Technique DPS Burst"
+    ],
+    "type": "Light",
+    "category": "LTD Immortal Leggendary"
   }
 }
