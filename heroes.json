@@ -128,5 +128,13 @@
     ],
     "type": "Light",
     "category": "LTD Immortal Leggendary"
+  },
+  "muzan": {
+    "from": "Demon Slayer",
+    "roles": [
+      "AOE Buff Debuff"
+    ],
+    "type": "Chaos",
+    "category": "LTD Immortal Leggendary"
   }
 }
