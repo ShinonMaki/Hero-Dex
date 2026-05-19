@@ -136,5 +136,13 @@
     ],
     "type": "Chaos",
     "category": "LTD Immortal Leggendary"
+  },
+  "remram": {
+    "from": "Re:ZERO -Starting Life in Another World-, Re:ZERO -Starting Life in Another World- Memory Snow, Re:ZERO -Starting Life in Another World- The Frozen Bond",
+    "roles": [
+      "Healing Buff Debuff"
+    ],
+    "type": "Light",
+    "category": "LDT Immortal Leggendary"
   }
 }
