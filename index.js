@@ -36,6 +36,7 @@ const { handleCompare } = require("./commands/compare");
 const { handleStart } = require("./commands/start");
 const { startAddNotify, handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
+const { handleCalendar } = require("./commands/calendar");
 
 const { bonusSessions } = require("./sessions/bonusSessions");
 const heroBonusScores = require("./data/heroBonusScores.json");
@@ -334,6 +335,7 @@ client.on("messageCreate", async (message) => {
   if (command === "compare") return handleCompare(message);
   if (command === "start") return handleStart(message);
   if (command === "addnotify") return startAddNotify(message);
+  if (command === "calendar") return handleCalendar(message);
 
   // HERO COMMAND
   const hero = command;
