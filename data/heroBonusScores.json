@@ -2749,6 +2749,199 @@
       "dmgBonus": 10
     }
   }
+},
+"remram": {
+  "virgo": {
+    "label": "Best Healer",
+
+    "weapon": {
+      "atk": 6,
+      "hp": 10,
+      "hpRegen": 10,
+      "hitRate": 7,
+      "dodge": 7,
+      "hpBonus": 10,
+      "critReduction": 8,
+      "dmgReduction": 9
+    },
+
+    "armor": {
+      "atk": 6,
+      "hp": 10,
+      "hpRegen": 10,
+      "hitRate": 7,
+      "dodge": 7,
+      "hpBonus": 10,
+      "critReduction": 8,
+      "dmgReduction": 9
+    },
+
+    "helm": {
+      "atk": 5,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 7,
+      "dodge": 7,
+      "atkBonus": 6,
+      "critDmg": 1,
+      "dmgBonus": 3
+    },
+
+    "accessory": {
+      "atk": 5,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 7,
+      "dodge": 7,
+      "atkBonus": 6,
+      "critDmg": 1,
+      "dmgBonus": 3
+    }
+  },
+
+  "aquarius": {
+    "label": "Early Game Healer",
+
+    "weapon": {
+      "atk": 5,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 6,
+      "dodge": 7,
+      "hpBonus": 10,
+      "critReduction": 7,
+      "dmgReduction": 8
+    },
+
+    "armor": {
+      "atk": 5,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 6,
+      "dodge": 7,
+      "hpBonus": 10,
+      "critReduction": 7,
+      "dmgReduction": 8
+    },
+
+    "helm": {
+      "atk": 4,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 6,
+      "dodge": 7,
+      "atkBonus": 5,
+      "critDmg": 1,
+      "dmgBonus": 2
+    },
+
+    "accessory": {
+      "atk": 4,
+      "hp": 9,
+      "hpRegen": 10,
+      "hitRate": 6,
+      "dodge": 7,
+      "atkBonus": 5,
+      "critDmg": 1,
+      "dmgBonus": 2
+    }
+  },
+
+  "scorpio": {
+    "label": "Tank Healer",
+
+    "weapon": {
+      "atk": 3,
+      "hp": 10,
+      "hpRegen": 9,
+      "hitRate": 6,
+      "dodge": 8,
+      "hpBonus": 10,
+      "critReduction": 10,
+      "dmgReduction": 10
+    },
+
+    "armor": {
+      "atk": 3,
+      "hp": 10,
+      "hpRegen": 9,
+      "hitRate": 6,
+      "dodge": 8,
+      "hpBonus": 10,
+      "critReduction": 10,
+      "dmgReduction": 10
+    },
+
+    "helm": {
+      "atk": 2,
+      "hp": 10,
+      "hpRegen": 8,
+      "hitRate": 6,
+      "dodge": 8,
+      "atkBonus": 2,
+      "critDmg": 1,
+      "dmgBonus": 2
+    },
+
+    "accessory": {
+      "atk": 2,
+      "hp": 10,
+      "hpRegen": 8,
+      "hitRate": 6,
+      "dodge": 8,
+      "atkBonus": 2,
+      "critDmg": 1,
+      "dmgBonus": 2
+    }
+  },
+
+  "libra": {
+    "label": "Safe Healer",
+
+    "weapon": {
+      "atk": 4,
+      "hp": 10,
+      "hpRegen": 9,
+      "hitRate": 7,
+      "dodge": 9,
+      "hpBonus": 10,
+      "critReduction": 9,
+      "dmgReduction": 9
+    },
+
+    "armor": {
+      "atk": 4,
+      "hp": 10,
+      "hpRegen": 9,
+      "hitRate": 7,
+      "dodge": 9,
+      "hpBonus": 10,
+      "critReduction": 9,
+      "dmgReduction": 9
+    },
+
+    "helm": {
+      "atk": 3,
+      "hp": 9,
+      "hpRegen": 8,
+      "hitRate": 7,
+      "dodge": 9,
+      "atkBonus": 3,
+      "critDmg": 1,
+      "dmgBonus": 2
+    },
+
+    "accessory": {
+      "atk": 3,
+      "hp": 9,
+      "hpRegen": 8,
+      "hitRate": 7,
+      "dodge": 9,
+      "atkBonus": 3,
+      "critDmg": 1,
+      "dmgBonus": 2
+    }
+  }
 }
 }
     
