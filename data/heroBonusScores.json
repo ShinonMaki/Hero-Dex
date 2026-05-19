@@ -2942,6 +2942,247 @@
       "dmgBonus": 2
     }
   }
+},
+"sebastian": {
+  "taurus": {
+    "label": "Best Overall DPS",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 8,
+      "hpRegen": 4,
+      "hitRate": 7,
+      "dodge": 8,
+      "hpBonus": 8,
+      "critReduction": 6,
+      "dmgReduction": 8
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 8,
+      "hpRegen": 4,
+      "hitRate": 7,
+      "dodge": 8,
+      "hpBonus": 8,
+      "critReduction": 6,
+      "dmgReduction": 8
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 8,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 8,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    }
+  },
+
+  "sagittarius": {
+    "label": "On Field Burst",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 7,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 7,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 7,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 7,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    }
+  },
+
+  "cancer": {
+    "label": "High Crit Build",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 9
+    }
+  },
+
+  "capricorn": {
+    "label": "Balanced DPS",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 6,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 6,
+      "hpBonus": 6,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 8
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 8
+    }
+  },
+
+  "pisces": {
+    "label": "Anti Mage/Assassin",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    }
+  }
 }
 }
     
