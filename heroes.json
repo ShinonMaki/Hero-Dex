@@ -144,5 +144,13 @@
     ],
     "type": "Light",
     "category": "LDT Immortal Leggendary"
+  },
+  "sebastian": {
+    "from": "Black Butler, Black Butler: Book of Circus, Black Butler: Book of Murder, Black Butler: Book of the Atlantic,Black Butler: Public School Arc, Black Butler: Emerald Witch Arc",
+    "roles": [
+      "CRIT Debuff DPS"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
