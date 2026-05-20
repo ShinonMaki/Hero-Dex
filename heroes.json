@@ -160,5 +160,13 @@
     ],
     "type": "Dark",
     "category": "LTD Immortal Leggendary"
+  },
+  "sjw": {
+    "from": "Solo Leveling, Solo Leveling Arise from the Shadow, Solo Leveling: Ragnarok",
+    "roles": [
+      "Normal Attack DPS Curse"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
