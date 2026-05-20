@@ -152,5 +152,13 @@
     ],
     "type": "Dark",
     "category": "LTD Immortal Leggendary"
+  },
+  "saber": {
+    "from": "Fate/stay night: Heaven’s Feel I. presage flower, Fate/stay night: Heaven’s Feel II. lost butterfly, Fate/stay night: Heaven’s Feel III. spring song, Fate/Grand Order, Fate/Grand Order Final Singularity – Grand Temple of Time: Solomon",
+    "roles": [
+      "CC DPS Debuff"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
