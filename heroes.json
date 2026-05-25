@@ -168,5 +168,13 @@
     ],
     "type": "Dark",
     "category": "LTD Immortal Leggendary"
+  },
+  "sukuna": {
+    "from": "Jujutsu Kaisen",
+    "roles": [
+      "Burst Curse DPS"
+    ],
+    "type": "Dark",
+    "category": "LTD Immortal Leggendary"
   }
 }
