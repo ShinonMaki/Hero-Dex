@@ -3569,6 +3569,199 @@
       "dmgBonus": 10
     }
   }
+},
+"sukuna": {
+  "sagittarius": {
+    "label": "Whale Burst",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 6,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 4,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 4,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 10,
+      "dmgBonus": 10
+    }
+  },
+
+  "taurus": {
+    "label": "Sustain Curse DPS",
+
+    "weapon": {
+      "atk": 10,
+      "hp": 9,
+      "hpRegen": 4,
+      "hitRate": 7,
+      "dodge": 7,
+      "hpBonus": 9,
+      "critReduction": 6,
+      "dmgReduction": 9
+    },
+
+    "armor": {
+      "atk": 10,
+      "hp": 9,
+      "hpRegen": 4,
+      "hitRate": 7,
+      "dodge": 7,
+      "hpBonus": 9,
+      "critReduction": 6,
+      "dmgReduction": 9
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    }
+  },
+
+  "capricorn": {
+    "label": "Balanced DPS",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 6,
+      "hpBonus": 7,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 8,
+      "hpRegen": 3,
+      "hitRate": 7,
+      "dodge": 6,
+      "hpBonus": 7,
+      "critReduction": 5,
+      "dmgReduction": 7
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 9
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 6,
+      "hpRegen": 1,
+      "hitRate": 8,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 9
+    }
+  },
+
+  "pisces": {
+    "label": "Anti Mage/Assassin",
+
+    "weapon": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "armor": {
+      "atk": 9,
+      "hp": 7,
+      "hpRegen": 2,
+      "hitRate": 8,
+      "dodge": 6,
+      "hpBonus": 5,
+      "critReduction": 5,
+      "dmgReduction": 6
+    },
+
+    "helm": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    },
+
+    "accessory": {
+      "atk": 9,
+      "hp": 5,
+      "hpRegen": 1,
+      "hitRate": 9,
+      "dodge": 5,
+      "atkBonus": 10,
+      "critDmg": 9,
+      "dmgBonus": 10
+    }
+  }
 }
 }
     
