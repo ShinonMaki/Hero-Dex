@@ -736,44 +736,50 @@ client.once("clientReady", () => {
 client.on("error", console.error);
 client.on("shardError", console.error);
 
-client.on("error", console.error);
-client.on("shardError", console.error);
-
 const AUTO_ROLES = {
-  "🔴": "1511654794639704134",
-  "🔵": "1511654934506897438",
-  "🟢": "1511655002408489012"
+  "🔴": "1511654794639704134", // NA
+  "🔵": "1511654934506897438", // EU
+  "🟢": "1511655002408489012"  // RUMBLE
 };
 
-client.on("messageReactionAdd", async (reaction, user) => {
-  console.log("REACTION ADD FIRED");
+function getAutoroleData() {
+  return JSON.parse(fs.readFileSync("./autorole.json", "utf8"));
+}
 
+client.on("messageReactionAdd", async (reaction, user) => {
   if (user.bot) return;
 
-  console.log("MESSAGE ID:", reaction.message.id);
-  console.log("EXPECTED ID:", autoroleData.messageId);
+  const autoroleData = getAutoroleData();
 
   if (reaction.message.id !== autoroleData.messageId) return;
 
   try {
     const roleId = AUTO_ROLES[reaction.emoji.name];
-
-    console.log("EMOJI:", reaction.emoji.name);
-    console.log("ROLE:", roleId);
-
     if (!roleId) return;
 
     const member = await reaction.message.guild.members.fetch(user.id);
-
-    console.log("ADDING ROLE TO:", user.username);
-
     await member.roles.add(roleId);
-
-    console.log("ROLE ADDED");
   } catch (err) {
     console.error("Autorole add error:", err);
   }
 });
 
-client.login(process.env.TOKEN);
+client.on("messageReactionRemove", async (reaction, user) => {
+  if (user.bot) return;
+
+  const autoroleData = getAutoroleData();
+
+  if (reaction.message.id !== autoroleData.messageId) return;
+
+  try {
+    const roleId = AUTO_ROLES[reaction.emoji.name];
+    if (!roleId) return;
+
+    const member = await reaction.message.guild.members.fetch(user.id);
+    await member.roles.remove(roleId);
+  } catch (err) {
+    console.error("Autorole remove error:", err);
+  }
+});
+
 client.login(process.env.TOKEN);
