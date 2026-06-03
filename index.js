@@ -17,7 +17,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  StringSelectMenuBuilder
+  StringSelectMenuBuilder,
 } = require("discord.js");
 
 const { PREFIX, typeColors } = require("./config/constants");
@@ -39,6 +39,7 @@ const { startAddNotify, handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
 const { handleCalendar } = require("./commands/calendar");
 const { handleRules } = require("./commands/rules");
+const { handleAutorole } = require("./commands/autorole");
 
 const { bonusSessions } = require("./sessions/bonusSessions");
 const heroBonusScores = require("./data/heroBonusScores.json");
@@ -190,7 +191,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions
   ]
 });
 
@@ -733,4 +735,44 @@ client.once("clientReady", () => {
 client.on("error", console.error);
 client.on("shardError", console.error);
 
+client.on("error", console.error);
+client.on("shardError", console.error);
+
+const AUTO_ROLES = {
+  "🔴": "1511654794639704134",
+  "🔵": "1511654934506897438",
+  "🟢": "1511655002408489012"
+};
+
+client.on("messageReactionAdd", async (reaction, user) => {
+  if (user.bot) return;
+  if (reaction.message.id !== autoroleData.messageId) return;
+
+  try {
+    const roleId = AUTO_ROLES[reaction.emoji.name];
+    if (!roleId) return;
+
+    const member = await reaction.message.guild.members.fetch(user.id);
+    await member.roles.add(roleId);
+  } catch (err) {
+    console.error("Autorole add error:", err);
+  }
+});
+
+client.on("messageReactionRemove", async (reaction, user) => {
+  if (user.bot) return;
+  if (reaction.message.id !== autoroleData.messageId) return;
+
+  try {
+    const roleId = AUTO_ROLES[reaction.emoji.name];
+    if (!roleId) return;
+
+    const member = await reaction.message.guild.members.fetch(user.id);
+    await member.roles.remove(roleId);
+  } catch (err) {
+    console.error("Autorole remove error:", err);
+  }
+});
+
+client.login(process.env.TOKEN);
 client.login(process.env.TOKEN);
