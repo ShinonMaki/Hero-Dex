@@ -38,7 +38,7 @@ const { handleStart } = require("./commands/start");
 const { startAddNotify, handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
 const { handleCalendar } = require("./commands/calendar");
-const { handleRules } = require(”./commands/rules”);
+const { handleRules } = require("./commands/rules");
 
 const { bonusSessions } = require("./sessions/bonusSessions");
 const heroBonusScores = require("./data/heroBonusScores.json");
