@@ -746,32 +746,32 @@ const AUTO_ROLES = {
 };
 
 client.on("messageReactionAdd", async (reaction, user) => {
+  console.log("REACTION ADD FIRED");
+
   if (user.bot) return;
+
+  console.log("MESSAGE ID:", reaction.message.id);
+  console.log("EXPECTED ID:", autoroleData.messageId);
+
   if (reaction.message.id !== autoroleData.messageId) return;
 
   try {
     const roleId = AUTO_ROLES[reaction.emoji.name];
+
+    console.log("EMOJI:", reaction.emoji.name);
+    console.log("ROLE:", roleId);
+
     if (!roleId) return;
 
     const member = await reaction.message.guild.members.fetch(user.id);
+
+    console.log("ADDING ROLE TO:", user.username);
+
     await member.roles.add(roleId);
+
+    console.log("ROLE ADDED");
   } catch (err) {
     console.error("Autorole add error:", err);
-  }
-});
-
-client.on("messageReactionRemove", async (reaction, user) => {
-  if (user.bot) return;
-  if (reaction.message.id !== autoroleData.messageId) return;
-
-  try {
-    const roleId = AUTO_ROLES[reaction.emoji.name];
-    if (!roleId) return;
-
-    const member = await reaction.message.guild.members.fetch(user.id);
-    await member.roles.remove(roleId);
-  } catch (err) {
-    console.error("Autorole remove error:", err);
   }
 });
 
