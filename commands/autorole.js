@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 async function handleAutorole(message) {
+  console.log("AUTOROLE COMMAND CALLED");
   const msg = await message.channel.send(
 `## Game Version Selection
 
