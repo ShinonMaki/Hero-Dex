@@ -622,7 +622,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.customId === "guide_rename_category_select") {
       return handleRenameCategorySelect(interaction);
     }
-    
+  }   
 });
 
 function isInitialRealmPeriod() {
