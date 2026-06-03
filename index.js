@@ -598,7 +598,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.customId === "guide_rename_category_select") {
       return handleRenameCategorySelect(interaction);
     }
-    if (interaction.customId === “rules_accept”) {
+    if (interaction.customId === "rules_accept") {
 
 const member = interaction.guild.members.cache.get(
 interaction.user.id
@@ -606,22 +606,22 @@ interaction.user.id
 
 if (!member) {
 return interaction.reply({
-content: “Member not found.”,
+content: "Member not found.",
 ephemeral: true
 });
 }
 
-if (member.roles.cache.has(“1511657776139604138”)) {
+if (member.roles.cache.has("1511657776139604138")) {
 return interaction.reply({
-content: “You already have access to the server.”,
+content: "You already have access to the server.”
+  ",
 ephemeral: true
 });
 }
-
-await member.roles.add(“1511657776139604138”);
+await member.roles.add("1511657776139604138");
 
 return interaction.reply({
-content: “🎉 Welcome to the server!”,
+content: "🎉 Welcome to the server!",
 ephemeral: true
 });
 
