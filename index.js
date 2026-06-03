@@ -23,6 +23,7 @@ const {
 const { PREFIX, typeColors } = require("./config/constants");
 const { heroesData, findPdf, findImage } = require("./utils/fileUtils");
 
+
 // COMMANDS
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
@@ -37,6 +38,7 @@ const { handleStart } = require("./commands/start");
 const { startAddNotify, handleAddNotifyFlow } = require("./commands/addnotify");
 const { startNotificationRunner } = require("./utils/notificationRunner");
 const { handleCalendar } = require("./commands/calendar");
+const { handleRules } = require(”./commands/rules”);
 
 const { bonusSessions } = require("./sessions/bonusSessions");
 const heroBonusScores = require("./data/heroBonusScores.json");
@@ -336,6 +338,7 @@ client.on("messageCreate", async (message) => {
   if (command === "start") return handleStart(message);
   if (command === "addnotify") return startAddNotify(message);
   if (command === "calendar") return handleCalendar(message);
+  if (command === “rules”) return handleRules(message);
 
   // HERO COMMAND
   const hero = command;
@@ -595,6 +598,33 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.customId === "guide_rename_category_select") {
       return handleRenameCategorySelect(interaction);
     }
+    if (interaction.customId === “rules_accept”) {
+
+const member = interaction.guild.members.cache.get(
+interaction.user.id
+);
+
+if (!member) {
+return interaction.reply({
+content: “Member not found.”,
+ephemeral: true
+});
+}
+
+if (member.roles.cache.has(“1511657776139604138”)) {
+return interaction.reply({
+content: “You already have access to the server.”,
+ephemeral: true
+});
+}
+
+await member.roles.add(“1511657776139604138”);
+
+return interaction.reply({
+content: “🎉 Welcome to the server!”,
+ephemeral: true
+});
+
   }
 });
 
