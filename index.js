@@ -341,6 +341,7 @@ client.on("messageCreate", async (message) => {
   if (command === "addnotify") return startAddNotify(message);
   if (command === "calendar") return handleCalendar(message);
   if (command === "rules") return handleRules(message);
+  if (command === "autorole") return handleAutorole(message);
 
   // HERO COMMAND
   const hero = command;
