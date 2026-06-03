@@ -459,6 +459,30 @@ client.on("messageCreate", async (message) => {
 // ===== INTERACTIONS =====
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
+    if (interaction.customId === "rules_accept") {
+  const member = interaction.guild.members.cache.get(interaction.user.id);
+
+  if (!member) {
+    return interaction.reply({
+      content: "Member not found.",
+      ephemeral: true
+    });
+  }
+
+  if (member.roles.cache.has("1511657776139604138")) {
+    return interaction.reply({
+      content: "You already have access to the server.",
+      ephemeral: true
+    });
+  }
+
+  await member.roles.add("1511657776139604138");
+
+  return interaction.reply({
+    content: "Welcome to the server!",
+    ephemeral: true
+  });
+}
     if (interaction.customId.startsWith("suggestion_done_")) {
       return handleSuggestionDone(interaction);
     }
@@ -598,33 +622,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.customId === "guide_rename_category_select") {
       return handleRenameCategorySelect(interaction);
     }
-    if (interaction.customId === "rules_accept") {
-
-const member = interaction.guild.members.cache.get(
-interaction.user.id
-);
-
-if (!member) {
-return interaction.reply({
-content: "Member not found.",
-ephemeral: true
-});
-}
-
-if (member.roles.cache.has("1511657776139604138")) {
-return interaction.reply({
-content: "You already have access to the server.",
-ephemeral: true
-});
-}
-await member.roles.add("1511657776139604138");
-
-return interaction.reply({
-content: "🎉 Welcome to the server!",
-ephemeral: true
-});
-
-  }
+    
 });
 
 function isInitialRealmPeriod() {
