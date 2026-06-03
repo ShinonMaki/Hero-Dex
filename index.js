@@ -613,7 +613,7 @@ ephemeral: true
 
 if (member.roles.cache.has("1511657776139604138")) {
 return interaction.reply({
-content: "You already have access to the server.”,
+content: "You already have access to the server.",
 ephemeral: true
 });
 }
