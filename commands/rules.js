@@ -8,7 +8,7 @@ const {
 async function handleRules(message) {
   const embed = new EmbedBuilder()
     .setColor(0xFF2D95)
-    .setTitle("📜 Rules & Community Guidelines")
+    .setTitle("Rules & Community Guidelines")
     .setDescription(`
 Welcome to the server!
 
@@ -46,7 +46,7 @@ All members must comply with Discord's Terms of Service and Community Guidelines
 
 Staff members are here to keep the community healthy and organized. Please respect their decisions.
 
-🤝 **About This Community**
+ **About This Community**
 
 This server was created to help players, share knowledge, and build a friendly community around the game.
 
