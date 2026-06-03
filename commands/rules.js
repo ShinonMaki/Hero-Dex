@@ -9,8 +9,8 @@ async function handleRules(message) {
   const embed = new EmbedBuilder()
     .setColor(0xFF2D95)
     .setTitle("📜 Rules & Community Guidelines")
-    .setDescription(
-`Welcome to the server!
+    .setDescription(`
+Welcome to the server!
 
 To ensure a friendly and enjoyable environment for everyone, please follow these rules:
 
@@ -62,8 +62,8 @@ Please remember that all guides, tier lists, and updates are maintained by staff
 
 By joining this community, you agree to contribute positively and help maintain a respectful environment for everyone.
 
-Click ✅ below to accept these terms and gain access to the server.`
-    );
+Click ✅ below to accept these terms and gain access to the server.
+`);
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
