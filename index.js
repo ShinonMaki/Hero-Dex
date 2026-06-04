@@ -291,13 +291,7 @@ function getCommandChannelRestriction(context) {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  const channelRestriction = getCommandChannelRestriction(message);
-
-  if (channelRestriction) {
-    return message.reply(channelRestriction);
-  }
-
-  // ===== BONUS BUILD FLOW =====
+    // ===== BONUS BUILD FLOW =====
   const bonusSession = bonusSessions.get(message.author.id);
 
   if (bonusSession?.step === "hero") {
@@ -335,6 +329,12 @@ client.on("messageCreate", async (message) => {
   }
 
   if (await handleSuggestionMessage(message)) return;
+
+  const channelRestriction = getCommandChannelRestriction(message);
+
+  if (channelRestriction) {
+    return message.reply(channelRestriction);
+  }
 
   if (await handleAddHeroFlow(message)) return;
   if (await handleDeleteHeroFlow(message)) return;
