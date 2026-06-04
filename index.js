@@ -12,6 +12,7 @@ app.use(express.json());
 const {
   Client,
   GatewayIntentBits,
+  Partials,
   EmbedBuilder,
   AttachmentBuilder,
   ActionRowBuilder,
@@ -199,6 +200,11 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions
+  ],
+  partials: [
+    Partials.Message,
+    Partials.Channel,
+    Partials.Reaction
   ]
 });
 
@@ -291,7 +297,7 @@ function getCommandChannelRestriction(context) {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-    // ===== BONUS BUILD FLOW =====
+  // ===== BONUS BUILD FLOW =====
   const bonusSession = bonusSessions.get(message.author.id);
 
   if (bonusSession?.step === "hero") {
@@ -330,12 +336,6 @@ client.on("messageCreate", async (message) => {
 
   if (await handleSuggestionMessage(message)) return;
 
-  const channelRestriction = getCommandChannelRestriction(message);
-
-  if (channelRestriction) {
-    return message.reply(channelRestriction);
-  }
-
   if (await handleAddHeroFlow(message)) return;
   if (await handleDeleteHeroFlow(message)) return;
   if (await handleEditHeroFlow(message)) return;
@@ -345,6 +345,12 @@ client.on("messageCreate", async (message) => {
   if (await handleAddNotifyFlow(message)) return;
 
   if (!message.content.startsWith(PREFIX)) return;
+
+  const channelRestriction = getCommandChannelRestriction(message);
+
+  if (channelRestriction) {
+    return message.reply(channelRestriction);
+  }
 
   const args = message.content.slice(1).trim().split(/\s+/);
   const command = args.shift()?.toLowerCase();
@@ -776,13 +782,17 @@ function getAutoroleData() {
 }
 
 client.on("messageReactionAdd", async (reaction, user) => {
-  if (user.bot) return;
-
-  const autoroleData = getAutoroleData();
-
-  if (reaction.message.id !== autoroleData.messageId) return;
-
   try {
+    if (reaction.partial) {
+      await reaction.fetch();
+    }
+
+    if (user.bot) return;
+
+    const autoroleData = getAutoroleData();
+
+    if (reaction.message.id !== autoroleData.messageId) return;
+
     const roleId = AUTO_ROLES[reaction.emoji.name];
     if (!roleId) return;
 
@@ -794,13 +804,17 @@ client.on("messageReactionAdd", async (reaction, user) => {
 });
 
 client.on("messageReactionRemove", async (reaction, user) => {
-  if (user.bot) return;
-
-  const autoroleData = getAutoroleData();
-
-  if (reaction.message.id !== autoroleData.messageId) return;
-
   try {
+    if (reaction.partial) {
+      await reaction.fetch();
+    }
+
+    if (user.bot) return;
+
+    const autoroleData = getAutoroleData();
+
+    if (reaction.message.id !== autoroleData.messageId) return;
+
     const roleId = AUTO_ROLES[reaction.emoji.name];
     if (!roleId) return;
 
