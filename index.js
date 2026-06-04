@@ -23,7 +23,6 @@ const {
 const { PREFIX, typeColors } = require("./config/constants");
 const { heroesData, findPdf, findImage } = require("./utils/fileUtils");
 
-
 // COMMANDS
 const { handleHeroes } = require("./commands/heroes");
 const { handleTierlist } = require("./commands/tierlist");
@@ -95,6 +94,13 @@ const EVENT_ROLE_ID = "1470141312308216080";
 
 const RESTRICTED_GUILD_ID = "1434845553815982104";
 const ALLOWED_COMMAND_CHANNEL_ID = "1501588339776815144";
+
+const NEW_RESTRICTED_GUILD_ID = "1511651014153867284";
+const NEW_ALLOWED_COMMAND_CHANNEL_ID = "1511654393781420032";
+const NEW_ALLOWED_ROLE_IDS = [
+  "1511651222652846233",
+  "1512113425105293322"
+];
 
 // ===== BONUS HELPERS =====
 const bonusNames = {
@@ -258,18 +264,38 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`Web server attivo sulla porta ${PORT}`);
 });
 
-function isWrongCommandChannel(context) {
-  return (
+function getCommandChannelRestriction(context) {
+  if (
     context.guild?.id === RESTRICTED_GUILD_ID &&
     context.channel?.id !== ALLOWED_COMMAND_CHANNEL_ID
-  );
+  ) {
+    return `<#${ALLOWED_COMMAND_CHANNEL_ID}> Use the bot commands in this channel.`;
+  }
+
+  if (context.guild?.id === NEW_RESTRICTED_GUILD_ID) {
+    const member = context.member;
+
+    const hasAllowedRole = NEW_ALLOWED_ROLE_IDS.some(roleId =>
+      member?.roles?.cache?.has(roleId)
+    );
+
+    if (!hasAllowedRole && context.channel?.id !== NEW_ALLOWED_COMMAND_CHANNEL_ID) {
+      return "Dumbass, you can only use bot commands in this channel:\nhttps://discord.com/channels/1511651014153867284/1511654393781420032";
+    }
+  }
+
+  return null;
 }
 
 // ===== MESSAGE HANDLER =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  if (isWrongCommandChannel(message)) return;
+  const channelRestriction = getCommandChannelRestriction(message);
+
+  if (channelRestriction) {
+    return message.reply(channelRestriction);
+  }
 
   // ===== BONUS BUILD FLOW =====
   const bonusSession = bonusSessions.get(message.author.id);
@@ -463,38 +489,41 @@ client.on("messageCreate", async (message) => {
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
     if (interaction.customId === "rules_accept") {
-  const member = interaction.guild.members.cache.get(interaction.user.id);
+      const member = interaction.guild.members.cache.get(interaction.user.id);
 
-  if (!member) {
-    return interaction.reply({
-      content: "Member not found.",
-      ephemeral: true
-    });
-  }
+      if (!member) {
+        return interaction.reply({
+          content: "Member not found.",
+          ephemeral: true
+        });
+      }
 
-  if (member.roles.cache.has("1511657776139604138")) {
-    return interaction.reply({
-      content: "You already have access to the server.",
-      ephemeral: true
-    });
-  }
+      if (member.roles.cache.has("1511657776139604138")) {
+        return interaction.reply({
+          content: "You already have access to the server.",
+          ephemeral: true
+        });
+      }
 
-  await member.roles.add("1511657776139604138");
+      await member.roles.add("1511657776139604138");
 
-  return interaction.reply({
-    content: "Welcome to the server! The command bot is: .start",
-    ephemeral: true
-  });
-}
+      return interaction.reply({
+        content: "Welcome to the server! The command bot is: .start",
+        ephemeral: true
+      });
+    }
+
     if (interaction.customId.startsWith("suggestion_done_")) {
       return handleSuggestionDone(interaction);
     }
   }
 
-  if (isWrongCommandChannel(interaction)) {
+  const interactionRestriction = getCommandChannelRestriction(interaction);
+
+  if (interactionRestriction) {
     if (interaction.isRepliable()) {
       return interaction.reply({
-        content: `<#${ALLOWED_COMMAND_CHANNEL_ID}> Use the bot commands in this channel.`,
+        content: interactionRestriction,
         ephemeral: true
       }).catch(() => {});
     }
@@ -625,7 +654,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.customId === "guide_rename_category_select") {
       return handleRenameCategorySelect(interaction);
     }
-  }   
+  }
 });
 
 function isInitialRealmPeriod() {
@@ -737,9 +766,9 @@ client.on("error", console.error);
 client.on("shardError", console.error);
 
 const AUTO_ROLES = {
-  "🔴": "1511654794639704134", // NA
-  "🔵": "1511654934506897438", // EU
-  "🟢": "1511655002408489012"  // RUMBLE
+  "🔴": "1511654794639704134",
+  "🔵": "1511654934506897438",
+  "🟢": "1511655002408489012"
 };
 
 function getAutoroleData() {
