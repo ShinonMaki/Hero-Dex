@@ -482,7 +482,7 @@ client.on("interactionCreate", async (interaction) => {
   await member.roles.add("1511657776139604138");
 
   return interaction.reply({
-    content: "Welcome to the server!",
+    content: "Welcome to the server! The command bot is: .start",
     ephemeral: true
   });
 }
