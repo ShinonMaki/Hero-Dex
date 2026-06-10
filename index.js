@@ -204,7 +204,8 @@ const client = new Client({
   partials: [
     Partials.Message,
     Partials.Channel,
-    Partials.Reaction
+    Partials.Reaction,
+    Partials.User
   ]
 });
 
@@ -807,6 +808,9 @@ client.on("messageReactionRemove", async (reaction, user) => {
   try {
     if (reaction.partial) {
       await reaction.fetch();
+    }
+    if (user.partial) {
+      await user.fetch();
     }
 
     if (user.bot) return;
